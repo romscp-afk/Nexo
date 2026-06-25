@@ -128,7 +128,11 @@ export function scanImports(environment: ScanEnvironment): {
   async function scan() {
     const entries = await computeEntries(environment)
     if (!entries.length) {
-      if (!config.optimizeDeps.entries && !config.optimizeDeps.include) {
+      if (
+        !config.optimizeDeps.entries &&
+        !config.optimizeDeps.include &&
+        !config.input
+      ) {
         environment.logger.warn(
           colors.yellow(
             '(!) Could not auto-determine entry point from rolldownOptions or html files ' +
@@ -196,12 +200,17 @@ async function computeEntries(environment: ScanEnvironment) {
   let entries: string[] = []
 
   const explicitEntryPatterns = environment.config.optimizeDeps.entries
-  const buildInput = environment.config.build.rolldownOptions.input
+  const buildInput =
+    environment.config.input ?? environment.config.build.rolldownOptions.input
 
   if (explicitEntryPatterns) {
     entries = await globEntries(explicitEntryPatterns, environment)
   } else if (buildInput) {
     const resolvePath = async (p: string) => {
+      if (environment.config.input) {
+        // input is already resolved in resolveConfig
+        return p
+      }
       // rollup resolves the input from process.cwd()
       const id = (
         await environment.pluginContainer.resolveId(
