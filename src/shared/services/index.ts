@@ -1,5 +1,2 @@
-/**
- * Service layer — Sprint 2+
- * UI and hooks must not import supabase directly; use services here.
- */
-export {}
+export { authService } from './authService'
+export type { AuthResult } from './authService'
