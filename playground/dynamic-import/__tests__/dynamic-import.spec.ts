@@ -123,6 +123,37 @@ test('should load dynamic import with css in package', async () => {
   await expect.poll(() => getColor('.pkg-css')).toBe('blue')
 })
 
+test.runIf(isBuild)(
+  'should preload css for nested dynamic imports',
+  async () => {
+    const js = findAssetFile(/index-[-\w]{8}\.js$/) ?? ''
+    const innerPreload = js.match(
+      /import\([^)]*issue-22700-b-[-\w]+\.js[^)]*\)[\s\S]*?(,\[\]\)|__vite__mapDeps)/,
+    )?.[1]
+    expect(innerPreload).toBe(',[])')
+
+    await page.click('.issue-22700')
+    await expect
+      .poll(() => page.textContent('.issue-22700-result'))
+      .toMatch('nested dynamic import with css')
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          Array.from(
+            document.querySelectorAll<HTMLLinkElement>(
+              'link[rel="stylesheet"]',
+            ),
+            (link) => link.href,
+          ).some((href) => /issue-22700-a-[-\w]+\.css$/.test(href)),
+        ),
+      )
+      .toBe(true)
+    await expect
+      .poll(() => getColor('.issue-22700-result'))
+      .toBe('rgb(12, 34, 56)')
+  },
+)
+
 test('should work with load ../ and itself directory', async () => {
   await expect
     .poll(() => page.textContent('.dynamic-import-self'))
