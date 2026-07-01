@@ -214,7 +214,11 @@ CREATE TRIGGER reviews_update_provider_rating
 -- ─── Trigger: signup → profile (+ provider row) ─────────────────────────────
 
 CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
   assigned_role user_role;
   meta_role TEXT;
@@ -252,7 +256,12 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+GRANT EXECUTE ON FUNCTION handle_new_user() TO service_role;
+GRANT EXECUTE ON FUNCTION handle_new_user() TO supabase_auth_admin;
+GRANT INSERT ON public.profiles TO supabase_auth_admin;
+GRANT INSERT ON public.providers TO supabase_auth_admin;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

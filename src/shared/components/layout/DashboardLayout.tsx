@@ -7,9 +7,21 @@ import { cn } from '@/shared/lib/utils'
 type NavItem = { to: string; label: string }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
-  customer: [{ to: '/dashboard', label: 'Dashboard' }],
-  provider: [{ to: '/provider', label: 'Dashboard' }],
-  admin: [{ to: '/admin', label: 'Dashboard' }],
+  customer: [
+    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/dashboard/bookings', label: 'My bookings' },
+  ],
+  provider: [
+    { to: '/provider', label: 'Dashboard' },
+    { to: '/provider/bookings', label: 'Bookings' },
+    { to: '/provider/profile', label: 'Profile' },
+  ],
+  admin: [
+    { to: '/admin', label: 'Dashboard' },
+    { to: '/admin/users', label: 'Users' },
+    { to: '/admin/providers', label: 'Providers' },
+    { to: '/admin/bookings', label: 'Bookings' },
+  ],
 }
 
 type DashboardLayoutProps = {
@@ -24,9 +36,11 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
 
   const nav = NAV_BY_ROLE[role]
 
+  const isActive = (to: string) =>
+    location.pathname === to || location.pathname.startsWith(`${to}/`)
+
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* Sidebar — desktop */}
       <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white md:block">
         <div className="flex h-14 items-center border-b border-slate-200 px-4 font-semibold text-teal-700">
           {APP_NAME}
@@ -38,7 +52,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               to={item.to}
               className={cn(
                 'block rounded-lg px-3 py-2 text-sm font-medium',
-                location.pathname === item.to
+                isActive(item.to)
                   ? 'bg-teal-50 text-teal-700'
                   : 'text-slate-600 hover:bg-slate-100',
               )}
@@ -52,7 +66,6 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </nav>
       </aside>
 
-      {/* Sidebar — mobile drawer */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
@@ -79,7 +92,6 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </div>
       )}
 
-      {/* Main */}
       <div className="flex flex-1 flex-col">
         <header className="flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4">
           <button className="md:hidden" onClick={toggleSidebar} aria-label="Open menu">

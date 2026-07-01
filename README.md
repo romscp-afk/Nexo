@@ -107,6 +107,38 @@ npx supabase db push
 
 ## Next sprint
 
-- **Sprint 3:** Catalog & provider listing UI
-- **Sprint 4:** Booking flow
-- **Sprint 5:** Dashboards & admin tools
+- **Sprint 3:** Catalog & provider listing UI ✅
+- **Sprint 4:** Booking flow ✅
+- **Sprint 5:** Dashboards & admin tools ✅
+
+### Sprint 5 — Dashboards, reviews & admin
+
+| Path | Role | Description |
+|------|------|-------------|
+| `/provider/profile` | Provider | Edit business profile |
+| `/dashboard/bookings/:id` | Customer | Leave review on completed booking |
+| `/admin` | Admin | Platform stats + recent bookings |
+| `/admin/users` | Admin | Activate / deactivate users |
+| `/admin/providers` | Admin | Verify / unverify providers |
+| `/admin/bookings` | Admin | All bookings table |
+
+**Services:** `reviewService`, `adminService` (stats, user/provider moderation, audit logging via `log_audit_action` RPC).
+
+### Sprint 4 — Booking routes
+
+| Path | Role | Description |
+|------|------|-------------|
+| `/providers/:id/book` | Customer | Book a provider |
+| `/dashboard` | Customer | Booking overview |
+| `/dashboard/bookings/:id` | Customer | View / cancel booking |
+| `/provider` | Provider | Job overview |
+| `/provider/bookings/:id` | Provider | Confirm / complete job |
+
+### Sprint 3 routes
+
+| Path | Description |
+|------|-------------|
+| `/services` | All service categories |
+| `/services/:slug` | Category detail + services |
+| `/providers` | Provider listing with filters |
+| `/providers/:id` | Provider profile |

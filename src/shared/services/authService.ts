@@ -3,10 +3,20 @@ import { supabase } from '@/shared/lib/supabase'
 import { parseRole, type UserRole } from '@/shared/lib/constants'
 import { mapProfileRow, type UserProfile } from '@/shared/types/database'
 import type { SignUpInput } from '@/shared/types/auth'
+import { formatAuthError } from '@/shared/lib/authErrors'
 
 export type AuthResult<T = void> = {
   data: T
   error: string | null
+}
+
+function isMissingProfilesTable(error: string | null | undefined): boolean {
+  if (!error) return false
+  return (
+    error.includes("Could not find the table 'public.profiles'") ||
+    error.includes('relation "public.profiles" does not exist') ||
+    error.includes('PGRST205')
+  )
 }
 
 function mapAuthUser(user: User, profile: UserProfile | null) {
@@ -34,7 +44,7 @@ export const authService = {
     })
 
     if (error) {
-      return { data: { needsEmailConfirmation: false }, error: error.message }
+      return { data: { needsEmailConfirmation: false }, error: formatAuthError(error) }
     }
 
     const needsEmailConfirmation = !data.session && Boolean(data.user)
@@ -48,7 +58,7 @@ export const authService = {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      return { data: null, error: error.message }
+      return { data: null, error: formatAuthError(error) }
     }
 
     if (!data.user) {
@@ -73,7 +83,7 @@ export const authService = {
     const { data, error } = await supabase.auth.getSession()
 
     if (error) {
-      return { data: null, error: error.message }
+      return { data: null, error: formatAuthError(error) }
     }
 
     if (!data.session?.user) {
@@ -94,6 +104,9 @@ export const authService = {
       .maybeSingle()
 
     if (error) {
+      if (isMissingProfilesTable(error.message)) {
+        return { data: null, error: null }
+      }
       return { data: null, error: error.message }
     }
 
@@ -106,7 +119,7 @@ export const authService = {
   async resolveAuthUser(user: User): Promise<AuthResult<ReturnType<typeof mapAuthUser>>> {
     const profileResult = await authService.getUserProfile(user.id)
 
-    if (profileResult.error) {
+    if (profileResult.error && !isMissingProfilesTable(profileResult.error)) {
       return { data: mapAuthUser(user, null), error: profileResult.error }
     }
 

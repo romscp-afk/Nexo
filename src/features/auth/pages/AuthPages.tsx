@@ -1,8 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { getDashboardPath, ROLES } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
+import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
+
+function DatabaseSetupBanner() {
+  const [ready, setReady] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (!env.isConfigured) return
+    void isDatabaseReady().then(setReady)
+  }, [])
+
+  if (!env.isConfigured || ready !== false) return null
+
+  return (
+    <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-900">
+      <p className="font-medium">Database schema not applied yet</p>
+      <p className="mt-1">
+        Run <code className="text-xs">node scripts/apply-schema.mjs</code> or paste{' '}
+        <code className="text-xs">supabase/schema.sql</code> in the{' '}
+        <a href={getSqlEditorUrl()} target="_blank" rel="noreferrer" className="underline">
+          Supabase SQL Editor
+        </a>
+        . Register/login will fail until this is done.
+      </p>
+    </div>
+  )
+}
 
 function ConfigBanner() {
   if (env.isConfigured) return null
@@ -41,6 +67,7 @@ export function LoginPage() {
       <p className="mt-1 text-sm text-slate-500">Sign in with your Nexo account</p>
 
       <ConfigBanner />
+      <DatabaseSetupBanner />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {error && (
@@ -139,6 +166,7 @@ export function RegisterPage() {
       <p className="mt-1 text-sm text-slate-500">Join Nexo as a customer or service provider</p>
 
       <ConfigBanner />
+      <DatabaseSetupBanner />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {error && (

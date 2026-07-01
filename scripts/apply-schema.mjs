@@ -8,7 +8,11 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import dns from 'node:dns'
 import pg from 'pg'
+
+// Supabase direct DB host is IPv6-only; prefer IPv6 when resolving hostnames.
+dns.setDefaultResultOrder('ipv6first')
 
 const root = dirname(fileURLToPath(import.meta.url))
 const envPath = join(root, '..', '.env')
@@ -43,6 +47,27 @@ const poolerUrl =
   process.env.SUPABASE_POOLER_URL
 
 const candidates = [connectionString, poolerUrl].filter(Boolean)
+
+const poolerRegions = [
+  'ap-southeast-1',
+  'ap-southeast-2',
+  'ap-northeast-1',
+  'ap-south-1',
+  'us-east-1',
+  'us-west-1',
+  'eu-west-1',
+  'eu-central-1',
+]
+
+for (const aws of ['aws-0', 'aws-1']) {
+  for (const region of poolerRegions) {
+    for (const port of [6543, 5432]) {
+      candidates.push(
+        `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@${aws}-${region}.pooler.supabase.com:${port}/postgres`,
+      )
+    }
+  }
+}
 
 const sql = readFileSync(join(root, '..', 'supabase', 'schema.sql'), 'utf8')
 

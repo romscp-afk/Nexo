@@ -1,7 +1,10 @@
 import { Link, Outlet } from 'react-router-dom'
-import { APP_NAME } from '@/shared/lib/constants'
+import { APP_NAME, getDashboardPath } from '@/shared/lib/constants'
+import { useAuth } from '@/features/auth/context/AuthProvider'
 
 export function AppLayout() {
+  const { user } = useAuth()
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -9,13 +12,33 @@ export function AppLayout() {
           <Link to="/" className="font-semibold text-teal-700">
             {APP_NAME}
           </Link>
-          <nav className="flex gap-4 text-sm">
-            <Link to="/login" className="text-slate-600 hover:text-teal-700">
-              Log in
+          <nav className="flex items-center gap-4 text-sm">
+            <Link to="/services" className="text-slate-600 hover:text-teal-700">
+              Services
             </Link>
-            <Link to="/register" className="text-slate-600 hover:text-teal-700">
-              Register
+            <Link to="/providers" className="text-slate-600 hover:text-teal-700">
+              Providers
             </Link>
+            {user ? (
+              <Link
+                to={getDashboardPath(user.role)}
+                className="rounded-lg bg-teal-700 px-3 py-1.5 font-medium text-white hover:bg-teal-800"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-slate-600 hover:text-teal-700">
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  className="rounded-lg bg-teal-700 px-3 py-1.5 font-medium text-white hover:bg-teal-800"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -23,7 +46,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} {APP_NAME} · Sprint 1 Foundation
+        © {new Date().getFullYear()} {APP_NAME} · Singapore home services marketplace
       </footer>
     </div>
   )

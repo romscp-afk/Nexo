@@ -1,2 +1,7 @@
 export { authService } from './authService'
 export type { AuthResult } from './authService'
+export { categoryService } from './categoryService'
+export { providerService } from './providerService'
+export { bookingService } from './bookingService'
+export { reviewService } from './reviewService'
+export { adminService } from './adminService'
