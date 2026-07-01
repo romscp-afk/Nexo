@@ -35,19 +35,42 @@ if (!password) {
 
 const connectionString =
   env('SUPABASE_DB_URL') ??
+  process.env.SUPABASE_DB_URL ??
   `postgresql://postgres:${encodeURIComponent(password)}@db.${projectRef}.supabase.co:5432/postgres`
 
-const sql = readFileSync(join(root, '..', 'supabase', 'schema.sql'), 'utf8')
-const client = new pg.Client({ connectionString, ssl: { rejectUnauthorized: false } })
+const poolerUrl =
+  env('SUPABASE_POOLER_URL') ??
+  process.env.SUPABASE_POOLER_URL
 
-try {
-  await client.connect()
-  console.log('Connected. Applying schema…')
-  await client.query(sql)
-  console.log('Schema applied successfully.')
-} catch (err) {
-  console.error('Schema apply failed:', err.message)
-  process.exit(1)
-} finally {
-  await client.end()
+const candidates = [connectionString, poolerUrl].filter(Boolean)
+
+const sql = readFileSync(join(root, '..', 'supabase', 'schema.sql'), 'utf8')
+
+let lastError = null
+for (const url of candidates) {
+  const client = new pg.Client({
+    connectionString: url,
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 15000,
+  })
+  try {
+    await client.connect()
+    console.log('Connected. Applying schema…')
+    await client.query(sql)
+    console.log('Schema applied successfully.')
+    await client.end()
+    process.exit(0)
+  } catch (err) {
+    lastError = err
+    console.error(`Connection failed (${url.split('@')[1] ?? url}):`, err.message)
+    try {
+      await client.end()
+    } catch {}
+  }
 }
+
+console.error('\nCould not connect to Postgres.')
+console.error('Copy the URI from Supabase Dashboard → Project Settings → Database')
+console.error('and set SUPABASE_DB_URL in .env, then rerun this script.')
+console.error('Or paste supabase/schema.sql into the SQL Editor and run it there.')
+if (lastError) process.exit(1)
