@@ -64,12 +64,25 @@ Optional seed data:
 
 **Demo accounts** (password `Demo1234!` for all):
 
-| Email | Role | Notes |
-|-------|------|-------|
-| `customer.demo@nexo.sg` | Customer | Tampines address pre-filled |
-| `cleanpro@nexo.sg` | Provider | Cleaning · East SG · from $45 |
-| `handyman.sg@nexo.sg` | Provider | Handyman · West/Central · from $65 |
-| `aircool@nexo.sg` | Provider | Aircon · North/Central · from $50 |
+| Email | Role | Category | Areas | From |
+|-------|------|----------|-------|------|
+| `customer.demo@nexo.sg` | Customer | — | Tampines (address saved) | — |
+| `cleanpro@nexo.sg` | Provider | Cleaning | Tampines, Bedok, East | $45 |
+| `swiftmove@nexo.sg` | Provider | Movers | Tampines, Bedok, East | $120 |
+| `pipefix@nexo.sg` | Provider | Plumbing | Tampines, Bedok, Central | $75 |
+| `handyman.sg@nexo.sg` | Provider | Handyman | Jurong, Clementi, CBD | $65 |
+| `aircool@nexo.sg` | Provider | Aircon | North, Central | $50 |
+
+**Pre-loaded for `customer.demo@nexo.sg`:** 1 completed booking + review, 1 confirmed move, 1 in-progress plumbing job, plus notifications.
+
+**End-to-end test flow:**
+
+1. Run SQL in order: `schema.sql` → `seed.sql` → `add-profile-location.sql` → `fix-auth-trigger.sql` → `add-booking-notifications.sql` → `seed-demo.sql`
+2. Log in as **customer.demo@nexo.sg** → `/dashboard` (see bookings & notifications)
+3. `/providers` → filter **Tampines** → book **CleanPro SG** (new pending booking)
+4. Log out → log in as **cleanpro@nexo.sg** → confirm the new booking
+5. Log in as **pipefix@nexo.sg** → mark in-progress plumbing job **completed**
+6. Back as customer → leave review on completed plumbing job
 
 **Admin setup:** Edit `nexo_admin_emails()` in `schema.sql` before running, or update the function in SQL Editor with your admin email before first admin signup.
 

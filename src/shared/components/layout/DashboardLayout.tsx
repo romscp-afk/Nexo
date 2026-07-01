@@ -4,12 +4,14 @@ import { APP_NAME, type UserRole } from '@/shared/lib/constants'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
+import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 
 type NavItem = { to: string; label: string; exact?: boolean; badge?: boolean }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   customer: [
     { to: '/dashboard', label: 'Dashboard', exact: true },
+    { to: '/providers', label: 'Browse providers' },
     { to: '/dashboard/bookings', label: 'My bookings' },
     { to: '/dashboard/reviews', label: 'My reviews' },
     { to: '/dashboard/notifications', label: 'Notifications', badge: true },
@@ -22,9 +24,11 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   ],
   admin: [
     { to: '/admin', label: 'Dashboard', exact: true },
+    { to: '/admin/payments', label: 'PayNow payments' },
+    { to: '/admin/activity', label: 'Activity log' },
+    { to: '/admin/bookings', label: 'Bookings' },
     { to: '/admin/users', label: 'Users' },
     { to: '/admin/providers', label: 'Providers' },
-    { to: '/admin/bookings', label: 'Bookings' },
   ],
 }
 
@@ -94,6 +98,9 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
           <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-teal-700">
             ← Back to site
           </Link>
+          <div className="mt-2 border-t border-slate-100 pt-2">
+            <LogoutButton variant="sidebar" />
+          </div>
         </nav>
       </aside>
 
@@ -117,6 +124,9 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
                   onNavigate={() => setSidebarOpen(false)}
                 />
               ))}
+              <div className="mt-4 border-t border-slate-100 pt-2">
+                <LogoutButton variant="sidebar" onLogout={() => setSidebarOpen(false)} />
+              </div>
             </nav>
           </aside>
         </div>
@@ -128,6 +138,9 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             <Menu className="h-5 w-5 text-slate-600" />
           </button>
           <span className="text-sm capitalize text-slate-500">{role} portal</span>
+          <div className="ml-auto">
+            <LogoutButton />
+          </div>
         </header>
         <main className="flex-1 p-6">
           <Outlet />

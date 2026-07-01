@@ -31,4 +31,6 @@ FROM service_categories
 ON CONFLICT (category_id, slug) DO NOTHING;
 
 -- Demo providers with locations, prices, and a sample customer:
--- Run supabase/seed-demo.sql after this file.
+--   seed-sample-provider.sql — one provider (provider.demo@nexo.sg)
+--   seed-demo.sql — full demo set (customer + 5 providers + bookings)
+-- Marketplace + PayNow/Cash: run add-marketplace.sql after add-payments.sql

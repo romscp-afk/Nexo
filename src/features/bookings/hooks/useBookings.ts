@@ -49,6 +49,8 @@ export function useCreateBooking() {
       void queryClient.invalidateQueries({ queryKey: ['bookings'] })
       void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
       void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['payments', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['payment', data.id] })
       void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
   })
@@ -66,7 +68,10 @@ export function useUpdateBookingStatus() {
       void queryClient.invalidateQueries({ queryKey: ['bookings'] })
       void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
       void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['payments', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['payment', data.id] })
       void queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
     },
   })
 }
@@ -97,5 +102,35 @@ export function useBookingStatusHistory(bookingId: string) {
       return data
     },
     enabled: Boolean(bookingId),
+  })
+}
+
+export function useOpenProviderRequests() {
+  return useQuery({
+    queryKey: ['bookings', 'open'],
+    queryFn: async () => {
+      const { data, error } = await bookingService.listOpenForProvider()
+      if (error) throw new Error(error)
+      return data
+    },
+  })
+}
+
+export function useAcceptBooking() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await bookingService.acceptOpenBooking(id)
+      if (error) throw new Error(error)
+      if (!data) throw new Error('Accept failed')
+      return data
+    },
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['payments', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
+    },
   })
 }

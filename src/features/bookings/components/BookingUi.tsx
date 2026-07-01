@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Booking, BookingStatus } from '@/shared/types/booking'
 import { BOOKING_STATUS_LABELS } from '@/shared/types/booking'
+import { PaymentMethodBadge } from '@/features/bookings/components/PaymentMethodBadge'
 import { cn, formatCurrency, formatDateTime } from '@/shared/lib/utils'
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
@@ -27,20 +28,28 @@ export function BookingStatusBadge({ status }: { status: BookingStatus }) {
 export function BookingCard({
   booking,
   detailPath,
+  showPaymentMethod,
 }: {
   booking: Booking
   detailPath: string
+  showPaymentMethod?: boolean
 }) {
   return (
     <Link
       to={detailPath}
-      className="block rounded-xl border border-slate-200 bg-white p-5 transition hover:border-teal-200 hover:shadow-sm"
+      className={cn(
+        'block rounded-xl border bg-white p-5 transition hover:shadow-sm',
+        booking.paymentMethod === 'cash' ? 'border-amber-300 hover:border-amber-400' : 'border-slate-200 hover:border-teal-200',
+      )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-medium text-slate-900">
-            {booking.serviceName ?? 'Service'} · {booking.providerName ?? 'Provider'}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-medium text-slate-900">
+              {booking.serviceName ?? 'Service'} · {booking.providerName ?? 'Open request'}
+            </p>
+            {showPaymentMethod && <PaymentMethodBadge method={booking.paymentMethod} />}
+          </div>
           <p className="mt-1 text-sm text-slate-600">{formatDateTime(booking.scheduledAt)}</p>
           <p className="mt-1 text-xs text-slate-500">
             {booking.addressLine1}, {booking.postalCode}
@@ -63,10 +72,12 @@ export function BookingList({
   bookings,
   detailPathPrefix,
   emptyMessage,
+  showPaymentMethod,
 }: {
   bookings: Booking[]
   detailPathPrefix: string
   emptyMessage: string
+  showPaymentMethod?: boolean
 }) {
   if (bookings.length === 0) {
     return (
@@ -83,6 +94,7 @@ export function BookingList({
           key={booking.id}
           booking={booking}
           detailPath={`${detailPathPrefix}/${booking.id}`}
+          showPaymentMethod={showPaymentMethod}
         />
       ))}
     </div>

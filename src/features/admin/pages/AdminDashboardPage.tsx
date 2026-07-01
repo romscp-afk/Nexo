@@ -32,7 +32,9 @@ export function AdminDashboardPage() {
             <StatCard label="Total bookings" value={stats.totalBookings} />
             <StatCard label="Pending bookings" value={stats.pendingBookings} />
             <StatCard label="Completed" value={stats.completedBookings} />
-            <StatCard label="Revenue (completed)" value={formatCurrency(stats.totalRevenue)} />
+            <StatCard label="PayNow received" value={formatCurrency(stats.totalRevenue)} />
+            <StatCard label="Pending payments" value={stats.pendingPayments} />
+            <StatCard label="Paid bookings" value={stats.paidPayments} />
           </div>
         )}
       </QueryState>
@@ -77,7 +79,19 @@ export function AdminDashboardPage() {
         </div>
       </section>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          to="/admin/payments"
+          className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-medium text-teal-800 hover:bg-teal-100"
+        >
+          PayNow payments →
+        </Link>
+        <Link
+          to="/admin/activity"
+          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
+        >
+          Activity log →
+        </Link>
         <Link
           to="/admin/users"
           className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
@@ -89,12 +103,6 @@ export function AdminDashboardPage() {
           className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
         >
           Manage providers →
-        </Link>
-        <Link
-          to="/admin/bookings"
-          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
-        >
-          All bookings →
         </Link>
       </div>
     </div>

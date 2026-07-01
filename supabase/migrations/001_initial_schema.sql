@@ -10,7 +10,7 @@ CREATE TYPE notification_type AS ENUM ('booking', 'review', 'system', 'admin');
 -- Admin emails auto-promoted on signup (edit before first deploy)
 CREATE OR REPLACE FUNCTION nexo_admin_emails()
 RETURNS TEXT[] AS $$
-  SELECT ARRAY['admin@nexo.sg']::TEXT[];
+  SELECT ARRAY['romalgk@gmail.com']::TEXT[];
 $$ LANGUAGE sql IMMUTABLE;
 
 -- ─── 1. profiles ─────────────────────────────────────────────────────────────

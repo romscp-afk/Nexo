@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
-import { getDashboardPath, ROLES, SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { getDashboardPath, ROLES, SINGAPORE_AREAS, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, isAdminEmail } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
 
@@ -40,25 +40,150 @@ function ConfigBanner() {
   )
 }
 
+function AdminLoginHelp({
+  error,
+  onCreateAdmin,
+  creating,
+}: {
+  error: string
+  onCreateAdmin: () => void
+  creating: boolean
+}) {
+  const isNetwork =
+    /cannot reach supabase|connection|timed out|load failed|failed to fetch/i.test(error)
+
+  if (isNetwork) {
+    return (
+      <span className="mt-2 block text-xs text-red-600">
+        Network error — confirm <code className="text-[11px]">.env</code> has your Supabase URL/key,
+        restart the dev server (<code className="text-[11px]">npm run dev</code>), and try again.
+      </span>
+    )
+  }
+
+  return (
+    <span className="mt-2 block space-y-2 text-xs text-red-600">
+      <span className="block font-medium">Admin account does not exist yet.</span>
+      <button
+        type="button"
+        onClick={onCreateAdmin}
+        disabled={creating}
+        className="rounded-md bg-teal-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+      >
+        {creating ? 'Creating admin…' : 'Create admin account (one click)'}
+      </button>
+      <span className="block text-slate-600">
+        Requires <code className="text-[11px]">schema.sql</code> run once in SQL Editor. Manual
+        option: Dashboard → Authentication → Add user → then{' '}
+        <code className="text-[11px]">promote-admin.sql</code>.
+      </span>
+      <a href={getSqlEditorUrl()} target="_blank" rel="noreferrer" className="underline">
+        Open SQL Editor
+      </a>
+    </span>
+  )
+}
+
+function DemoAccountsHint({
+  onSelect,
+  onCreateAdmin,
+  creatingAdmin,
+}: {
+  onSelect: (email: string, password: string) => void
+  onCreateAdmin: () => void
+  creatingAdmin: boolean
+}) {
+  const accounts = [
+    { label: 'Admin', email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD, hint: 'use Create admin button if login fails' },
+    { label: 'Sample customer', email: 'customer.demo@nexo.sg', password: 'Demo1234!', hint: 'run seed-demo.sql' },
+    { label: 'Sample provider', email: 'provider.demo@nexo.sg', password: 'Demo1234!', hint: 'run seed-sample-provider.sql' },
+  ] as const
+
+  return (
+    <div className="mt-4 rounded-lg bg-slate-50 px-3 py-3 text-xs text-slate-600">
+      <p className="font-medium text-slate-700">
+        Demo quick-fill · Admin: {DEMO_ADMIN_PASSWORD} · Others: Demo1234!
+      </p>
+      <button
+        type="button"
+        onClick={onCreateAdmin}
+        disabled={creatingAdmin}
+        className="mt-2 rounded-md bg-teal-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+      >
+        {creatingAdmin ? 'Setting up admin…' : `Create admin account (${DEMO_ADMIN_EMAIL})`}
+      </button>
+      <ul className="mt-2 space-y-2">
+        {accounts.map((account) => (
+          <li key={account.email} className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onSelect(account.email, account.password)}
+              className="rounded-md bg-white px-2 py-1 font-medium text-teal-800 ring-1 ring-teal-200 hover:bg-teal-50"
+            >
+              {account.label}
+            </button>
+            <span>
+              {account.email} · <span className="text-slate-500">{account.hint}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export function LoginPage() {
-  const { signIn } = useAuth()
+  const { signIn, setupDemoAdmin } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [creatingAdmin, setCreatingAdmin] = useState(false)
+
+  const handleCreateAdmin = async () => {
+    setError('')
+    setSuccess('')
+    setCreatingAdmin(true)
+    try {
+      const { error: err, role, message } = await setupDemoAdmin()
+      if (err) {
+        setError(err)
+        return
+      }
+      if (message) {
+        setSuccess(message)
+        setEmail(DEMO_ADMIN_EMAIL)
+        setPassword(DEMO_ADMIN_PASSWORD)
+        return
+      }
+      if (role) {
+        navigate(getDashboardPath(role))
+      }
+    } finally {
+      setCreatingAdmin(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error: err, role } = await signIn(email, password)
-    setLoading(false)
-    if (err) {
-      setError(err)
-      return
+    try {
+      const signInPromise = signIn(email, password)
+      const timeoutPromise = new Promise<{ error: string; role: null }>((resolve) =>
+        setTimeout(() => resolve({ error: 'Sign in timed out. Check your connection and try again.', role: null }), 20000),
+      )
+      const { error: err, role } = await Promise.race([signInPromise, timeoutPromise])
+      if (err) {
+        setError(err)
+        return
+      }
+      navigate(getDashboardPath(role ?? 'customer'))
+    } finally {
+      setLoading(false)
     }
-    navigate(getDashboardPath(role ?? 'customer'))
   }
 
   return (
@@ -70,9 +195,21 @@ export function LoginPage() {
       <DatabaseSetupBanner />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        {success && (
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-800" role="status">
+            {success}
+          </p>
+        )}
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
             {error}
+            {isAdminEmail(email) && (
+              <AdminLoginHelp
+                error={error}
+                onCreateAdmin={handleCreateAdmin}
+                creating={creatingAdmin}
+              />
+            )}
           </p>
         )}
         <div>
@@ -113,6 +250,17 @@ export function LoginPage() {
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
+
+      <DemoAccountsHint
+        onSelect={(demoEmail, demoPassword) => {
+          setEmail(demoEmail)
+          setPassword(demoPassword)
+          setError('')
+          setSuccess('')
+        }}
+        onCreateAdmin={handleCreateAdmin}
+        creatingAdmin={creatingAdmin}
+      />
 
       <p className="mt-6 text-center text-sm text-slate-500">
         No account?{' '}
@@ -459,9 +607,8 @@ export function RegisterPage() {
       </form>
 
       <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
-        Demo accounts (after running <code>seed-demo.sql</code>): customer{' '}
-        <strong>customer.demo@nexo.sg</strong>, providers <strong>cleanpro@nexo.sg</strong> — password{' '}
-        <strong>Demo1234!</strong>
+        Demo: run <code>seed-sample-provider.sql</code> or <code>seed-demo.sql</code> in Supabase.
+        Password for all demo accounts: <strong>Demo1234!</strong>
       </p>
 
       <p className="mt-6 text-center text-sm text-slate-500">

@@ -8,6 +8,14 @@ export const ROLES = {
 
 export type UserRole = (typeof ROLES)[keyof typeof ROLES]
 
+/** Primary admin account for portal access */
+export const DEMO_ADMIN_EMAIL = 'romalgk@gmail.com'
+export const DEMO_ADMIN_PASSWORD = 'Test@123'
+
+export function isAdminEmail(email: string): boolean {
+  return email.trim().toLowerCase() === DEMO_ADMIN_EMAIL.toLowerCase()
+}
+
 export function getDashboardPath(role: UserRole): string {
   switch (role) {
     case 'admin':

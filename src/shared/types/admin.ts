@@ -12,6 +12,8 @@ export type AdminStats = {
   pendingBookings: number
   completedBookings: number
   totalRevenue: number
+  pendingPayments: number
+  paidPayments: number
 }
 
 export type AdminUser = UserProfile

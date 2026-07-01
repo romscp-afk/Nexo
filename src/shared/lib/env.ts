@@ -16,6 +16,8 @@ function required(name: string, value: string | undefined): string {
 export const env = {
   supabaseUrl: required('VITE_SUPABASE_URL', import.meta.env.VITE_SUPABASE_URL),
   supabaseAnonKey: required('VITE_SUPABASE_ANON_KEY', import.meta.env.VITE_SUPABASE_ANON_KEY),
+  openAiApiKey: import.meta.env.VITE_OPENAI_API_KEY ?? '',
+  openAiConfigured: Boolean(import.meta.env.VITE_OPENAI_API_KEY),
   isDev: import.meta.env.DEV,
   isConfigured:
     Boolean(import.meta.env.VITE_SUPABASE_URL) &&

@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router-dom'
 import { APP_NAME, getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
+import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 
 export function AppLayout() {
   const { user } = useAuth()
@@ -20,12 +21,15 @@ export function AppLayout() {
               Providers
             </Link>
             {user ? (
-              <Link
-                to={getDashboardPath(user.role)}
-                className="rounded-lg bg-teal-700 px-3 py-1.5 font-medium text-white hover:bg-teal-800"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  to={getDashboardPath(user.role)}
+                  className="rounded-lg bg-teal-700 px-3 py-1.5 font-medium text-white hover:bg-teal-800"
+                >
+                  Dashboard
+                </Link>
+                <LogoutButton showIcon={false} />
+              </>
             ) : (
               <>
                 <Link to="/login" className="text-slate-600 hover:text-teal-700">

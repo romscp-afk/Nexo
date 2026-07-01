@@ -14,6 +14,7 @@ export function HomePage() {
         <h1 className="text-3xl font-bold sm:text-4xl">Home services, simplified.</h1>
         <p className="mt-3 max-w-xl text-teal-100">
           Nexo connects Singapore homeowners with trusted cleaners, handymen, movers, and more.
+          Questions? Tap <strong>Ask Nexo</strong> anytime — our AI assistant knows booking, payments, and more.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link

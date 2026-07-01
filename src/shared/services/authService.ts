@@ -1,9 +1,10 @@
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/shared/lib/supabase'
-import { parseRole, type UserRole } from '@/shared/lib/constants'
+import { parseRole, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, type UserRole } from '@/shared/lib/constants'
 import { mapProfileRow, type UserProfile } from '@/shared/types/database'
 import type { SignUpInput } from '@/shared/types/auth'
 import { formatAuthError } from '@/shared/lib/authErrors'
+import { env } from '@/shared/lib/env'
 
 export type AuthResult<T = void> = {
   data: T
@@ -19,11 +20,21 @@ function isMissingProfilesTable(error: string | null | undefined): boolean {
   )
 }
 
+const ADMIN_EMAILS = new Set([DEMO_ADMIN_EMAIL.toLowerCase()])
+
+function resolveRole(user: User, profile: UserProfile | null): UserRole {
+  if (profile?.role) return profile.role
+  const fromMeta = parseRole(user.user_metadata?.role)
+  if (fromMeta !== 'customer') return fromMeta
+  if (user.email && ADMIN_EMAILS.has(user.email.toLowerCase())) return 'admin'
+  return 'customer'
+}
+
 function mapAuthUser(user: User, profile: UserProfile | null) {
   return {
     id: user.id,
     email: user.email ?? profile?.email ?? '',
-    role: profile?.role ?? parseRole(user.user_metadata?.role),
+    role: resolveRole(user, profile),
     fullName: profile?.fullName,
     phone: profile?.phone ?? user.user_metadata?.phone ?? null,
     addressLine1: profile?.addressLine1 ?? user.user_metadata?.address_line1 ?? null,
@@ -67,23 +78,36 @@ export const authService = {
   async signIn(
     email: string,
     password: string,
-  ): Promise<AuthResult<{ user: User; role: UserRole } | null>> {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (error) {
-      return { data: null, error: formatAuthError(error) }
+  ): Promise<AuthResult<{ user: User; session: Session; role: UserRole } | null>> {
+    if (!env.isConfigured) {
+      return {
+        data: null,
+        error: 'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env',
+      }
     }
 
-    if (!data.user) {
-      return { data: null, error: 'Sign in failed' }
-    }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-    const profileResult = await authService.getUserProfile(data.user.id)
-    const role = profileResult.data?.role ?? parseRole(data.user.user_metadata?.role)
+      if (error) {
+        return { data: null, error: formatAuthError(error) }
+      }
 
-    return {
-      data: { user: data.user, role },
-      error: null,
+      if (!data.user || !data.session) {
+        return { data: null, error: 'Sign in failed' }
+      }
+
+      const role = resolveRole(data.user, null)
+
+      return {
+        data: { user: data.user, session: data.session, role },
+        error: null,
+      }
+    } catch (err) {
+      return {
+        data: null,
+        error: formatAuthError(err instanceof Error ? { message: err.message, name: err.name } : null),
+      }
     }
   },
 
@@ -144,8 +168,53 @@ export const authService = {
 
   onAuthStateChange(callback: (session: Session | null) => void) {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      callback(session)
+      // Defer to avoid Supabase auth client deadlock during signInWithPassword.
+      setTimeout(() => callback(session), 0)
     })
     return data.subscription
+  },
+
+  /** Creates the demo admin via Supabase Auth (no SQL). Requires schema.sql applied. */
+  async setupDemoAdmin(): Promise<
+    AuthResult<{ needsEmailConfirmation: boolean; alreadyExists: boolean }>
+  > {
+    if (!env.isConfigured) {
+      return {
+        data: { needsEmailConfirmation: false, alreadyExists: false },
+        error: 'Supabase is not configured.',
+      }
+    }
+
+    const email = DEMO_ADMIN_EMAIL
+    const password = DEMO_ADMIN_PASSWORD
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          role: 'admin',
+          full_name: 'Romal Admin',
+          phone: '87877525',
+        },
+      },
+    })
+
+    if (error) {
+      const code = error.code ?? (error as { error_code?: string }).error_code
+      if (code === 'user_already_exists') {
+        return {
+          data: { needsEmailConfirmation: false, alreadyExists: true },
+          error: null,
+        }
+      }
+      return {
+        data: { needsEmailConfirmation: false, alreadyExists: false },
+        error: formatAuthError(error),
+      }
+    }
+
+    const needsEmailConfirmation = !data.session && Boolean(data.user)
+    return { data: { needsEmailConfirmation, alreadyExists: false }, error: null }
   },
 }

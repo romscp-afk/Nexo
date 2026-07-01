@@ -68,10 +68,16 @@ export function CategoryPage() {
           Find a trusted provider for {category.name.toLowerCase()}.
         </p>
         <Link
-          to={`/providers?category=${category.slug}`}
-          className="mt-2 inline-block text-sm font-medium text-teal-700 hover:underline"
+          to={`/services/${category.slug}/request`}
+          className="mt-2 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
         >
-          View providers →
+          Request {category.name.toLowerCase()} →
+        </Link>
+        <Link
+          to={`/providers?category=${category.slug}`}
+          className="mt-2 ml-3 inline-block text-sm font-medium text-teal-700 hover:underline"
+        >
+          Or pick a provider
         </Link>
       </div>
     </div>

@@ -5,7 +5,9 @@ import { useProvider } from '@/features/providers/hooks/useProviders'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
+import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function BookProviderPage() {
   const { id = '' } = useParams()
@@ -25,6 +27,7 @@ export function BookProviderPage() {
   const [postalCode, setPostalCode] = useState('')
   const [serviceArea, setServiceArea] = useState('')
   const [notes, setNotes] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<BookingPaymentMethod>('paynow')
   const [formError, setFormError] = useState('')
   const [prefilled, setPrefilled] = useState(false)
 
@@ -67,6 +70,7 @@ export function BookProviderPage() {
         addressLine1,
         addressLine2: addressLine2 || undefined,
         postalCode,
+        paymentMethod,
         notes: notes
           ? serviceArea
             ? `Area: ${serviceArea}. ${notes}`
@@ -144,6 +148,20 @@ export function BookProviderPage() {
                     />
                   </label>
                 </div>
+
+                <fieldset className="rounded-xl border border-slate-200 p-4">
+                  <legend className="px-1 text-sm font-medium text-slate-700">Payment</legend>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <label className={`cursor-pointer rounded-lg border p-3 text-sm ${paymentMethod === 'paynow' ? 'border-teal-500 bg-teal-50' : ''}`}>
+                      <input type="radio" checked={paymentMethod === 'paynow'} onChange={() => setPaymentMethod('paynow')} className="mr-2" />
+                      PayNow in advance
+                    </label>
+                    <label className={`cursor-pointer rounded-lg border p-3 text-sm ${paymentMethod === 'cash' ? 'border-amber-500 bg-amber-50 ring-2 ring-amber-300' : ''}`}>
+                      <input type="radio" checked={paymentMethod === 'cash'} onChange={() => setPaymentMethod('cash')} className="mr-2" />
+                      <span className="font-bold text-amber-900">Cash</span>
+                    </label>
+                  </div>
+                </fieldset>
 
                 <label className="block text-sm">
                   <span className="font-medium text-slate-700">Service area</span>
@@ -232,7 +250,9 @@ export function BookProviderPage() {
                   </div>
                 </dl>
                 <p className="mt-3 text-xs text-slate-500">
-                  Payment collection is not enabled in this MVP.
+                  {paymentMethod === 'paynow'
+                    ? 'Pay via PayNow after the provider confirms.'
+                    : `Cash on completion. Provider pays ${formatCurrency(ADMIN_FEE_SGD)} platform fee.`}
                 </p>
                 <button
                   type="submit"

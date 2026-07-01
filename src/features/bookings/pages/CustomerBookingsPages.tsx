@@ -4,6 +4,8 @@ import { MapPin, Star } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useCustomerBookings } from '@/features/bookings/hooks/useBookings'
 import { useCustomerReviews } from '@/features/bookings/hooks/useReviews'
+import { useProviders } from '@/features/providers/hooks/useProviders'
+import { ProviderCard } from '@/features/providers/components/ProviderCard'
 import { BookingList } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
@@ -14,6 +16,13 @@ export function CustomerDashboardPage() {
   const { data: bookings, isLoading, error } = useCustomerBookings()
   const { data: reviews } = useCustomerReviews()
   const unreadNotifications = useUnreadNotificationCount()
+
+  const providerFilters = user?.preferredArea ? { area: user.preferredArea } : {}
+  const {
+    data: nearbyProviders,
+    isLoading: providersLoading,
+    error: providersError,
+  } = useProviders(providerFilters)
 
   const upcoming = bookings?.filter((b) => !['completed', 'cancelled'].includes(b.status)) ?? []
   const pendingReview = Math.max(
@@ -74,7 +83,7 @@ export function CustomerDashboardPage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <Link
-          to="/providers"
+          to={user?.preferredArea ? `/providers?area=${encodeURIComponent(user.preferredArea)}` : '/providers'}
           className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-medium text-teal-800 hover:bg-teal-100"
         >
           Book a provider →
@@ -103,6 +112,45 @@ export function CustomerDashboardPage() {
           .
         </p>
       )}
+
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-slate-900">
+              {user?.preferredArea
+                ? `Providers near ${user.preferredArea}`
+                : 'Recommended providers'}
+            </h2>
+            <p className="text-sm text-slate-600">Browse verified professionals and book a service.</p>
+          </div>
+          <Link
+            to={
+              user?.preferredArea
+                ? `/providers?area=${encodeURIComponent(user.preferredArea)}`
+                : '/providers'
+            }
+            className="text-sm text-teal-700 hover:underline"
+          >
+            View all
+          </Link>
+        </div>
+        <QueryState
+          loading={providersLoading}
+          error={providersError}
+          empty={!nearbyProviders?.length}
+          emptyMessage={
+            user?.preferredArea
+              ? `No providers in ${user.preferredArea} yet. Run supabase/seed-demo.sql or try All areas on the providers page.`
+              : 'No providers yet. Run supabase/seed-demo.sql in the Supabase SQL Editor.'
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            {nearbyProviders?.slice(0, 4).map((provider) => (
+              <ProviderCard key={provider.id} provider={provider} />
+            ))}
+          </div>
+        </QueryState>
+      </section>
 
       <section>
         <div className="mb-4 flex items-center justify-between">

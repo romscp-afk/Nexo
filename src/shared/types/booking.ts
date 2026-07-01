@@ -13,10 +13,12 @@ export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
   cancelled: 'Cancelled',
 }
 
+export type BookingPaymentMethod = 'paynow' | 'cash'
+
 export type BookingRow = {
   id: string
   customer_id: string
-  provider_id: string
+  provider_id: string | null
   service_id: string
   status: BookingStatus
   scheduled_at: string
@@ -26,6 +28,9 @@ export type BookingRow = {
   postal_code: string
   notes: string | null
   total_price: number | null
+  payment_method: BookingPaymentMethod
+  admin_fee: number | null
+  customer_contact_shared: boolean
   created_at: string
   updated_at: string
 }
@@ -33,7 +38,7 @@ export type BookingRow = {
 export type Booking = {
   id: string
   customerId: string
-  providerId: string
+  providerId: string | null
   serviceId: string
   status: BookingStatus
   scheduledAt: string
@@ -43,10 +48,16 @@ export type Booking = {
   postalCode: string
   notes: string | null
   totalPrice: number | null
+  paymentMethod: BookingPaymentMethod
+  adminFee: number | null
+  customerContactShared: boolean
   createdAt: string
   updatedAt: string
   providerName?: string
   serviceName?: string
+  categoryName?: string
+  customerName?: string
+  customerPhone?: string
 }
 
 export type BookingStatusHistoryEntry = {
@@ -60,7 +71,7 @@ export type BookingStatusHistoryEntry = {
 }
 
 export type CreateBookingInput = {
-  providerId: string
+  providerId?: string | null
   serviceId: string
   scheduledAt: string
   durationHours: number
@@ -69,11 +80,18 @@ export type CreateBookingInput = {
   postalCode: string
   notes?: string
   totalPrice: number
+  paymentMethod: BookingPaymentMethod
 }
 
 export function mapBooking(
   row: BookingRow,
-  extras?: { providerName?: string; serviceName?: string },
+  extras?: {
+    providerName?: string
+    serviceName?: string
+    categoryName?: string
+    customerName?: string
+    customerPhone?: string
+  },
 ): Booking {
   return {
     id: row.id,
@@ -88,10 +106,16 @@ export function mapBooking(
     postalCode: row.postal_code,
     notes: row.notes,
     totalPrice: row.total_price != null ? Number(row.total_price) : null,
+    paymentMethod: row.payment_method ?? 'paynow',
+    adminFee: row.admin_fee != null ? Number(row.admin_fee) : null,
+    customerContactShared: row.customer_contact_shared ?? false,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     providerName: extras?.providerName,
     serviceName: extras?.serviceName,
+    categoryName: extras?.categoryName,
+    customerName: extras?.customerName,
+    customerPhone: extras?.customerPhone,
   }
 }
 

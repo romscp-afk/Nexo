@@ -11,7 +11,7 @@ export function ReviewSection({ booking }: { booking: Booking }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  if (booking.status !== 'completed') return null
+  if (booking.status !== 'completed' || !booking.providerId) return null
   if (isLoading) return null
 
   if (review) {
@@ -35,7 +35,7 @@ export function ReviewSection({ booking }: { booking: Booking }) {
     try {
       await createReview.mutateAsync({
         bookingId: booking.id,
-        providerId: booking.providerId,
+        providerId: booking.providerId!,
         rating,
         comment: comment || undefined,
       })

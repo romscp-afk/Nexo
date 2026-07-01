@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { Phone, User } from 'lucide-react'
 import { BookingStatusTimeline } from '@/features/bookings/components/BookingStatusTimeline'
+import { PaymentMethodBadge } from '@/features/bookings/components/PaymentMethodBadge'
 import {
+  useAcceptBooking,
   useBooking,
   useBookingStatusHistory,
   useCancelBooking,
@@ -9,6 +12,9 @@ import {
 } from '@/features/bookings/hooks/useBookings'
 import { BookingStatusBadge } from '@/features/bookings/components/BookingUi'
 import { ReviewSection } from '@/features/bookings/components/ReviewSection'
+import { PayNowQrPanel } from '@/features/payments/components/PayNowQrPanel'
+import { ReceiptPanel } from '@/features/payments/components/ReceiptPanel'
+import { useBookingPayments } from '@/features/payments/hooks/usePayments'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
 import type { BookingStatus } from '@/shared/types/booking'
@@ -21,10 +27,25 @@ type BookingDetailPageProps = {
 export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
   const { id = '' } = useParams()
   const { data: booking, isLoading, error } = useBooking(id)
+  const { data: payments } = useBookingPayments(id)
   const { data: statusHistory } = useBookingStatusHistory(id)
   const cancelBooking = useCancelBooking()
   const updateStatus = useUpdateBookingStatus()
+  const acceptBooking = useAcceptBooking()
   const [actionError, setActionError] = useState('')
+
+  const isOpenRequest = !booking?.providerId && booking?.status === 'pending'
+  const isCash = booking?.paymentMethod === 'cash'
+
+  const canStartJob = () => {
+    if (!booking || booking.status !== 'confirmed') return false
+    if (booking.paymentMethod === 'paynow') {
+      return payments?.customerAdvance?.status === 'paid'
+    }
+    return (
+      payments?.providerAdminFee?.status === 'paid' && booking.customerContactShared
+    )
+  }
 
   const handleStatus = async (status: BookingStatus) => {
     setActionError('')
@@ -32,6 +53,15 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
       await updateStatus.mutateAsync({ id, status })
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Update failed')
+    }
+  }
+
+  const handleAccept = async () => {
+    setActionError('')
+    try {
+      await acceptBooking.mutateAsync(id)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Accept failed')
     }
   }
 
@@ -44,7 +74,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
     }
   }
 
-  const isPending = updateStatus.isPending || cancelBooking.isPending
+  const isPending = updateStatus.isPending || cancelBooking.isPending || acceptBooking.isPending
 
   return (
     <div>
@@ -57,13 +87,25 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
           <div className="mt-4 space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {booking.serviceName ?? 'Booking'}
-                </h1>
-                <p className="mt-1 text-slate-600">{booking.providerName}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-2xl font-bold text-slate-900">
+                    {booking.serviceName ?? 'Booking'}
+                  </h1>
+                  <PaymentMethodBadge method={booking.paymentMethod} />
+                </div>
+                <p className="mt-1 text-slate-600">
+                  {booking.categoryName && `${booking.categoryName} · `}
+                  {booking.providerName ?? 'Awaiting provider'}
+                </p>
               </div>
               <BookingStatusBadge status={booking.status} />
             </div>
+
+            {isCash && (
+              <p className="rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950">
+                CASH payment — customer pays provider on completion. Provider pays platform admin fee via PayNow.
+              </p>
+            )}
 
             {actionError && (
               <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{actionError}</p>
@@ -114,6 +156,44 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
               </section>
             </div>
 
+            {role === 'provider' && booking.customerContactShared && booking.customerName && (
+              <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+                <h2 className="font-semibold text-slate-900">Customer contact</h2>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                  <span className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-teal-700" />
+                    {booking.customerName}
+                  </span>
+                  {booking.customerPhone && (
+                    <span className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-teal-700" />
+                      {booking.customerPhone}
+                    </span>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {role === 'customer' &&
+              booking.paymentMethod === 'paynow' &&
+              payments?.customerAdvance &&
+              ['confirmed', 'in_progress'].includes(booking.status) && (
+                <PayNowQrPanel payment={payments.customerAdvance} booking={booking} role="customer" />
+              )}
+
+            {role === 'provider' &&
+              isCash &&
+              payments?.providerAdminFee &&
+              ['confirmed', 'in_progress'].includes(booking.status) && (
+                <PayNowQrPanel payment={payments.providerAdminFee} booking={booking} role="provider" />
+              )}
+
+            {isCash && role === 'customer' && booking.status === 'confirmed' && (
+              <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                Pay the provider in cash when the job is done. No online payment required.
+              </p>
+            )}
+
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h2 className="font-semibold text-slate-900">Status timeline</h2>
               <div className="mt-4">
@@ -125,52 +205,55 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
               <h2 className="font-semibold text-slate-900">Actions</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {role === 'customer' && booking.status === 'pending' && (
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    disabled={isPending}
-                    className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
-                  >
-                    Cancel booking
+                  <button type="button" onClick={handleCancel} disabled={isPending} className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">
+                    Cancel request
                   </button>
                 )}
-                {role === 'provider' && booking.status === 'pending' && (
-                  <button
-                    type="button"
-                    onClick={() => handleStatus('confirmed')}
-                    disabled={isPending}
-                    className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-                  >
+
+                {role === 'provider' && isOpenRequest && (
+                  <button type="button" onClick={handleAccept} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                    Accept this job
+                  </button>
+                )}
+
+                {role === 'provider' && booking.providerId && booking.status === 'pending' && (
+                  <button type="button" onClick={() => handleStatus('confirmed')} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
                     Confirm booking
                   </button>
                 )}
+
                 {role === 'provider' && booking.status === 'confirmed' && (
-                  <button
-                    type="button"
-                    onClick={() => handleStatus('in_progress')}
-                    disabled={isPending}
-                    className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-                  >
-                    Start job
-                  </button>
+                  <>
+                    {!canStartJob() && (
+                      <p className="w-full text-sm text-amber-800">
+                        {isCash
+                          ? 'Pay admin fee via PayNow and wait for admin confirmation to receive customer contact.'
+                          : 'Waiting for customer PayNow payment confirmation.'}
+                      </p>
+                    )}
+                    <button type="button" onClick={() => handleStatus('in_progress')} disabled={isPending || !canStartJob()} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                      Start job
+                    </button>
+                  </>
                 )}
+
                 {role === 'provider' && booking.status === 'in_progress' && (
-                  <button
-                    type="button"
-                    onClick={() => handleStatus('completed')}
-                    disabled={isPending}
-                    className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-                  >
-                    Mark completed
+                  <button type="button" onClick={() => handleStatus('completed')} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                    Mark service done
                   </button>
                 )}
+
                 {['completed', 'cancelled'].includes(booking.status) && (
-                  <p className="text-sm text-slate-500">No actions available for this booking.</p>
+                  <p className="text-sm text-slate-500">No actions available.</p>
                 )}
               </div>
             </section>
 
-            {role === 'customer' && <ReviewSection booking={booking} />}
+            {(booking.status === 'completed' || payments?.customerAdvance?.status === 'paid') && (
+              <ReceiptPanel bookingId={booking.id} />
+            )}
+
+            {role === 'customer' && booking.providerId && <ReviewSection booking={booking} />}
           </div>
         )}
       </QueryState>

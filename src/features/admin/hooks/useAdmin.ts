@@ -73,3 +73,14 @@ export function useSetProviderVerified() {
     },
   })
 }
+
+export function useAdminActivityLogs() {
+  return useQuery({
+    queryKey: ['admin', 'activity'],
+    queryFn: async () => {
+      const { data, error } = await adminService.listActivityLogs()
+      if (error) throw new Error(error)
+      return data
+    },
+  })
+}

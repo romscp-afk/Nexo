@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
@@ -10,6 +11,8 @@ import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 export function ProvidersPage() {
   const [searchParams] = useSearchParams()
   const categoryFromUrl = searchParams.get('category') ?? ''
+  const areaFromUrl = searchParams.get('area') ?? ''
+  const { user } = useAuth()
 
   const { categorySlug, verifiedOnly, area, setCategorySlug, setVerifiedOnly, setArea } =
     useProviderFilterStore()
@@ -19,6 +22,16 @@ export function ProvidersPage() {
   useEffect(() => {
     if (categoryFromUrl) setCategorySlug(categoryFromUrl)
   }, [categoryFromUrl, setCategorySlug])
+
+  useEffect(() => {
+    if (areaFromUrl) {
+      setArea(areaFromUrl)
+      return
+    }
+    if (user?.role === 'customer' && user.preferredArea && !area) {
+      setArea(user.preferredArea)
+    }
+  }, [areaFromUrl, user?.role, user?.preferredArea, area, setArea])
 
   const filters = useMemo(
     () => ({
