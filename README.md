@@ -55,8 +55,21 @@ This creates:
 Optional seed data:
 
 ```bash
-# Run supabase/seed.sql in SQL Editor after schema
+# Run in SQL Editor after schema:
+# 1. supabase/seed.sql — categories & services
+# 2. supabase/add-profile-location.sql — customer address fields (existing DBs)
+# 3. supabase/fix-auth-trigger.sql — signup trigger with location fields
+# 4. supabase/seed-demo.sql — demo accounts (providers + customer)
 ```
+
+**Demo accounts** (password `Demo1234!` for all):
+
+| Email | Role | Notes |
+|-------|------|-------|
+| `customer.demo@nexo.sg` | Customer | Tampines address pre-filled |
+| `cleanpro@nexo.sg` | Provider | Cleaning · East SG · from $45 |
+| `handyman.sg@nexo.sg` | Provider | Handyman · West/Central · from $65 |
+| `aircool@nexo.sg` | Provider | Aircon · North/Central · from $50 |
 
 **Admin setup:** Edit `nexo_admin_emails()` in `schema.sql` before running, or update the function in SQL Editor with your admin email before first admin signup.
 
@@ -121,6 +134,20 @@ npx supabase db push
 | `/admin/users` | Admin | Activate / deactivate users |
 | `/admin/providers` | Admin | Verify / unverify providers |
 | `/admin/bookings` | Admin | All bookings table |
+
+### Customer portal (complete)
+
+| Path | Description |
+|------|-------------|
+| `/dashboard` | Overview — stats, default address, quick actions |
+| `/dashboard/bookings` | All bookings with Active / Completed / Cancelled filters |
+| `/dashboard/bookings/:id` | Booking detail, status timeline, cancel, review |
+| `/dashboard/reviews` | Reviews you've submitted |
+| `/dashboard/notifications` | Booking & review updates (mark read) |
+| `/dashboard/profile` | Edit name, phone, area, address |
+| `/providers/:id/book` | Book a provider (prefills from profile) |
+
+Run `supabase/add-booking-notifications.sql` in SQL Editor for live notification triggers.
 
 **Services:** `reviewService`, `adminService` (stats, user/provider moderation, audit logging via `log_audit_action` RPC).
 

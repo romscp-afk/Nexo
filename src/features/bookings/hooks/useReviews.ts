@@ -24,8 +24,20 @@ export function useCreateReview() {
     },
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['review', data.bookingId] })
+      void queryClient.invalidateQueries({ queryKey: ['customer-reviews'] })
       void queryClient.invalidateQueries({ queryKey: ['provider', data.providerId] })
       void queryClient.invalidateQueries({ queryKey: ['providers'] })
+    },
+  })
+}
+
+export function useCustomerReviews() {
+  return useQuery({
+    queryKey: ['customer-reviews'],
+    queryFn: async () => {
+      const { data, error } = await reviewService.listForCustomer()
+      if (error) throw new Error(error)
+      return data
     },
   })
 }

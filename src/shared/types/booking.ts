@@ -49,6 +49,16 @@ export type Booking = {
   serviceName?: string
 }
 
+export type BookingStatusHistoryEntry = {
+  id: string
+  bookingId: string
+  oldStatus: BookingStatus | null
+  newStatus: BookingStatus
+  changedBy: string | null
+  notes: string | null
+  createdAt: string
+}
+
 export type CreateBookingInput = {
   providerId: string
   serviceId: string
@@ -82,5 +92,27 @@ export function mapBooking(
     updatedAt: row.updated_at,
     providerName: extras?.providerName,
     serviceName: extras?.serviceName,
+  }
+}
+
+type StatusHistoryRow = {
+  id: string
+  booking_id: string
+  old_status: BookingStatus | null
+  new_status: BookingStatus
+  changed_by: string | null
+  notes: string | null
+  created_at: string
+}
+
+export function mapBookingStatusHistory(row: StatusHistoryRow): BookingStatusHistoryEntry {
+  return {
+    id: row.id,
+    bookingId: row.booking_id,
+    oldStatus: row.old_status,
+    newStatus: row.new_status,
+    changedBy: row.changed_by,
+    notes: row.notes,
+    createdAt: row.created_at,
   }
 }

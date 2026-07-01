@@ -45,8 +45,11 @@ export function useCreateBooking() {
       if (error) throw new Error(error)
       return data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
   })
 }
@@ -62,6 +65,8 @@ export function useUpdateBookingStatus() {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['bookings'] })
       void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
   })
 }
@@ -77,6 +82,20 @@ export function useCancelBooking() {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['bookings'] })
       void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+  })
+}
+
+export function useBookingStatusHistory(bookingId: string) {
+  return useQuery({
+    queryKey: ['booking-history', bookingId],
+    queryFn: async () => {
+      const { data, error } = await bookingService.getStatusHistory(bookingId)
+      if (error) throw new Error(error)
+      return data
+    },
+    enabled: Boolean(bookingId),
   })
 }

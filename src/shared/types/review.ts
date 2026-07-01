@@ -16,6 +16,8 @@ export type Review = {
   rating: number
   comment: string | null
   createdAt: string
+  providerName?: string
+  serviceName?: string
 }
 
 export type CreateReviewInput = {

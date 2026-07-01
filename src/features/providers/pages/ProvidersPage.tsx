@@ -5,6 +5,7 @@ import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { useProviderFilterStore } from '@/shared/stores/filterStore'
+import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 
 export function ProvidersPage() {
   const [searchParams] = useSearchParams()
@@ -56,13 +57,18 @@ export function ProvidersPage() {
 
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Area</span>
-          <input
-            type="text"
+          <select
             value={area}
             onChange={(e) => setArea(e.target.value)}
-            placeholder="e.g. Tampines, CBD"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-          />
+          >
+            <option value="">All areas</option>
+            {SINGAPORE_AREAS.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="flex items-end gap-2 pb-2 text-sm">

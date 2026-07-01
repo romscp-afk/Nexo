@@ -3,21 +3,25 @@ import { Menu, X } from 'lucide-react'
 import { APP_NAME, type UserRole } from '@/shared/lib/constants'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
+import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 
-type NavItem = { to: string; label: string }
+type NavItem = { to: string; label: string; exact?: boolean; badge?: boolean }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   customer: [
-    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/dashboard', label: 'Dashboard', exact: true },
     { to: '/dashboard/bookings', label: 'My bookings' },
+    { to: '/dashboard/reviews', label: 'My reviews' },
+    { to: '/dashboard/notifications', label: 'Notifications', badge: true },
+    { to: '/dashboard/profile', label: 'Profile' },
   ],
   provider: [
-    { to: '/provider', label: 'Dashboard' },
+    { to: '/provider', label: 'Dashboard', exact: true },
     { to: '/provider/bookings', label: 'Bookings' },
     { to: '/provider/profile', label: 'Profile' },
   ],
   admin: [
-    { to: '/admin', label: 'Dashboard' },
+    { to: '/admin', label: 'Dashboard', exact: true },
     { to: '/admin/users', label: 'Users' },
     { to: '/admin/providers', label: 'Providers' },
     { to: '/admin/bookings', label: 'Bookings' },
@@ -28,16 +32,49 @@ type DashboardLayoutProps = {
   role: UserRole
 }
 
+function NavLink({
+  item,
+  isActive,
+  unreadCount,
+  onNavigate,
+}: {
+  item: NavItem
+  isActive: boolean
+  unreadCount: number
+  onNavigate?: () => void
+}) {
+  return (
+    <Link
+      to={item.to}
+      onClick={onNavigate}
+      className={cn(
+        'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium',
+        isActive ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-slate-100',
+      )}
+    >
+      <span>{item.label}</span>
+      {item.badge && unreadCount > 0 && (
+        <span className="rounded-full bg-teal-700 px-1.5 py-0.5 text-xs text-white">
+          {unreadCount}
+        </span>
+      )}
+    </Link>
+  )
+}
+
 export function DashboardLayout({ role }: DashboardLayoutProps) {
   const location = useLocation()
   const sidebarOpen = useAppStore((s) => s.sidebarOpen)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
+  const unreadCount = useUnreadNotificationCount()
 
   const nav = NAV_BY_ROLE[role]
 
-  const isActive = (to: string) =>
-    location.pathname === to || location.pathname.startsWith(`${to}/`)
+  const isActive = (item: NavItem) => {
+    if (item.exact) return location.pathname === item.to
+    return location.pathname === item.to || location.pathname.startsWith(`${item.to}/`)
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -47,18 +84,12 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </div>
         <nav className="space-y-1 p-3">
           {nav.map((item) => (
-            <Link
+            <NavLink
               key={item.to}
-              to={item.to}
-              className={cn(
-                'block rounded-lg px-3 py-2 text-sm font-medium',
-                isActive(item.to)
-                  ? 'bg-teal-50 text-teal-700'
-                  : 'text-slate-600 hover:bg-slate-100',
-              )}
-            >
-              {item.label}
-            </Link>
+              item={item}
+              isActive={isActive(item)}
+              unreadCount={unreadCount}
+            />
           ))}
           <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-teal-700">
             ← Back to site
@@ -78,14 +109,13 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             </div>
             <nav className="space-y-1 p-3">
               {nav.map((item) => (
-                <Link
+                <NavLink
                   key={item.to}
-                  to={item.to}
-                  onClick={() => setSidebarOpen(false)}
-                  className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
-                >
-                  {item.label}
-                </Link>
+                  item={item}
+                  isActive={isActive(item)}
+                  unreadCount={unreadCount}
+                  onNavigate={() => setSidebarOpen(false)}
+                />
               ))}
             </nav>
           </aside>

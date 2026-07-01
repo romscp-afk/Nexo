@@ -53,10 +53,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    authService.getCurrentUser().then(({ data, error }) => {
-      if (error) setProfileError(error)
-      void loadUser(data?.session ?? null).finally(() => setLoading(false))
-    })
+    authService
+      .getCurrentUser()
+      .then(({ data, error }) => {
+        if (error) setProfileError(error)
+        return loadUser(data?.session ?? null)
+      })
+      .catch(() => {
+        setProfileError('Unable to reach Supabase — check your connection and .env')
+        setUser(null)
+        setSession(null)
+      })
+      .finally(() => setLoading(false))
 
     const subscription = authService.onAuthStateChange((nextSession) => {
       void loadUser(nextSession)

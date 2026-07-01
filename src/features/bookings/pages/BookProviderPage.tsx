@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useProvider } from '@/features/providers/hooks/useProviders'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
+import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 
 export function BookProviderPage() {
   const { id = '' } = useParams()
+  const { user } = useAuth()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { data: provider, isLoading, error } = useProvider(id)
@@ -20,8 +23,19 @@ export function BookProviderPage() {
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
   const [postalCode, setPostalCode] = useState('')
+  const [serviceArea, setServiceArea] = useState('')
   const [notes, setNotes] = useState('')
   const [formError, setFormError] = useState('')
+  const [prefilled, setPrefilled] = useState(false)
+
+  useEffect(() => {
+    if (!user || prefilled) return
+    if (user.addressLine1) setAddressLine1(user.addressLine1)
+    if (user.addressLine2) setAddressLine2(user.addressLine2)
+    if (user.postalCode) setPostalCode(user.postalCode)
+    if (user.preferredArea) setServiceArea(user.preferredArea)
+    setPrefilled(true)
+  }, [user, prefilled])
 
   const selectedServiceId = serviceId || preselectedService
   const selectedService = provider?.services.find((s) => s.serviceId === selectedServiceId)
@@ -53,7 +67,13 @@ export function BookProviderPage() {
         addressLine1,
         addressLine2: addressLine2 || undefined,
         postalCode,
-        notes: notes || undefined,
+        notes: notes
+          ? serviceArea
+            ? `Area: ${serviceArea}. ${notes}`
+            : notes
+          : serviceArea
+            ? `Area: ${serviceArea}`
+            : undefined,
         totalPrice,
       })
       navigate(`/dashboard/bookings/${booking.id}`)
@@ -126,25 +146,43 @@ export function BookProviderPage() {
                 </div>
 
                 <label className="block text-sm">
-                  <span className="font-medium text-slate-700">Address line 1</span>
+                  <span className="font-medium text-slate-700">Service area</span>
+                  <select
+                    value={serviceArea}
+                    onChange={(e) => setServiceArea(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                    required
+                  >
+                    <option value="">Select area</option>
+                    {SINGAPORE_AREAS.map((area) => (
+                      <option key={area} value={area}>
+                        {area}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block text-sm">
+                  <span className="font-medium text-slate-700">Block / street address</span>
                   <input
                     type="text"
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
-                    placeholder="Block / street name"
+                    placeholder="Blk 123 Tampines Street 11"
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
                     required
                   />
                 </label>
 
                 <label className="block text-sm">
-                  <span className="font-medium text-slate-700">Address line 2 (optional)</span>
+                  <span className="font-medium text-slate-700">Unit number</span>
                   <input
                     type="text"
                     value={addressLine2}
                     onChange={(e) => setAddressLine2(e.target.value)}
-                    placeholder="Unit number"
+                    placeholder="#08-456"
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                    required
                   />
                 </label>
 

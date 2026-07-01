@@ -63,6 +63,11 @@ export type UpdateProviderInput = {
   serviceAreas: string[]
 }
 
+export type ProviderServicePriceInput = {
+  serviceId: string
+  priceFrom: number
+}
+
 async function getCurrentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser()
   return data.user?.id ?? null
@@ -187,5 +192,43 @@ export const providerService = {
 
     if (error) return { data: null as unknown as ProviderListing, error: error.message }
     return { data: mapProviderListing(data as ProviderRow), error: null }
+  },
+
+  async updateMyProviderServices(
+    services: ProviderServicePriceInput[],
+  ): Promise<AuthResult<ProviderListing>> {
+    const userId = await getCurrentUserId()
+    if (!userId) return { data: null as unknown as ProviderListing, error: 'Not authenticated' }
+
+    const { data: providerRow, error: providerError } = await supabase
+      .from('providers')
+      .select('id')
+      .eq('user_id', userId)
+      .single()
+
+    if (providerError || !providerRow) {
+      return { data: null as unknown as ProviderListing, error: providerError?.message ?? 'Provider not found' }
+    }
+
+    const providerId = providerRow.id as string
+
+    const { error: deleteError } = await supabase
+      .from('provider_services')
+      .delete()
+      .eq('provider_id', providerId)
+    if (deleteError) return { data: null as unknown as ProviderListing, error: deleteError.message }
+
+    if (services.length > 0) {
+      const { error: insertError } = await supabase.from('provider_services').insert(
+        services.map((s) => ({
+          provider_id: providerId,
+          service_id: s.serviceId,
+          price_from: s.priceFrom,
+        })),
+      )
+      if (insertError) return { data: null as unknown as ProviderListing, error: insertError.message }
+    }
+
+    return providerService.getMyProvider() as Promise<AuthResult<ProviderListing>>
   },
 }

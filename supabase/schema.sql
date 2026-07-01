@@ -21,6 +21,10 @@ CREATE TABLE profiles (
   email TEXT NOT NULL,
   full_name TEXT NOT NULL,
   phone TEXT,
+  address_line1 TEXT,
+  address_line2 TEXT,
+  postal_code TEXT,
+  preferred_area TEXT,
   avatar_url TEXT,
   role user_role NOT NULL DEFAULT 'customer',
   is_active BOOLEAN NOT NULL DEFAULT true,
@@ -192,6 +196,84 @@ CREATE TRIGGER bookings_status_history
   AFTER INSERT OR UPDATE OF status ON bookings
   FOR EACH ROW EXECUTE FUNCTION log_booking_status_change();
 
+-- ─── Trigger: booking notifications ──────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION notify_booking_participants()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  provider_user_id UUID;
+  status_label TEXT;
+BEGIN
+  SELECT user_id INTO provider_user_id FROM providers WHERE id = NEW.provider_id;
+
+  IF TG_OP = 'INSERT' THEN
+    INSERT INTO notifications (user_id, title, body, type, metadata)
+    VALUES (
+      NEW.customer_id,
+      'Booking request sent',
+      'Your booking is pending provider confirmation.',
+      'booking',
+      jsonb_build_object('booking_id', NEW.id, 'status', NEW.status)
+    );
+
+    IF provider_user_id IS NOT NULL THEN
+      INSERT INTO notifications (user_id, title, body, type, metadata)
+      VALUES (
+        provider_user_id,
+        'New booking request',
+        'A customer requested a booking. Review and confirm.',
+        'booking',
+        jsonb_build_object('booking_id', NEW.id, 'status', NEW.status)
+      );
+    END IF;
+  ELSIF OLD.status IS DISTINCT FROM NEW.status THEN
+    status_label := initcap(replace(NEW.status::TEXT, '_', ' '));
+
+    INSERT INTO notifications (user_id, title, body, type, metadata)
+    VALUES (
+      NEW.customer_id,
+      'Booking ' || status_label,
+      'Your booking is now ' || lower(status_label) || '.',
+      'booking',
+      jsonb_build_object('booking_id', NEW.id, 'status', NEW.status)
+    );
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER bookings_notify_participants
+  AFTER INSERT OR UPDATE OF status ON bookings
+  FOR EACH ROW EXECUTE FUNCTION notify_booking_participants();
+
+CREATE OR REPLACE FUNCTION notify_review_created()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO notifications (user_id, title, body, type, metadata)
+  VALUES (
+    NEW.customer_id,
+    'Review submitted',
+    'Thanks for rating your provider. Your feedback helps others book with confidence.',
+    'review',
+    jsonb_build_object('booking_id', NEW.booking_id, 'review_id', NEW.id)
+  );
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER reviews_notify_customer
+  AFTER INSERT ON reviews
+  FOR EACH ROW EXECUTE FUNCTION notify_review_created();
+
 -- ─── Trigger: provider rating on review ──────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION update_provider_rating()
@@ -233,24 +315,37 @@ BEGIN
     assigned_role := 'customer';
   END IF;
 
-  INSERT INTO profiles (user_id, email, full_name, phone, role)
+  INSERT INTO profiles (user_id, email, full_name, phone, address_line1, address_line2, postal_code, preferred_area, role)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
     NEW.raw_user_meta_data->>'phone',
+    NEW.raw_user_meta_data->>'address_line1',
+    NEW.raw_user_meta_data->>'address_line2',
+    NEW.raw_user_meta_data->>'postal_code',
+    NEW.raw_user_meta_data->>'preferred_area',
     assigned_role
   );
 
   IF assigned_role = 'provider' THEN
-    INSERT INTO providers (user_id, business_name)
+    INSERT INTO providers (user_id, business_name, bio, years_experience, hourly_rate, service_areas)
     VALUES (
       NEW.id,
       COALESCE(
         NEW.raw_user_meta_data->>'business_name',
         NEW.raw_user_meta_data->>'full_name',
         'My Business'
-      )
+      ),
+      NEW.raw_user_meta_data->>'bio',
+      COALESCE((NEW.raw_user_meta_data->>'years_experience')::INT, 0),
+      COALESCE((NEW.raw_user_meta_data->>'hourly_rate')::NUMERIC, 0),
+      CASE
+        WHEN NEW.raw_user_meta_data->>'service_areas' IS NOT NULL
+          AND NEW.raw_user_meta_data->>'service_areas' <> ''
+        THEN string_to_array(NEW.raw_user_meta_data->>'service_areas', ',')
+        ELSE '{}'::TEXT[]
+      END
     );
   END IF;
 

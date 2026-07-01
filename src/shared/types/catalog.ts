@@ -54,6 +54,8 @@ export type CatalogService = {
   description: string | null
   basePrice: number
   sortOrder: number
+  categoryName?: string
+  categorySlug?: string
 }
 
 export type ProviderServiceSummary = {

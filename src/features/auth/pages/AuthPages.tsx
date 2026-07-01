@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
-import { getDashboardPath, ROLES } from '@/shared/lib/constants'
+import { getDashboardPath, ROLES, SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
 
@@ -130,22 +130,56 @@ export function RegisterPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('')
   const [role, setRole] = useState<'customer' | 'provider'>('customer')
+  const [preferredArea, setPreferredArea] = useState('')
+  const [addressLine1, setAddressLine1] = useState('')
+  const [addressLine2, setAddressLine2] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [businessName, setBusinessName] = useState('')
+  const [bio, setBio] = useState('')
+  const [yearsExperience, setYearsExperience] = useState('1')
+  const [hourlyRate, setHourlyRate] = useState('40')
+  const [serviceAreas, setServiceAreas] = useState<string[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const inputClass = 'mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm'
+
+  const toggleServiceArea = (area: string) => {
+    setServiceAreas((prev) =>
+      prev.includes(area) ? prev.filter((a) => a !== area) : [...prev, area],
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess('')
     setLoading(true)
+
+    if (role === 'provider' && serviceAreas.length === 0) {
+      setError('Select at least one service area you cover.')
+      setLoading(false)
+      return
+    }
+
     const { error: err, needsEmailConfirmation } = await signUp({
       email,
       password,
       role,
       fullName,
-      businessName: role === 'provider' ? fullName : undefined,
+      phone: phone || undefined,
+      addressLine1: role === 'customer' ? addressLine1 : undefined,
+      addressLine2: role === 'customer' ? addressLine2 : undefined,
+      postalCode: role === 'customer' ? postalCode : undefined,
+      preferredArea: role === 'customer' ? preferredArea : undefined,
+      businessName: role === 'provider' ? businessName || fullName : undefined,
+      bio: role === 'provider' ? bio : undefined,
+      yearsExperience: role === 'provider' ? Number(yearsExperience) || 0 : undefined,
+      hourlyRate: role === 'provider' ? Number(hourlyRate) || 0 : undefined,
+      serviceAreas: role === 'provider' ? serviceAreas : undefined,
     })
     setLoading(false)
     if (err) {
@@ -209,11 +243,181 @@ export function RegisterPage() {
             autoComplete="name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className={inputClass}
             required
             disabled={loading}
           />
         </div>
+        {role === 'provider' && (
+          <div>
+            <label htmlFor="business-name" className="block text-sm font-medium text-slate-700">
+              Business name
+            </label>
+            <input
+              id="business-name"
+              type="text"
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              placeholder="e.g. CleanPro SG"
+              className={inputClass}
+              disabled={loading}
+            />
+          </div>
+        )}
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+            Phone (Singapore)
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="91234567"
+            pattern="[689]\d{7}"
+            className={inputClass}
+            required
+            disabled={loading}
+          />
+        </div>
+        {role === 'customer' && (
+          <>
+            <div>
+              <label htmlFor="preferred-area" className="block text-sm font-medium text-slate-700">
+                Preferred area
+              </label>
+              <select
+                id="preferred-area"
+                value={preferredArea}
+                onChange={(e) => setPreferredArea(e.target.value)}
+                className={inputClass}
+                required
+                disabled={loading}
+              >
+                <option value="">Select your area</option>
+                {SINGAPORE_AREAS.map((area) => (
+                  <option key={area} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="address-line1" className="block text-sm font-medium text-slate-700">
+                Block / street address
+              </label>
+              <input
+                id="address-line1"
+                type="text"
+                value={addressLine1}
+                onChange={(e) => setAddressLine1(e.target.value)}
+                placeholder="Blk 123 Tampines Street 11"
+                className={inputClass}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="address-line2" className="block text-sm font-medium text-slate-700">
+                Unit number
+              </label>
+              <input
+                id="address-line2"
+                type="text"
+                value={addressLine2}
+                onChange={(e) => setAddressLine2(e.target.value)}
+                placeholder="#08-456"
+                className={inputClass}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="postal-code" className="block text-sm font-medium text-slate-700">
+                Postal code
+              </label>
+              <input
+                id="postal-code"
+                type="text"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                placeholder="521123"
+                pattern="\d{6}"
+                className={inputClass}
+                required
+                disabled={loading}
+              />
+            </div>
+          </>
+        )}
+        {role === 'provider' && (
+          <>
+            <div>
+              <label htmlFor="bio" className="block text-sm font-medium text-slate-700">
+                Business bio
+              </label>
+              <textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={3}
+                placeholder="Brief description of your services…"
+                className={inputClass}
+                disabled={loading}
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="years-exp" className="block text-sm font-medium text-slate-700">
+                  Years experience
+                </label>
+                <input
+                  id="years-exp"
+                  type="number"
+                  min={0}
+                  value={yearsExperience}
+                  onChange={(e) => setYearsExperience(e.target.value)}
+                  className={inputClass}
+                  disabled={loading}
+                />
+              </div>
+              <div>
+                <label htmlFor="hourly-rate" className="block text-sm font-medium text-slate-700">
+                  Hourly rate (SGD)
+                </label>
+                <input
+                  id="hourly-rate"
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(e.target.value)}
+                  className={inputClass}
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-700">Service areas covered</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {SINGAPORE_AREAS.map((area) => (
+                  <label key={area} className="flex items-center gap-2 text-sm text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={serviceAreas.includes(area)}
+                      onChange={() => toggleServiceArea(area)}
+                      disabled={loading}
+                      className="rounded border-slate-300"
+                    />
+                    {area}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </>
+        )}
         <div>
           <label htmlFor="reg-email" className="block text-sm font-medium text-slate-700">
             Email
@@ -224,7 +428,7 @@ export function RegisterPage() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className={inputClass}
             required
             disabled={loading}
           />
@@ -239,7 +443,7 @@ export function RegisterPage() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className={inputClass}
             minLength={6}
             required
             disabled={loading}
@@ -253,6 +457,12 @@ export function RegisterPage() {
           {loading ? 'Creating…' : 'Create account'}
         </button>
       </form>
+
+      <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        Demo accounts (after running <code>seed-demo.sql</code>): customer{' '}
+        <strong>customer.demo@nexo.sg</strong>, providers <strong>cleanpro@nexo.sg</strong> — password{' '}
+        <strong>Demo1234!</strong>
+      </p>
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Have an account?{' '}

@@ -25,6 +25,11 @@ function mapAuthUser(user: User, profile: UserProfile | null) {
     email: user.email ?? profile?.email ?? '',
     role: profile?.role ?? parseRole(user.user_metadata?.role),
     fullName: profile?.fullName,
+    phone: profile?.phone ?? user.user_metadata?.phone ?? null,
+    addressLine1: profile?.addressLine1 ?? user.user_metadata?.address_line1 ?? null,
+    addressLine2: profile?.addressLine2 ?? user.user_metadata?.address_line2 ?? null,
+    postalCode: profile?.postalCode ?? user.user_metadata?.postal_code ?? null,
+    preferredArea: profile?.preferredArea ?? user.user_metadata?.preferred_area ?? null,
   }
 }
 
@@ -38,7 +43,15 @@ export const authService = {
           role: input.role,
           full_name: input.fullName,
           phone: input.phone ?? null,
+          address_line1: input.addressLine1 ?? null,
+          address_line2: input.addressLine2 ?? null,
+          postal_code: input.postalCode ?? null,
+          preferred_area: input.preferredArea ?? null,
           business_name: input.businessName ?? null,
+          bio: input.bio ?? null,
+          years_experience: input.yearsExperience != null ? String(input.yearsExperience) : null,
+          hourly_rate: input.hourlyRate != null ? String(input.hourlyRate) : null,
+          service_areas: input.serviceAreas?.length ? input.serviceAreas.join(',') : null,
         },
       },
     })

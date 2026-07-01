@@ -2,9 +2,11 @@ import { supabase } from '@/shared/lib/supabase'
 import type { AuthResult } from '@/shared/services/authService'
 import {
   mapBooking,
+  mapBookingStatusHistory,
   type Booking,
   type BookingRow,
   type BookingStatus,
+  type BookingStatusHistoryEntry,
   type CreateBookingInput,
 } from '@/shared/types/booking'
 
@@ -129,5 +131,16 @@ export const bookingService = {
 
   async cancel(id: string): Promise<AuthResult<Booking>> {
     return bookingService.updateStatus(id, 'cancelled')
+  },
+
+  async getStatusHistory(bookingId: string): Promise<AuthResult<BookingStatusHistoryEntry[]>> {
+    const { data, error } = await supabase
+      .from('booking_status_history')
+      .select('*')
+      .eq('booking_id', bookingId)
+      .order('created_at', { ascending: true })
+
+    if (error) return { data: [], error: error.message }
+    return { data: data.map(mapBookingStatusHistory), error: null }
   },
 }

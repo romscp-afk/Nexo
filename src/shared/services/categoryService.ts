@@ -53,4 +53,25 @@ export const categoryService = {
       error: null,
     }
   },
+
+  async listAllServices(): Promise<AuthResult<CatalogService[]>> {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*, service_categories ( name, slug )')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+
+    if (error) return { data: [], error: error.message }
+
+    return {
+      data: (data as (ServiceRow & { service_categories: { name: string; slug: string } | null })[]).map(
+        (row) => ({
+          ...mapService(row),
+          categoryName: row.service_categories?.name ?? '',
+          categorySlug: row.service_categories?.slug ?? '',
+        }),
+      ),
+      error: null,
+    }
+  },
 }

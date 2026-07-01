@@ -23,3 +23,22 @@ export function parseRole(value: unknown): UserRole {
   if (value === 'admin' || value === 'provider' || value === 'customer') return value
   return 'customer'
 }
+
+/** Common Singapore areas for customer preferred location & provider coverage */
+export const SINGAPORE_AREAS = [
+  'Ang Mo Kio',
+  'Bedok',
+  'Bishan',
+  'Bukit Batok',
+  'CBD',
+  'Clementi',
+  'Jurong East',
+  'Pasir Ris',
+  'Simei',
+  'Tampines',
+  'Toa Payoh',
+  'Woodlands',
+  'Yishun',
+] as const
+
+export type SingaporeArea = (typeof SINGAPORE_AREAS)[number]

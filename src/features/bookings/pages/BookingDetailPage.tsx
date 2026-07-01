@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { BookingStatusTimeline } from '@/features/bookings/components/BookingStatusTimeline'
 import {
   useBooking,
+  useBookingStatusHistory,
   useCancelBooking,
   useUpdateBookingStatus,
 } from '@/features/bookings/hooks/useBookings'
@@ -19,6 +21,7 @@ type BookingDetailPageProps = {
 export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
   const { id = '' } = useParams()
   const { data: booking, isLoading, error } = useBooking(id)
+  const { data: statusHistory } = useBookingStatusHistory(id)
   const cancelBooking = useCancelBooking()
   const updateStatus = useUpdateBookingStatus()
   const [actionError, setActionError] = useState('')
@@ -110,6 +113,13 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                 </dl>
               </section>
             </div>
+
+            <section className="rounded-xl border border-slate-200 bg-white p-6">
+              <h2 className="font-semibold text-slate-900">Status timeline</h2>
+              <div className="mt-4">
+                <BookingStatusTimeline history={statusHistory ?? []} />
+              </div>
+            </section>
 
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h2 className="font-semibold text-slate-900">Actions</h2>
