@@ -1,4 +1,5 @@
 export const APP_NAME = 'Nexo'
+export const APP_TAGLINE = 'Connecting Trust. Simplifying Life'
 export const DEVELOPER_NAME = 'Roms'
 
 export const ROLES = {

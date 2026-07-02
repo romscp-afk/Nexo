@@ -1,4 +1,4 @@
-import { APP_NAME, DEVELOPER_NAME } from '@/shared/lib/constants'
+import { APP_NAME, APP_TAGLINE, DEVELOPER_NAME } from '@/shared/lib/constants'
 import { cn } from '@/shared/lib/utils'
 
 type SiteFooterProps = {
@@ -20,7 +20,7 @@ export function SiteFooter({ className, compact = false }: SiteFooterProps) {
         Developed by {DEVELOPER_NAME}
       </p>
       {!compact && (
-        <p className="mt-1 text-slate-400">Singapore home services marketplace</p>
+        <p className="mt-1 text-slate-400">{APP_TAGLINE}</p>
       )}
     </footer>
   )

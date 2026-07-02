@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { APP_TAGLINE } from '@/shared/lib/constants'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 
@@ -8,7 +9,7 @@ export function AuthLayout() {
       <div className="flex flex-1 flex-col items-center justify-center">
         <div className="mb-8 text-center">
           <Logo to="/" size="lg" className="flex-col gap-3" />
-          <p className="mt-3 text-sm text-slate-500">Home services marketplace</p>
+          <p className="mt-3 text-sm text-slate-500">{APP_TAGLINE}</p>
         </div>
         <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
           <Outlet />
