@@ -88,7 +88,7 @@ export function HomeCta() {
             className="pointer-events-none absolute inset-0 opacity-40"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 20% 80%, #73dec5 0%, transparent 40%), radial-gradient(circle at 80% 20%, #ddd4c0 0%, transparent 35%)',
+                'radial-gradient(circle at 20% 80%, #4f46e5 0%, transparent 40%), radial-gradient(circle at 80% 20%, #2563eb 0%, transparent 35%)',
             }}
           />
           <div className="relative">
@@ -100,7 +100,7 @@ export function HomeCta() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-nexo-900 shadow-lg transition hover:bg-nexo-soft"
+                className="inline-flex items-center gap-2 rounded-full bg-nexo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800"
               >
                 Create free account
                 <ArrowRight className="h-4 w-4" />

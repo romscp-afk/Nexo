@@ -22,7 +22,7 @@ export function HomeHero() {
   const { user } = useAuth()
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-ink via-nexo-deep to-nexo-900 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-ink via-nexo-deep to-indigo-950 text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-nexo-glow/15 blur-3xl animate-pulse-glow"
@@ -57,7 +57,7 @@ export function HomeHero() {
 
             <h1 className="animate-fade-up-delay-1 mt-6 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
               Your home,
-              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-nexo-champagne bg-clip-text text-transparent">
+              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-white bg-clip-text text-transparent">
                 handled with care.
               </span>
             </h1>
@@ -70,7 +70,7 @@ export function HomeHero() {
             <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
               <Link
                 to="/services"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-nexo-900 shadow-lg shadow-black/15 transition hover:bg-nexo-soft"
+                className="group inline-flex items-center gap-2 rounded-full bg-nexo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800"
               >
                 Explore services
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -124,7 +124,7 @@ export function HomeHero() {
             {floatingServices.map((item) => (
               <div
                 key={item.label}
-                className="animate-float-delayed absolute z-10 flex items-center gap-2 rounded-2xl border border-nexo-400/25 bg-nexo-800/70 px-3 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md"
+                className="animate-float-delayed absolute z-10 flex items-center gap-2 rounded-2xl border border-nexo-400/30 bg-nexo-deep/80 px-3 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md"
                 style={{
                   top: item.top,
                   left: item.left,
@@ -148,7 +148,7 @@ export function HomeHero() {
         </div>
       </div>
 
-      <div className="relative border-t border-white/10 bg-nexo-900/40 py-3">
+      <div className="relative border-t border-white/10 bg-nexo-ink/50 py-3">
         <div className="flex overflow-hidden">
           <div className="animate-marquee flex shrink-0 items-center gap-8 whitespace-nowrap px-4 text-sm text-nexo-mint/70">
             {[...Array(2)].map((_, copy) => (

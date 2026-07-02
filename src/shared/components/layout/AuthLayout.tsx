@@ -11,7 +11,7 @@ export function AuthLayout() {
           <Logo to="/" size="lg" className="flex-col gap-3" />
           <p className="mt-3 text-sm text-nexo-700/70">{APP_TAGLINE}</p>
         </div>
-        <div className="w-full max-w-md rounded-2xl border border-nexo-200/80 bg-white/95 p-8 shadow-[0_8px_40px_-12px_rgba(20,46,41,0.15)] backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-2xl border border-nexo-200/80 bg-white p-8 shadow-[0_8px_40px_-12px_rgba(15,23,42,0.12)] backdrop-blur-sm">
           <Outlet />
         </div>
       </div>

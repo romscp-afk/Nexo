@@ -2,27 +2,32 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  /* Brand anchor: #73dec5 — refined mint teal */
-  --color-nexo-50: #f4f9f8;
-  --color-nexo-100: #e6f2ef;
-  --color-nexo-200: #cce4de;
-  --color-nexo-300: #a8d9cb;
-  --color-nexo-400: #73dec5;
-  --color-nexo-500: #56c7ae;
-  --color-nexo-600: #3fa893;
-  --color-nexo-700: #328a78;
-  --color-nexo-800: #296e60;
-  --color-nexo-900: #1f5349;
-  --color-nexo-950: #142e29;
+  /* Nexo brand palette */
+  --color-nexo-50: #f8fafc;
+  --color-nexo-100: #eef2ff;
+  --color-nexo-200: #e2e8f0;
+  --color-nexo-300: #c7d2fe;
+  --color-nexo-400: #6366f1;
+  --color-nexo-500: #4f46e5;
+  --color-nexo-600: #2563eb;
+  --color-nexo-700: #2563eb;
+  --color-nexo-800: #1d4ed8;
+  --color-nexo-900: #1e293b;
+  --color-nexo-950: #0f172a;
   /* Brand accents */
-  --color-nexo-accent: #8ae8d6;
-  --color-nexo-glow: #73dec5;
-  --color-nexo-mint: #b5e8dc;
-  --color-nexo-soft: #edf7f4;
-  --color-nexo-pearl: #fafcfb;
-  --color-nexo-deep: #0f2421;
-  --color-nexo-ink: #0a1816;
-  --color-nexo-champagne: #ddd4c0;
+  --color-nexo-accent: #818cf8;
+  --color-nexo-glow: #4f46e5;
+  --color-nexo-mint: #e0e7ff;
+  --color-nexo-soft: #f1f5f9;
+  --color-nexo-pearl: #f8fafc;
+  --color-nexo-deep: #312e81;
+  --color-nexo-ink: #0f172a;
+  --color-nexo-champagne: #cbd5e1;
+  --color-nexo-card: #ffffff;
+  /* Semantic */
+  --color-nexo-success: #10b981;
+  --color-nexo-warning: #f59e0b;
+  --color-nexo-error: #ef4444;
   /* Silver Legacy banner palette */
   --color-legacy-950: #121212;
   --color-legacy-900: #1a1a1a;

@@ -7,8 +7,8 @@ import { cn, formatCurrency, formatDateTime } from '@/shared/lib/utils'
 const STATUS_STYLES: Record<BookingStatus, string> = {
   pending: 'bg-amber-50 text-amber-800',
   confirmed: 'bg-blue-50 text-blue-800',
-  in_progress: 'bg-violet-50 text-violet-800',
-  completed: 'bg-green-50 text-green-800',
+  in_progress: 'bg-indigo-50 text-indigo-800',
+  completed: 'bg-emerald-50 text-emerald-800',
   cancelled: 'bg-slate-100 text-slate-600',
 }
 

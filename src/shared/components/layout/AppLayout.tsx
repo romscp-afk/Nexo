@@ -52,7 +52,7 @@ export function AppLayout() {
                   className={cn(
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
-                      ? 'bg-white text-nexo-900 shadow-sm hover:bg-nexo-soft'
+                      ? 'bg-white text-nexo-950 shadow-sm hover:bg-nexo-soft'
                       : 'bg-nexo-700 text-white hover:bg-nexo-800',
                   )}
                 >
@@ -83,7 +83,7 @@ export function AppLayout() {
                   className={cn(
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
-                      ? 'bg-nexo-400 text-nexo-950 hover:bg-nexo-accent'
+                      ? 'bg-nexo-600 text-white hover:bg-nexo-800'
                       : 'bg-nexo-700 text-white hover:bg-nexo-800',
                   )}
                 >
