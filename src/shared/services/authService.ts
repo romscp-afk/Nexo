@@ -5,6 +5,7 @@ import { mapProfileRow, type UserProfile } from '@/shared/types/database'
 import type { SignUpInput } from '@/shared/types/auth'
 import { formatAuthError } from '@/shared/lib/authErrors'
 import { env } from '@/shared/lib/env'
+import { normalizeSgPhone } from '@/shared/lib/phone'
 
 export type AuthResult<T = void> = {
   data: T
@@ -46,6 +47,15 @@ function mapAuthUser(user: User, profile: UserProfile | null) {
 
 export const authService = {
   async signUp(input: SignUpInput): Promise<AuthResult<{ needsEmailConfirmation: boolean }>> {
+    const phoneE164 = input.phone ? normalizeSgPhone(input.phone) : null
+
+    if ((input.role === 'customer' || input.role === 'provider') && !input.phoneVerificationId) {
+      return {
+        data: { needsEmailConfirmation: false },
+        error: 'Verify your phone number via WhatsApp before creating an account.',
+      }
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: input.email,
       password: input.password,
@@ -53,7 +63,8 @@ export const authService = {
         data: {
           role: input.role,
           full_name: input.fullName,
-          phone: input.phone ?? null,
+          phone: phoneE164,
+          phone_verification_id: input.phoneVerificationId ?? null,
           address_line1: input.addressLine1 ?? null,
           address_line2: input.addressLine2 ?? null,
           postal_code: input.postalCode ?? null,

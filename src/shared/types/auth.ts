@@ -16,6 +16,7 @@ export type SignUpInput = {
   role: import('@/shared/lib/constants').UserRole
   fullName: string
   phone?: string
+  phoneVerificationId?: string
   addressLine1?: string
   addressLine2?: string
   postalCode?: string
