@@ -1,0 +1,9 @@
+{
+  "name": "nexo-vercel-entry",
+  "private": true,
+  "scripts": {
+    "build": "node ../scripts/vercel-build.mjs",
+    "vercel-build": "node ../scripts/vercel-build.mjs",
+    "vercel-install": "node ../scripts/vercel-install.mjs"
+  }
+}
