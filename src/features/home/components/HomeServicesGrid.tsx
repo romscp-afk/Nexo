@@ -6,12 +6,12 @@ import type { ServiceCategory } from '@/shared/types/catalog'
 import { cn } from '@/shared/lib/utils'
 
 const cardStyles = [
-  'from-nexo-600 to-nexo-800',
-  'from-nexo-500 to-nexo-700',
   'from-nexo-700 to-nexo-900',
-  'from-nexo-500 to-nexo-800',
+  'from-nexo-600 to-nexo-800',
+  'from-nexo-800 to-nexo-deep',
   'from-nexo-600 to-nexo-900',
   'from-nexo-700 to-nexo-800',
+  'from-nexo-500 to-nexo-700',
 ]
 
 function HomeCategoryCard({
@@ -36,7 +36,7 @@ function HomeCategoryCard({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-nexo-accent/20 blur-2xl"
+          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-nexo-400/25 blur-2xl"
         />
         <div>
           <span className="text-5xl" aria-hidden>
@@ -47,7 +47,7 @@ function HomeCategoryCard({
             <p className="mt-2 max-w-xl text-base text-nexo-mint/90">{category.description}</p>
           )}
         </div>
-        <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-nexo-accent">
+        <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-nexo-400">
           Book now <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
         </span>
       </Link>

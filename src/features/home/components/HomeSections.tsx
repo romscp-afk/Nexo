@@ -69,7 +69,7 @@ export function HomeHowItWorks() {
               <span className="text-4xl font-black text-nexo-200">{step}</span>
               <h3 className="mt-4 text-xl font-bold text-nexo-900">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-nexo-800/70">{description}</p>
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-nexo-accent transition-all group-hover:w-full" />
+              <div className="absolute bottom-0 left-0 h-1 w-0 bg-nexo-400 transition-all group-hover:w-full" />
             </div>
           ))}
         </div>
@@ -82,13 +82,13 @@ export function HomeCta() {
   return (
     <section className="bg-nexo-50 py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-700 via-nexo-600 to-nexo-800 px-8 py-16 text-center text-white shadow-xl sm:px-16">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-deep via-nexo-700 to-nexo-600 px-8 py-16 text-center text-white shadow-xl sm:px-16">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-40"
+            className="pointer-events-none absolute inset-0 opacity-50"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 20% 80%, #7ee787 0%, transparent 45%), radial-gradient(circle at 80% 20%, #4ade80 0%, transparent 40%)',
+                'radial-gradient(circle at 20% 80%, #73dec5 0%, transparent 45%), radial-gradient(circle at 80% 20%, #8ee8d4 0%, transparent 40%)',
             }}
           />
           <div className="relative">
@@ -100,7 +100,7 @@ export function HomeCta() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 rounded-full bg-nexo-accent px-8 py-3.5 text-sm font-semibold text-nexo-900 shadow-lg transition hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-full bg-nexo-400 px-8 py-3.5 text-sm font-semibold text-nexo-950 shadow-lg transition hover:bg-nexo-accent"
               >
                 Create free account
                 <ArrowRight className="h-4 w-4" />

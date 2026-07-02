@@ -2,22 +2,24 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  /* Balanced sage — rich enough to pop, light enough to breathe */
-  --color-nexo-50: #f0f7f3;
-  --color-nexo-100: #dceee3;
-  --color-nexo-200: #b8ddc9;
-  --color-nexo-300: #8bc4a8;
-  --color-nexo-400: #5aad7f;
-  --color-nexo-500: #3d9468;
-  --color-nexo-600: #2f7a56;
-  --color-nexo-700: #256647;
-  --color-nexo-800: #1e5239;
-  --color-nexo-900: #184030;
-  --color-nexo-950: #0f2a1f;
-  /* Eye-catching accents */
-  --color-nexo-accent: #7ee787;
-  --color-nexo-glow: #4ade80;
-  --color-nexo-mint: #bbf7d0;
+  /* Brand anchor: #73dec5 — mint aqua teal */
+  --color-nexo-50: #eefaf7;
+  --color-nexo-100: #daf5ee;
+  --color-nexo-200: #c0ede3;
+  --color-nexo-300: #9ee8d9;
+  --color-nexo-400: #73dec5;
+  --color-nexo-500: #52cdb0;
+  --color-nexo-600: #3bb59a;
+  --color-nexo-700: #2d9680;
+  --color-nexo-800: #257a68;
+  --color-nexo-900: #1f6355;
+  --color-nexo-950: #163f37;
+  /* Variations of #73dec5 */
+  --color-nexo-accent: #8ee8d4;
+  --color-nexo-glow: #73dec5;
+  --color-nexo-mint: #b8f0e4;
+  --color-nexo-soft: #a5e8d8;
+  --color-nexo-deep: #1a5650;
 }
 
 body {
@@ -54,7 +56,7 @@ body {
     transform: scale(1);
   }
   50% {
-    opacity: 0.65;
+    opacity: 0.7;
     transform: scale(1.05);
   }
 }

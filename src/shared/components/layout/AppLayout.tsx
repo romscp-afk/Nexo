@@ -17,7 +17,7 @@ export function AppLayout() {
         className={cn(
           'sticky top-0 z-50 border-b backdrop-blur-md',
           isHome
-            ? 'border-nexo-700/30 bg-nexo-800/90 text-white'
+            ? 'border-nexo-700/40 bg-nexo-deep/90 text-white'
             : 'border-slate-200 bg-white',
         )}
       >
@@ -52,7 +52,7 @@ export function AppLayout() {
                   className={cn(
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
-                      ? 'bg-nexo-accent text-nexo-900 hover:bg-white'
+                      ? 'bg-nexo-400 text-nexo-950 hover:bg-nexo-accent'
                       : 'bg-nexo-600 text-white hover:bg-nexo-700',
                   )}
                 >
@@ -83,7 +83,7 @@ export function AppLayout() {
                   className={cn(
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
-                      ? 'bg-nexo-accent text-nexo-900 hover:bg-white'
+                      ? 'bg-nexo-400 text-nexo-950 hover:bg-nexo-accent'
                       : 'bg-nexo-600 text-white hover:bg-nexo-700',
                   )}
                 >

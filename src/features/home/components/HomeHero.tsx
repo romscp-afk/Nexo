@@ -23,7 +23,7 @@ export function HomeHero() {
   const { user } = useAuth()
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-800 via-nexo-700 to-nexo-600 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-deep via-nexo-800 to-nexo-600 text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-nexo-glow/25 blur-3xl animate-pulse-glow"
@@ -51,14 +51,14 @@ export function HomeHero() {
       <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
           <div className="relative z-10">
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-nexo-accent/30 bg-nexo-accent/10 px-4 py-1.5 text-sm text-nexo-mint">
-              <Sparkles className="h-4 w-4 text-nexo-accent" />
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-nexo-400/40 bg-nexo-400/15 px-4 py-1.5 text-sm text-nexo-mint">
+              <Sparkles className="h-4 w-4 text-nexo-400" />
               Singapore&apos;s trusted home services hub
             </div>
 
             <h1 className="animate-fade-up-delay-1 mt-6 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
               Your home,
-              <span className="mt-1 block bg-gradient-to-r from-nexo-accent via-nexo-mint to-white bg-clip-text text-transparent">
+              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-nexo-mint bg-clip-text text-transparent">
                 handled with care.
               </span>
             </h1>
@@ -71,7 +71,7 @@ export function HomeHero() {
             <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
               <Link
                 to="/services"
-                className="group inline-flex items-center gap-2 rounded-full bg-nexo-accent px-6 py-3 text-sm font-semibold text-nexo-900 shadow-lg shadow-black/20 transition hover:bg-white"
+                className="group inline-flex items-center gap-2 rounded-full bg-nexo-400 px-6 py-3 text-sm font-semibold text-nexo-950 shadow-lg shadow-black/20 transition hover:bg-nexo-accent"
               >
                 Explore services
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -95,7 +95,7 @@ export function HomeHero() {
 
             <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-nexo-100/80">
               <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-nexo-accent" />
+                <ShieldCheck className="h-4 w-4 text-nexo-400" />
                 Verified providers
               </span>
               <span className="inline-flex items-center gap-1.5">
@@ -103,7 +103,7 @@ export function HomeHero() {
                 Rated & reviewed
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-nexo-accent" />
+                <MapPin className="h-4 w-4 text-nexo-400" />
                 Island-wide coverage
               </span>
             </div>
@@ -119,13 +119,13 @@ export function HomeHero() {
                   <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <p className="mt-2 text-center text-xs text-nexo-accent/90">4.9 · 2,400+ bookings</p>
+              <p className="mt-2 text-center text-xs text-nexo-400">4.9 · 2,400+ bookings</p>
             </div>
 
             {floatingServices.map((item) => (
               <div
                 key={item.label}
-                className="animate-float-delayed absolute z-10 flex items-center gap-2 rounded-2xl border border-white/20 bg-nexo-700/80 px-3 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md"
+                className="animate-float-delayed absolute z-10 flex items-center gap-2 rounded-2xl border border-nexo-400/25 bg-nexo-800/70 px-3 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md"
                 style={{
                   top: item.top,
                   left: item.left,
@@ -143,7 +143,7 @@ export function HomeHero() {
 
             <div
               aria-hidden
-              className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-nexo-accent/25 sm:h-80 sm:w-80"
+              className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-nexo-400/30 sm:h-80 sm:w-80"
             />
           </div>
         </div>
@@ -186,12 +186,12 @@ export function HomeAssistantPromo() {
       <div className="relative overflow-hidden rounded-3xl border border-nexo-200 bg-gradient-to-br from-nexo-100 to-white px-8 py-10 sm:px-12 sm:py-14">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-nexo-glow/20 blur-2xl"
+          className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-nexo-400/25 blur-2xl"
         />
         <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-nexo-600 shadow-md">
-              <Bot className="h-7 w-7 text-nexo-accent" />
+              <Bot className="h-7 w-7 text-nexo-400" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-nexo-900">Meet your AI concierge</h2>
