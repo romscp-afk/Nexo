@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { APP_NAME } from '@/shared/lib/constants'
 import { cn } from '@/shared/lib/utils'
+import logoUrl from '@/assets/logo.png'
 
 type LogoProps = {
   to?: string
@@ -25,7 +26,7 @@ export function Logo({ to = '/', className, showName = true, size = 'md' }: Logo
   const content = (
     <>
       <img
-        src="/logo.png"
+        src={logoUrl}
         alt={`${APP_NAME} logo`}
         className={cn('shrink-0 object-contain', imageSizes[size])}
       />
