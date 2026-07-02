@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=20.19.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "typecheck": "tsc -b",
     "lint": "oxlint",
     "preview": "vite preview",
     "setup:db": "node scripts/apply-schema.mjs",
@@ -16,7 +17,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
+    "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-query": "^5.101.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.22.0",
@@ -25,19 +28,17 @@
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
     "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.2",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.2",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^24.13.2",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
-    "pg": "^8.22.0",
-    "tailwindcss": "^4.3.2",
-    "typescript": "~6.0.2",
-    "vite": "^8.1.2"
+    "pg": "^8.22.0"
   }
 }
