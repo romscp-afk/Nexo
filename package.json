@@ -12,6 +12,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "setup:db": "node scripts/apply-schema.mjs",
+    "setup:phone-verification": "node scripts/apply-phone-verification.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
   "dependencies": {
