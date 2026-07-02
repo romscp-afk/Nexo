@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm run vercel-install",
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "buildCommand": "node scripts/vercel-gathering-build.mjs",
+  "outputDirectory": "deploy/silver-legacy-site",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

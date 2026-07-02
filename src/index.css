@@ -20,13 +20,33 @@
   --color-nexo-mint: #b8f0e4;
   --color-nexo-soft: #a5e8d8;
   --color-nexo-deep: #1a5650;
+  /* Silver Legacy banner palette */
+  --color-legacy-950: #121212;
+  --color-legacy-900: #1a1a1a;
+  --color-legacy-800: #2a2a2a;
+  --color-legacy-700: #3d3d3d;
+  --color-legacy-silver: #b8bcc4;
+  --color-legacy-silver-light: #e8eaed;
+  --color-legacy-gold: #f5c842;
+  --color-legacy-gold-dark: #d4a017;
+  --color-legacy-red: #e1251b;
+  --color-legacy-sky: #6fa3bc;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100%;
 }
 
 @keyframes float {

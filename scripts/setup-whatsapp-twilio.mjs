@@ -59,5 +59,5 @@ console.log('  1. Twilio Console → Messaging → Try WhatsApp → note join ph
 console.log('  2. From YOUR WhatsApp, message the sandbox number: join <phrase>')
 console.log('  3. Each test user must also join the sandbox before receiving OTPs')
 console.log('')
-console.log(`Test: https://nexo-service-sepia.vercel.app/register`)
+console.log(`Test: ${process.env.VITE_SITE_URL?.replace(/\/$/, '') || 'https://nexo-service-sepia.vercel.app'}/register`)
 console.log(`Function: https://${projectRef}.supabase.co/functions/v1/whatsapp-otp`)

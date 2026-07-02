@@ -1,4 +1,4 @@
-import { HomeHero, HomeAssistantPromo } from '@/features/home/components/HomeHero'
+import { HomeHero } from '@/features/home/components/HomeHero'
 import { HomeServicesGrid } from '@/features/home/components/HomeServicesGrid'
 import { HomeTrustBar, HomeHowItWorks, HomeCta } from '@/features/home/components/HomeSections'
 
@@ -9,7 +9,6 @@ export function HomePage() {
       <HomeServicesGrid />
       <HomeTrustBar />
       <HomeHowItWorks />
-      <HomeAssistantPromo />
       <HomeCta />
     </div>
   )

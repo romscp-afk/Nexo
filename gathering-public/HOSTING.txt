@@ -1,0 +1,21 @@
+Silver Legacy 2001 — upload package
+=====================================
+
+This is NOT separate HTML files for each page.
+It is ONE website made of:
+  - index.html          (start here)
+  - assets/             (styles, scripts, images)
+  - .htaccess           (Apache — keeps /contact URLs working)
+
+Pages (same site, different URLs):
+  /contact              Intro
+  /contact/entry        Survey form
+  /contact/thank-you    Thank you
+  /contact/admin/login  Admin login (Username: Admin)
+  /contact/report       Survey report (admin only)
+
+Upload everything in this folder to your web root (public_html).
+
+After upload open: https://yourdomain.com/contact
+
+Admin login: https://yourdomain.com/contact/admin/login

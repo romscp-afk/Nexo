@@ -1,6 +1,6 @@
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/shared/lib/supabase'
-import { parseRole, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, type UserRole } from '@/shared/lib/constants'
+import { parseRole, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, getSiteUrl, type UserRole } from '@/shared/lib/constants'
 import { mapProfileRow, type UserProfile } from '@/shared/types/database'
 import type { SignUpInput } from '@/shared/types/auth'
 import { formatAuthError } from '@/shared/lib/authErrors'
@@ -53,7 +53,7 @@ export const authService = {
       email: input.email,
       password: input.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/login`,
+        emailRedirectTo: `${getSiteUrl()}/login`,
         data: {
           role: input.role,
           full_name: input.fullName,

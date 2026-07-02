@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
-  Bot,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -174,36 +173,6 @@ export function HomeHero() {
               </span>
             ))}
           </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export function HomeAssistantPromo() {
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-3xl border border-nexo-200 bg-gradient-to-br from-nexo-100 to-white px-8 py-10 sm:px-12 sm:py-14">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-nexo-400/25 blur-2xl"
-        />
-        <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-nexo-600 shadow-md">
-              <Bot className="h-7 w-7 text-nexo-400" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-nexo-900">Meet your AI concierge</h2>
-              <p className="mt-2 max-w-md text-nexo-800/80">
-                Tap <strong className="text-nexo-700">Ask Nexo</strong> anytime — get instant help with
-                bookings, PayNow payments, provider jobs, and more.
-              </p>
-            </div>
-          </div>
-          <p className="rounded-full border border-nexo-300 bg-nexo-50 px-4 py-2 text-sm font-medium text-nexo-700">
-            Available on every page ↘
-          </p>
         </div>
       </div>
     </section>

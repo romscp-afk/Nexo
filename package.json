@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && test -f dist/index.html",
+    "build:gathering": "node scripts/package-gathering.mjs",
+    "build:gathering:site": "node scripts/build-gathering.mjs",
+    "deploy:vercel": "node scripts/build-gathering.mjs && vercel deploy deploy/silver-legacy-site --prebuilt",
+    "dev:gathering": "vite --config vite.gathering.config.ts --open /gathering/",
     "vercel-build": "node scripts/vercel-build.mjs",
     "vercel-install": "node scripts/vercel-install.mjs",
     "typecheck": "tsc -b",
@@ -35,6 +39,7 @@
     "tailwindcss": "^4.3.2",
     "typescript": "~6.0.2",
     "vite": "^8.1.2",
+    "xlsx": "^0.18.5",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

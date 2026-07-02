@@ -27,3 +27,7 @@ dist-ssr
 .env
 .env.local
 .vercel
+
+# Gathering deploy artifacts (built locally / on Vercel)
+deploy/silver-legacy-site/
+deploy/*.zip

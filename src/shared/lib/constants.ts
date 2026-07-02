@@ -2,6 +2,18 @@ export const APP_NAME = 'Nexo'
 export const APP_TAGLINE = 'Connecting Trust. Simplifying Life'
 export const DEVELOPER_NAME = 'Roms'
 
+/** Production site URL (Vercel). Override with VITE_SITE_URL in .env */
+export const SITE_URL =
+  (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') ||
+  'https://nexo-service-sepia.vercel.app'
+
+export function getSiteUrl(): string {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return import.meta.env.VITE_SITE_URL?.replace(/\/$/, '') || window.location.origin
+  }
+  return SITE_URL
+}
+
 export const ROLES = {
   CUSTOMER: 'customer',
   PROVIDER: 'provider',
