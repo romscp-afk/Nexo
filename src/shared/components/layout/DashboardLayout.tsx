@@ -1,10 +1,11 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
-import { APP_NAME, type UserRole } from '@/shared/lib/constants'
+import { type UserRole } from '@/shared/lib/constants'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
+import { Logo } from '@/shared/components/layout/Logo'
 
 type NavItem = { to: string; label: string; exact?: boolean; badge?: boolean }
 
@@ -83,8 +84,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white md:block">
-        <div className="flex h-14 items-center border-b border-slate-200 px-4 font-semibold text-teal-700">
-          {APP_NAME}
+        <div className="flex h-14 items-center border-b border-slate-200 px-4">
+          <Logo to="/" size="sm" />
         </div>
         <nav className="space-y-1 p-3">
           {nav.map((item) => (
@@ -108,8 +109,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
           <aside className="absolute left-0 top-0 h-full w-56 bg-white shadow-xl">
-            <div className="flex h-14 items-center justify-between border-b px-4 font-semibold">
-              {APP_NAME}
+            <div className="flex h-14 items-center justify-between border-b px-4">
+              <Logo to="/" size="sm" />
               <button onClick={() => setSidebarOpen(false)} aria-label="Close menu">
                 <X className="h-5 w-5" />
               </button>

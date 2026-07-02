@@ -2,6 +2,7 @@ import { Link, Outlet } from 'react-router-dom'
 import { APP_NAME, getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
+import { Logo } from '@/shared/components/layout/Logo'
 
 export function AppLayout() {
   const { user } = useAuth()
@@ -10,9 +11,7 @@ export function AppLayout() {
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link to="/" className="font-semibold text-teal-700">
-            {APP_NAME}
-          </Link>
+          <Logo to="/" />
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/services" className="text-slate-600 hover:text-teal-700">
               Services
