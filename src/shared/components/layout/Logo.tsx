@@ -8,6 +8,8 @@ type LogoProps = {
   className?: string
   showName?: boolean
   size?: 'sm' | 'md' | 'lg'
+  /** White badge behind logo — for dark headers */
+  highlighted?: boolean
 }
 
 const imageSizes = {
@@ -22,16 +24,36 @@ const nameSizes = {
   lg: 'text-2xl font-bold',
 } as const
 
-export function Logo({ to = '/', className, showName = true, size = 'md' }: LogoProps) {
+export function Logo({
+  to = '/',
+  className,
+  showName = true,
+  size = 'md',
+  highlighted = false,
+}: LogoProps) {
   const content = (
     <>
-      <img
-        src={logoUrl}
-        alt={`${APP_NAME} logo`}
-        className={cn('shrink-0 object-contain', imageSizes[size])}
-      />
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center justify-center',
+          highlighted && 'rounded-xl bg-white p-1 shadow-md shadow-black/10',
+        )}
+      >
+        <img
+          src={logoUrl}
+          alt={`${APP_NAME} logo`}
+          className={cn('object-contain', imageSizes[size], highlighted && 'h-[2rem] w-[2rem]')}
+        />
+      </span>
       {showName && (
-        <span className={cn('text-nexo-500', nameSizes[size])}>{APP_NAME}</span>
+        <span
+          className={cn(
+            highlighted ? 'font-semibold text-white' : 'text-nexo-500',
+            nameSizes[size],
+          )}
+        >
+          {APP_NAME}
+        </span>
       )}
     </>
   )

@@ -22,10 +22,7 @@ export function AppLayout() {
         )}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Logo
-            to="/"
-            className={isHome ? '[&_span]:text-white' : undefined}
-          />
+          <Logo to="/" highlighted={isHome} />
           <nav className="flex items-center gap-4 text-sm">
             <Link
               to="/services"
