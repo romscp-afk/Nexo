@@ -6,6 +6,7 @@ import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
+import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 
 type NavItem = { to: string; label: string; exact?: boolean; badge?: boolean }
 
@@ -143,8 +144,11 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             <LogoutButton />
           </div>
         </header>
-        <main className="flex-1 p-6">
-          <Outlet />
+        <main className="flex flex-1 flex-col p-6">
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <SiteFooter compact className="mt-8 border-0" />
         </main>
       </div>
     </div>

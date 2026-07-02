@@ -1,8 +1,9 @@
 import { Link, Outlet } from 'react-router-dom'
-import { APP_NAME, getDashboardPath } from '@/shared/lib/constants'
+import { getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
+import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 
 export function AppLayout() {
   const { user } = useAuth()
@@ -48,9 +49,7 @@ export function AppLayout() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         <Outlet />
       </main>
-      <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} {APP_NAME} · Singapore home services marketplace
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
