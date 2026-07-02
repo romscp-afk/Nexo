@@ -25,8 +25,33 @@ export function useCreateReview() {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['review', data.bookingId] })
       void queryClient.invalidateQueries({ queryKey: ['customer-reviews'] })
+      void queryClient.invalidateQueries({ queryKey: ['provider-reviews', data.providerId] })
+      void queryClient.invalidateQueries({ queryKey: ['public-reviews'] })
       void queryClient.invalidateQueries({ queryKey: ['provider', data.providerId] })
       void queryClient.invalidateQueries({ queryKey: ['providers'] })
+    },
+  })
+}
+
+export function useProviderReviews(providerId: string) {
+  return useQuery({
+    queryKey: ['provider-reviews', providerId],
+    queryFn: async () => {
+      const { data, error } = await reviewService.listForProvider(providerId)
+      if (error) throw new Error(error)
+      return data
+    },
+    enabled: Boolean(providerId),
+  })
+}
+
+export function usePublicReviews(limit = 6) {
+  return useQuery({
+    queryKey: ['public-reviews', limit],
+    queryFn: async () => {
+      const { data, error } = await reviewService.listRecentPublic(limit)
+      if (error) throw new Error(error)
+      return data
     },
   })
 }

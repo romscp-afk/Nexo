@@ -18,6 +18,7 @@ export type Review = {
   createdAt: string
   providerName?: string
   serviceName?: string
+  customerName?: string
 }
 
 export type CreateReviewInput = {
