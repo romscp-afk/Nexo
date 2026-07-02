@@ -47,6 +47,7 @@ export const router = createBrowserRouter([
       { path: '/services', element: <ServicesPage /> },
       { path: '/services/:slug', element: <CategoryPage /> },
       { path: '/providers', element: <ProvidersPage /> },
+      { path: '/providers/category/:slug', element: <ProvidersPage /> },
       { path: '/providers/:id', element: <ProviderDetailPage /> },
       {
         element: <ProtectedRoute />,

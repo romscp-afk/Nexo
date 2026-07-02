@@ -23,7 +23,7 @@ export function ProviderDetailPage() {
       <QueryState loading={isLoading} error={error} empty={!provider}>
         {provider && (
           <>
-            <PageHeader backTo="/providers" backLabel="All providers" title={provider.businessName} />
+            <PageHeader backTo="/providers" backLabel="All categories" title={provider.businessName} />
 
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="space-y-6 lg:col-span-2">

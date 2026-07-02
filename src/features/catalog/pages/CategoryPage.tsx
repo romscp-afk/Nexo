@@ -74,7 +74,7 @@ export function CategoryPage() {
           Request {category.name.toLowerCase()} →
         </Link>
         <Link
-          to={`/providers?category=${category.slug}`}
+          to={`/providers/category/${category.slug}`}
           className="mt-2 ml-3 inline-block text-sm font-medium text-nexo-700 hover:underline"
         >
           Or pick a provider

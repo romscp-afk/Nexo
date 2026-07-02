@@ -1,8 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 import { providerService } from '@/shared/services/providerService'
-import type { ProviderFilters } from '@/shared/types/catalog'
+import type { ProviderFilters, ProviderListing } from '@/shared/types/catalog'
 
-export function useProviders(filters: ProviderFilters = {}) {
+export function useProviders(
+  filters: ProviderFilters = {},
+  options?: Pick<UseQueryOptions<ProviderListing[]>, 'enabled'>,
+) {
   return useQuery({
     queryKey: ['providers', filters],
     queryFn: async () => {
@@ -10,6 +13,7 @@ export function useProviders(filters: ProviderFilters = {}) {
       if (error) throw new Error(error)
       return data
     },
+    enabled: options?.enabled ?? true,
   })
 }
 
