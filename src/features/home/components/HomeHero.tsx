@@ -111,7 +111,7 @@ export function HomeHero() {
 
           <div className="relative mx-auto h-[340px] w-full max-w-md sm:h-[400px] lg:mx-0 lg:max-w-none">
             <div className="animate-float absolute left-1/2 top-1/2 z-20 w-56 -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-xl sm:w-64">
-              <img src={logoUrl} alt="" className="mx-auto h-20 w-20 object-contain" />
+              <img src={logoUrl} alt="" className="mx-auto h-24 w-24 object-contain" />
               <p className="mt-3 text-center text-lg font-bold text-white">{APP_NAME}</p>
               <p className="mt-1 text-center text-xs text-nexo-mint/90">{APP_TAGLINE}</p>
               <div className="mt-4 flex justify-center gap-1">

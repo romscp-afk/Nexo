@@ -11,9 +11,9 @@ type LogoProps = {
 }
 
 const imageSizes = {
-  sm: 'h-7 w-7',
-  md: 'h-8 w-8',
-  lg: 'h-16 w-16',
+  sm: 'h-[2.1rem] w-[2.1rem]',
+  md: 'h-[2.4rem] w-[2.4rem]',
+  lg: 'h-[4.8rem] w-[4.8rem]',
 } as const
 
 const nameSizes = {

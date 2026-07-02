@@ -30,11 +30,14 @@ export function formatAuthError(error: AuthLikeError | null | undefined): string
 
   const message = error.message?.trim()
   if (message && message !== '{}' && !isNetworkError(message, error.name)) {
+    if (/phone whatsapp verification|phone verification is required|invalid or expired phone verification/i.test(message)) {
+      return 'Registration is blocked by an old WhatsApp verification rule in the database. Ask your admin to run supabase/restore-email-registration.sql in the Supabase SQL Editor.'
+    }
     return message
   }
 
   if (error.status === 500 || message === '{}') {
-    return 'Could not complete sign in. There may be a database configuration issue — please try again in a moment.'
+    return 'Could not complete auth. This is often a database trigger issue — run supabase/restore-email-registration.sql in the Supabase SQL Editor, then try again.'
   }
 
   if (isNetworkError(message ?? '', error.name)) {

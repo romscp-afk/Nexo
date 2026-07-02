@@ -65,3 +65,8 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION handle_new_user() TO service_role;
+GRANT EXECUTE ON FUNCTION handle_new_user() TO supabase_auth_admin;
+GRANT INSERT ON public.profiles TO supabase_auth_admin;
+GRANT INSERT ON public.providers TO supabase_auth_admin;
