@@ -58,7 +58,7 @@ export function AdminUsersPage() {
                         type="button"
                         onClick={() => toggleActive(user.userId, user.isActive)}
                         disabled={setActive.isPending}
-                        className="text-teal-700 hover:underline disabled:opacity-50"
+                        className="text-nexo-700 hover:underline disabled:opacity-50"
                       >
                         {user.isActive ? 'Deactivate' : 'Activate'}
                       </button>

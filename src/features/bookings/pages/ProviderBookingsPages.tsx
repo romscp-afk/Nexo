@@ -28,7 +28,7 @@ export function ProviderDashboardPage() {
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Active jobs</p>
-          <p className="mt-1 text-2xl font-bold text-teal-700">{active.length}</p>
+          <p className="mt-1 text-2xl font-bold text-nexo-700">{active.length}</p>
         </div>
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
           <p className="text-sm font-medium text-amber-900">Cash jobs</p>
@@ -46,7 +46,7 @@ export function ProviderDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Your bookings</h2>
-          <Link to="/provider/bookings" className="text-sm text-teal-700 hover:underline">View all</Link>
+          <Link to="/provider/bookings" className="text-sm text-nexo-700 hover:underline">View all</Link>
         </div>
         <QueryState loading={isLoading} error={error} empty={!bookings?.length}>
           <BookingList bookings={bookings?.slice(0, 5) ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No bookings yet." showPaymentMethod />

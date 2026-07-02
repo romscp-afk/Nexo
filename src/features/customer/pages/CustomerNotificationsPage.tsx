@@ -61,7 +61,7 @@ export function CustomerNotificationsPage() {
                       handleOpen(notification.id, notification.readAt, bookingId)
                     }
                     className={`w-full px-5 py-4 text-left transition hover:bg-slate-50 ${
-                      notification.readAt ? '' : 'bg-teal-50/40'
+                      notification.readAt ? '' : 'bg-nexo-50/40'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -73,11 +73,11 @@ export function CustomerNotificationsPage() {
                         </p>
                       </div>
                       {!notification.readAt && (
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-teal-600" />
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-nexo-600" />
                       )}
                     </div>
                     {bookingId && (
-                      <span className="mt-2 inline-block text-xs font-medium text-teal-700">
+                      <span className="mt-2 inline-block text-xs font-medium text-nexo-700">
                         View booking →
                       </span>
                     )}
@@ -91,7 +91,7 @@ export function CustomerNotificationsPage() {
 
       <p className="mt-6 text-sm text-slate-500">
         Need a new service?{' '}
-        <Link to="/providers" className="font-medium text-teal-700 hover:underline">
+        <Link to="/providers" className="font-medium text-nexo-700 hover:underline">
           Browse providers
         </Link>
       </p>

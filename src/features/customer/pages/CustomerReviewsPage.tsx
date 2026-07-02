@@ -50,7 +50,7 @@ export function CustomerReviewsPage() {
                 )}
                 <Link
                   to={`/dashboard/bookings/${review.bookingId}`}
-                  className="mt-3 inline-block text-sm font-medium text-teal-700 hover:underline"
+                  className="mt-3 inline-block text-sm font-medium text-nexo-700 hover:underline"
                 >
                   View booking
                 </Link>

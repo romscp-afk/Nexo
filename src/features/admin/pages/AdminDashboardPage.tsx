@@ -42,7 +42,7 @@ export function AdminDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Recent bookings</h2>
-          <Link to="/admin/bookings" className="text-sm text-teal-700 hover:underline">
+          <Link to="/admin/bookings" className="text-sm text-nexo-700 hover:underline">
             View all
           </Link>
         </div>
@@ -82,25 +82,25 @@ export function AdminDashboardPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           to="/admin/payments"
-          className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-medium text-teal-800 hover:bg-teal-100"
+          className="rounded-xl border border-nexo-200 bg-nexo-50 p-4 text-sm font-medium text-nexo-800 hover:bg-nexo-100"
         >
           PayNow payments →
         </Link>
         <Link
           to="/admin/activity"
-          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
+          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-nexo-700 hover:border-nexo-200"
         >
           Activity log →
         </Link>
         <Link
           to="/admin/users"
-          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
+          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-nexo-700 hover:border-nexo-200"
         >
           Manage users →
         </Link>
         <Link
           to="/admin/providers"
-          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-teal-700 hover:border-teal-200"
+          className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-nexo-700 hover:border-nexo-200"
         >
           Manage providers →
         </Link>

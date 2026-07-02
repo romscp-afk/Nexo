@@ -68,7 +68,7 @@ function AdminLoginHelp({
         type="button"
         onClick={onCreateAdmin}
         disabled={creating}
-        className="rounded-md bg-teal-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+        className="rounded-md bg-nexo-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
       >
         {creating ? 'Creating admin…' : 'Create admin account (one click)'}
       </button>
@@ -197,7 +197,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-teal-700 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="w-full rounded-lg bg-nexo-700 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
         >
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
@@ -205,7 +205,7 @@ export function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         No account?{' '}
-        <Link to="/register" className="font-medium text-teal-700 hover:underline">
+        <Link to="/register" className="font-medium text-nexo-700 hover:underline">
           Register
         </Link>
       </p>
@@ -320,7 +320,7 @@ export function RegisterPage() {
                 disabled={loading}
                 className={`flex-1 rounded-lg border py-2 text-sm capitalize ${
                   role === r
-                    ? 'border-teal-700 bg-teal-50 text-teal-700'
+                    ? 'border-nexo-700 bg-nexo-50 text-nexo-700'
                     : 'border-slate-200 text-slate-600'
                 }`}
               >
@@ -557,7 +557,7 @@ export function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Have an account?{' '}
-        <Link to="/login" className="font-medium text-teal-700 hover:underline">
+        <Link to="/login" className="font-medium text-nexo-700 hover:underline">
           Log in
         </Link>
       </p>

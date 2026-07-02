@@ -28,7 +28,7 @@ export function ProviderDetailPage() {
                       <span className="text-sm text-slate-500">({provider.ratingCount} reviews)</span>
                     </div>
                     {provider.isVerified && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-nexo-50 px-2.5 py-1 text-xs font-medium text-nexo-700">
                         <BadgeCheck className="h-3.5 w-3.5" />
                         Verified
                       </span>
@@ -64,13 +64,13 @@ export function ProviderDetailPage() {
                             <p className="text-xs text-slate-500">{service.categoryName}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-medium text-teal-700">
+                            <p className="text-sm font-medium text-nexo-700">
                               from {formatCurrency(service.priceFrom)}
                             </p>
                             {isCustomer && (
                               <Link
                                 to={`/providers/${id}/book?service=${service.serviceId}`}
-                                className="mt-1 inline-block text-xs text-teal-700 hover:underline"
+                                className="mt-1 inline-block text-xs text-nexo-700 hover:underline"
                               >
                                 Book this →
                               </Link>
@@ -93,7 +93,7 @@ export function ProviderDetailPage() {
                 {isCustomer ? (
                   <Link
                     to={`/providers/${id}/book`}
-                    className="mt-6 block w-full rounded-lg bg-teal-700 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800"
+                    className="mt-6 block w-full rounded-lg bg-nexo-700 py-2.5 text-center text-sm font-medium text-white hover:bg-nexo-800"
                   >
                     Book now
                   </Link>
@@ -104,7 +104,7 @@ export function ProviderDetailPage() {
                 ) : (
                   <Link
                     to="/login"
-                    className="mt-6 block w-full rounded-lg bg-teal-700 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800"
+                    className="mt-6 block w-full rounded-lg bg-nexo-700 py-2.5 text-center text-sm font-medium text-white hover:bg-nexo-800"
                   >
                     Log in to book
                   </Link>

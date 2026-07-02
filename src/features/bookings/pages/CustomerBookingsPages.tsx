@@ -42,7 +42,7 @@ export function CustomerDashboardPage() {
 
       {(user?.preferredArea || user?.addressLine1) && (
         <div className="flex items-start gap-2 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-teal-700" />
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-nexo-700" />
           <div>
             <p className="font-medium text-slate-900">Default service location</p>
             <p className="mt-0.5">
@@ -51,7 +51,7 @@ export function CustomerDashboardPage() {
               {user.postalCode && ` · ${user.postalCode}`}
             </p>
             {user.preferredArea && <p className="text-xs text-slate-500">{user.preferredArea}</p>}
-            <Link to="/dashboard/profile" className="mt-1 inline-block text-xs text-teal-700 hover:underline">
+            <Link to="/dashboard/profile" className="mt-1 inline-block text-xs text-nexo-700 hover:underline">
               Edit profile →
             </Link>
           </div>
@@ -73,7 +73,7 @@ export function CustomerDashboardPage() {
         </div>
         <Link
           to="/dashboard/notifications"
-          className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-teal-200"
+          className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-nexo-200"
         >
           <p className="text-sm text-slate-500">Notifications</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{unreadNotifications}</p>
@@ -84,7 +84,7 @@ export function CustomerDashboardPage() {
       <div className="grid gap-3 sm:grid-cols-3">
         <Link
           to={user?.preferredArea ? `/providers?area=${encodeURIComponent(user.preferredArea)}` : '/providers'}
-          className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm font-medium text-teal-800 hover:bg-teal-100"
+          className="rounded-xl border border-nexo-200 bg-nexo-50 p-4 text-sm font-medium text-nexo-800 hover:bg-nexo-100"
         >
           Book a provider →
         </Link>
@@ -129,7 +129,7 @@ export function CustomerDashboardPage() {
                 ? `/providers?area=${encodeURIComponent(user.preferredArea)}`
                 : '/providers'
             }
-            className="text-sm text-teal-700 hover:underline"
+            className="text-sm text-nexo-700 hover:underline"
           >
             View all
           </Link>
@@ -155,7 +155,7 @@ export function CustomerDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Recent bookings</h2>
-          <Link to="/dashboard/bookings" className="text-sm text-teal-700 hover:underline">
+          <Link to="/dashboard/bookings" className="text-sm text-nexo-700 hover:underline">
             View all
           </Link>
         </div>
@@ -213,7 +213,7 @@ export function CustomerBookingsPage() {
             onClick={() => setFilter(item.id)}
             className={`rounded-full px-3 py-1 text-sm font-medium ${
               filter === item.id
-                ? 'bg-teal-700 text-white'
+                ? 'bg-nexo-700 text-white'
                 : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
             }`}
           >

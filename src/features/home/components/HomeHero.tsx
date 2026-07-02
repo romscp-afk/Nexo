@@ -22,14 +22,14 @@ export function HomeHero() {
   const { user } = useAuth()
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-deep via-nexo-800 to-nexo-600 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-nexo-ink via-nexo-deep to-nexo-900 text-white">
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-nexo-glow/25 blur-3xl animate-pulse-glow"
+        className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-nexo-glow/15 blur-3xl animate-pulse-glow"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-nexo-accent/15 blur-3xl animate-pulse-glow"
+        className="pointer-events-none absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-nexo-accent/10 blur-3xl animate-pulse-glow"
         style={{ animationDelay: '1.5s' }}
       />
       <div
@@ -50,19 +50,19 @@ export function HomeHero() {
       <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
           <div className="relative z-10">
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-nexo-400/40 bg-nexo-400/15 px-4 py-1.5 text-sm text-nexo-mint">
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-nexo-champagne backdrop-blur-sm">
               <Sparkles className="h-4 w-4 text-nexo-400" />
               Singapore&apos;s trusted home services hub
             </div>
 
             <h1 className="animate-fade-up-delay-1 mt-6 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
               Your home,
-              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-nexo-mint bg-clip-text text-transparent">
+              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-nexo-champagne bg-clip-text text-transparent">
                 handled with care.
               </span>
             </h1>
 
-            <p className="animate-fade-up-delay-2 mt-5 max-w-lg text-lg leading-relaxed text-nexo-100/90">
+            <p className="animate-fade-up-delay-2 mt-5 max-w-lg text-lg leading-relaxed text-nexo-mint/80">
               {APP_TAGLINE}. Book verified cleaners, handymen, movers and more — all in one
               marketplace built for Singapore.
             </p>
@@ -70,7 +70,7 @@ export function HomeHero() {
             <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
               <Link
                 to="/services"
-                className="group inline-flex items-center gap-2 rounded-full bg-nexo-400 px-6 py-3 text-sm font-semibold text-nexo-950 shadow-lg shadow-black/20 transition hover:bg-nexo-accent"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-nexo-900 shadow-lg shadow-black/15 transition hover:bg-nexo-soft"
               >
                 Explore services
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -92,7 +92,7 @@ export function HomeHero() {
               )}
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-nexo-100/80">
+            <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-nexo-mint/75">
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck className="h-4 w-4 text-nexo-400" />
                 Verified providers
@@ -109,7 +109,7 @@ export function HomeHero() {
           </div>
 
           <div className="relative mx-auto h-[340px] w-full max-w-md sm:h-[400px] lg:mx-0 lg:max-w-none">
-            <div className="animate-float absolute left-1/2 top-1/2 z-20 w-56 -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-xl sm:w-64">
+            <div className="animate-float absolute left-1/2 top-1/2 z-20 w-56 -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl sm:w-64">
               <img src={logoUrl} alt="" className="mx-auto h-24 w-24 object-contain" />
               <p className="mt-3 text-center text-lg font-bold text-white">{APP_NAME}</p>
               <p className="mt-1 text-center text-xs text-nexo-mint/90">{APP_TAGLINE}</p>

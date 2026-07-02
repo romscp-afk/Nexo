@@ -55,12 +55,12 @@ function NavLink({
       onClick={onNavigate}
       className={cn(
         'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium',
-        isActive ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-slate-100',
+        isActive ? 'bg-nexo-50 text-nexo-700' : 'text-slate-600 hover:bg-slate-100',
       )}
     >
       <span>{item.label}</span>
       {item.badge && unreadCount > 0 && (
-        <span className="rounded-full bg-teal-700 px-1.5 py-0.5 text-xs text-white">
+        <span className="rounded-full bg-nexo-700 px-1.5 py-0.5 text-xs text-white">
           {unreadCount}
         </span>
       )}
@@ -97,7 +97,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               unreadCount={unreadCount}
             />
           ))}
-          <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-teal-700">
+          <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-nexo-700">
             ← Back to site
           </Link>
           <div className="mt-2 border-t border-slate-100 pt-2">

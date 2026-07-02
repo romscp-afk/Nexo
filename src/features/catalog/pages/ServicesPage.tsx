@@ -27,7 +27,7 @@ export function ServicesPage() {
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Ready to hire?{' '}
-        <Link to="/providers" className="font-medium text-teal-700 hover:underline">
+        <Link to="/providers" className="font-medium text-nexo-700 hover:underline">
           Browse providers
         </Link>
       </p>

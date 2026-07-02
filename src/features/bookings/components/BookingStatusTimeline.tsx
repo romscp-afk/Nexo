@@ -15,7 +15,7 @@ export function BookingStatusTimeline({
     <ol className="relative space-y-4 border-l border-slate-200 pl-5">
       {history.map((entry) => (
         <li key={entry.id} className="relative">
-          <span className="absolute -left-[1.35rem] top-1.5 h-2.5 w-2.5 rounded-full bg-teal-600 ring-4 ring-white" />
+          <span className="absolute -left-[1.35rem] top-1.5 h-2.5 w-2.5 rounded-full bg-nexo-600 ring-4 ring-white" />
           <div className="flex flex-wrap items-center gap-2">
             {entry.oldStatus ? (
               <>

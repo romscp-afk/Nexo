@@ -78,7 +78,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
   return (
     <div>
-      <Link to={backPath} className="text-sm text-teal-700 hover:underline">
+      <Link to={backPath} className="text-sm text-nexo-700 hover:underline">
         ← Back to bookings
       </Link>
 
@@ -125,7 +125,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                   </div>
                   <div>
                     <dt className="text-slate-500">Estimated total</dt>
-                    <dd className="font-medium text-teal-700">
+                    <dd className="font-medium text-nexo-700">
                       {booking.totalPrice != null ? formatCurrency(booking.totalPrice) : '—'}
                     </dd>
                   </div>
@@ -161,12 +161,12 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                 <h2 className="font-semibold text-slate-900">Customer contact</h2>
                 <div className="mt-3 flex flex-wrap gap-4 text-sm">
                   <span className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-teal-700" />
+                    <User className="h-4 w-4 text-nexo-700" />
                     {booking.customerName}
                   </span>
                   {booking.customerPhone && (
                     <span className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-teal-700" />
+                      <Phone className="h-4 w-4 text-nexo-700" />
                       {booking.customerPhone}
                     </span>
                   )}
@@ -211,13 +211,13 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                 )}
 
                 {role === 'provider' && isOpenRequest && (
-                  <button type="button" onClick={handleAccept} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                  <button type="button" onClick={handleAccept} disabled={isPending} className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                     Accept this job
                   </button>
                 )}
 
                 {role === 'provider' && booking.providerId && booking.status === 'pending' && (
-                  <button type="button" onClick={() => handleStatus('confirmed')} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                  <button type="button" onClick={() => handleStatus('confirmed')} disabled={isPending} className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                     Confirm booking
                   </button>
                 )}
@@ -231,14 +231,14 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                           : 'Waiting for customer PayNow payment confirmation.'}
                       </p>
                     )}
-                    <button type="button" onClick={() => handleStatus('in_progress')} disabled={isPending || !canStartJob()} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                    <button type="button" onClick={() => handleStatus('in_progress')} disabled={isPending || !canStartJob()} className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                       Start job
                     </button>
                   </>
                 )}
 
                 {role === 'provider' && booking.status === 'in_progress' && (
-                  <button type="button" onClick={() => handleStatus('completed')} disabled={isPending} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                  <button type="button" onClick={() => handleStatus('completed')} disabled={isPending} className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                     Mark service done
                   </button>
                 )}

@@ -111,7 +111,7 @@ export function ProvidersPage() {
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Are you a service professional?{' '}
-        <Link to="/register" className="font-medium text-teal-700 hover:underline">
+        <Link to="/register" className="font-medium text-nexo-700 hover:underline">
           Join as a provider
         </Link>
       </p>

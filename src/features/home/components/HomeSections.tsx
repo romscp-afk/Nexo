@@ -82,25 +82,25 @@ export function HomeCta() {
   return (
     <section className="bg-nexo-50 py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-deep via-nexo-700 to-nexo-600 px-8 py-16 text-center text-white shadow-xl sm:px-16">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-ink via-nexo-deep to-nexo-800 px-8 py-16 text-center text-white shadow-xl sm:px-16">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-50"
+            className="pointer-events-none absolute inset-0 opacity-40"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 20% 80%, #73dec5 0%, transparent 45%), radial-gradient(circle at 80% 20%, #8ee8d4 0%, transparent 40%)',
+                'radial-gradient(circle at 20% 80%, #73dec5 0%, transparent 40%), radial-gradient(circle at 80% 20%, #ddd4c0 0%, transparent 35%)',
             }}
           />
           <div className="relative">
             <h2 className="text-3xl font-bold sm:text-4xl">Ready to simplify your home life?</h2>
-            <p className="mx-auto mt-4 max-w-lg text-nexo-mint/90">
+            <p className="mx-auto mt-4 max-w-lg text-nexo-mint/80">
               Join thousands of Singapore homeowners who trust Nexo for reliable, verified home
               services.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 rounded-full bg-nexo-400 px-8 py-3.5 text-sm font-semibold text-nexo-950 shadow-lg transition hover:bg-nexo-accent"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-nexo-900 shadow-lg transition hover:bg-nexo-soft"
               >
                 Create free account
                 <ArrowRight className="h-4 w-4" />

@@ -9,7 +9,7 @@ export function PaymentMethodBadge({ method }: { method: BookingPaymentMethod })
     )
   }
   return (
-    <span className="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800">
+    <span className="inline-flex items-center rounded-full bg-nexo-100 px-2.5 py-0.5 text-xs font-medium text-nexo-800">
       PayNow
     </span>
   )

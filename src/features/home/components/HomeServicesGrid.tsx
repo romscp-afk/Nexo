@@ -6,12 +6,12 @@ import type { ServiceCategory } from '@/shared/types/catalog'
 import { cn } from '@/shared/lib/utils'
 
 const cardStyles = [
-  'from-nexo-700 to-nexo-900',
-  'from-nexo-600 to-nexo-800',
-  'from-nexo-800 to-nexo-deep',
-  'from-nexo-600 to-nexo-900',
-  'from-nexo-700 to-nexo-800',
-  'from-nexo-500 to-nexo-700',
+  'from-nexo-900 to-nexo-deep',
+  'from-nexo-800 to-nexo-950',
+  'from-nexo-deep to-nexo-800',
+  'from-nexo-900 to-nexo-800',
+  'from-nexo-950 to-nexo-700',
+  'from-nexo-800 to-nexo-900',
 ]
 
 function HomeCategoryCard({
@@ -36,7 +36,7 @@ function HomeCategoryCard({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-nexo-400/25 blur-2xl"
+          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-nexo-400/15 blur-2xl"
         />
         <div>
           <span className="text-5xl" aria-hidden>

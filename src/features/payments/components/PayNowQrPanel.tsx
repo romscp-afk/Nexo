@@ -87,13 +87,13 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
   return (
     <section
       className={`rounded-xl border p-6 ${
-        isAdminFee ? 'border-amber-300 bg-amber-50/50' : 'border-teal-200 bg-teal-50/40'
+        isAdminFee ? 'border-amber-300 bg-amber-50/50' : 'border-nexo-200 bg-nexo-50/40'
       }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 font-semibold text-slate-900">
-            <QrCode className="h-5 w-5 text-teal-700" />
+            <QrCode className="h-5 w-5 text-nexo-700" />
             {PAYMENT_KIND_LABELS[payment.paymentKind]}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
@@ -110,7 +110,7 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
       <dl className="mt-4 grid gap-3 rounded-lg bg-white p-4 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-slate-500">Amount</dt>
-          <dd className="text-lg font-bold text-teal-800">{formatCurrency(payment.amount)}</dd>
+          <dd className="text-lg font-bold text-nexo-800">{formatCurrency(payment.amount)}</dd>
         </div>
         <div>
           <dt className="text-slate-500">PayNow</dt>
@@ -120,7 +120,7 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
           <dt className="text-slate-500">Reference</dt>
           <dd className="flex items-center gap-2 font-mono text-xs font-medium">
             {payment.reference}
-            <button type="button" onClick={() => void copyReference()} className="rounded p-1 text-teal-700 hover:bg-teal-50" aria-label="Copy reference">
+            <button type="button" onClick={() => void copyReference()} className="rounded p-1 text-nexo-700 hover:bg-nexo-50" aria-label="Copy reference">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>
           </dd>
@@ -159,7 +159,7 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
             type="button"
             onClick={() => void handleSubmit()}
             disabled={submitting}
-            className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+            className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
           >
             {submitting ? 'Submitting…' : 'I have paid via PayNow'}
           </button>

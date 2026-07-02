@@ -55,7 +55,7 @@ export function CategoryPage() {
                   <p className="mt-0.5 text-sm text-slate-600">{service.description}</p>
                 )}
               </div>
-              <p className="text-sm font-medium text-teal-700">
+              <p className="text-sm font-medium text-nexo-700">
                 from {formatCurrency(service.basePrice)}
               </p>
             </div>
@@ -63,19 +63,19 @@ export function CategoryPage() {
         </div>
       </QueryState>
 
-      <div className="mt-8 rounded-xl bg-teal-50 px-5 py-4">
-        <p className="text-sm text-teal-900">
+      <div className="mt-8 rounded-xl bg-nexo-50 px-5 py-4">
+        <p className="text-sm text-nexo-900">
           Find a trusted provider for {category.name.toLowerCase()}.
         </p>
         <Link
           to={`/services/${category.slug}/request`}
-          className="mt-2 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+          className="mt-2 inline-block rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800"
         >
           Request {category.name.toLowerCase()} →
         </Link>
         <Link
           to={`/providers?category=${category.slug}`}
-          className="mt-2 ml-3 inline-block text-sm font-medium text-teal-700 hover:underline"
+          className="mt-2 ml-3 inline-block text-sm font-medium text-nexo-700 hover:underline"
         >
           Or pick a provider
         </Link>

@@ -39,7 +39,7 @@ export function BookingCard({
       to={detailPath}
       className={cn(
         'block rounded-xl border bg-white p-5 transition hover:shadow-sm',
-        booking.paymentMethod === 'cash' ? 'border-amber-300 hover:border-amber-400' : 'border-slate-200 hover:border-teal-200',
+        booking.paymentMethod === 'cash' ? 'border-amber-300 hover:border-amber-400' : 'border-slate-200 hover:border-nexo-200',
       )}
     >
       <div className="flex items-start justify-between gap-3">

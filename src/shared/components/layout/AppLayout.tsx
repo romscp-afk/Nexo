@@ -12,13 +12,13 @@ export function AppLayout() {
   const isHome = pathname === '/'
 
   return (
-    <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-50' : 'bg-slate-50 text-slate-900')}>
+    <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-pearl' : 'bg-nexo-50 text-nexo-950')}>
       <header
         className={cn(
-          'sticky top-0 z-50 border-b backdrop-blur-md',
+          'sticky top-0 z-50 border-b backdrop-blur-xl',
           isHome
-            ? 'border-nexo-700/40 bg-nexo-deep/90 text-white'
-            : 'border-slate-200 bg-white',
+            ? 'border-white/10 bg-nexo-ink/75 text-white'
+            : 'border-nexo-200/80 bg-white/90',
         )}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -31,7 +31,7 @@ export function AppLayout() {
               to="/services"
               className={cn(
                 'transition',
-                isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+                isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
               Services
@@ -40,7 +40,7 @@ export function AppLayout() {
               to="/providers"
               className={cn(
                 'transition',
-                isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+                isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
               Providers
@@ -52,8 +52,8 @@ export function AppLayout() {
                   className={cn(
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
-                      ? 'bg-nexo-400 text-nexo-950 hover:bg-nexo-accent'
-                      : 'bg-nexo-600 text-white hover:bg-nexo-700',
+                      ? 'bg-white text-nexo-900 shadow-sm hover:bg-nexo-soft'
+                      : 'bg-nexo-700 text-white hover:bg-nexo-800',
                   )}
                 >
                   Dashboard
@@ -62,7 +62,7 @@ export function AppLayout() {
                   showIcon={false}
                   className={
                     isHome
-                      ? 'border-transparent bg-transparent text-nexo-mint/90 hover:bg-white/10 hover:text-white'
+                      ? 'border-transparent bg-transparent text-nexo-mint/85 hover:bg-white/10 hover:text-white'
                       : undefined
                   }
                 />
@@ -73,7 +73,7 @@ export function AppLayout() {
                   to="/login"
                   className={cn(
                     'transition',
-                    isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+                    isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
                   )}
                 >
                   Log in
@@ -84,7 +84,7 @@ export function AppLayout() {
                     'rounded-lg px-3 py-1.5 font-medium transition',
                     isHome
                       ? 'bg-nexo-400 text-nexo-950 hover:bg-nexo-accent'
-                      : 'bg-nexo-600 text-white hover:bg-nexo-700',
+                      : 'bg-nexo-700 text-white hover:bg-nexo-800',
                   )}
                 >
                   Register
@@ -97,7 +97,7 @@ export function AppLayout() {
       <main className={cn('mx-auto w-full flex-1', isHome ? 'max-w-none px-0 py-0' : 'max-w-5xl px-4 py-8')}>
         <Outlet />
       </main>
-      <SiteFooter className={isHome ? 'border-t border-nexo-200 bg-white' : undefined} />
+      <SiteFooter className={isHome ? 'border-t border-nexo-200/80 bg-white/80' : undefined} />
     </div>
   )
 }

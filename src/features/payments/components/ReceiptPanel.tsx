@@ -18,7 +18,7 @@ export function ReceiptPanel({ bookingId }: { bookingId: string }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6">
       <h2 className="flex items-center gap-2 font-semibold text-slate-900">
-        <FileText className="h-5 w-5 text-teal-700" />
+        <FileText className="h-5 w-5 text-nexo-700" />
         Receipts
       </h2>
       <QueryState
@@ -38,7 +38,7 @@ export function ReceiptPanel({ bookingId }: { bookingId: string }) {
                     {receipt.paymentMethod === 'cash' ? 'Cash job' : 'PayNow'}
                   </p>
                 </div>
-                <p className="text-lg font-bold text-teal-800">{formatCurrency(receipt.amount)}</p>
+                <p className="text-lg font-bold text-nexo-800">{formatCurrency(receipt.amount)}</p>
               </div>
               <p className="mt-2 text-xs text-slate-500">{formatDateTime(receipt.createdAt)}</p>
               {receipt.details.provider_name != null && (

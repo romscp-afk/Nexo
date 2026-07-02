@@ -112,7 +112,7 @@ export function RequestServicePage() {
                 <fieldset className="rounded-xl border border-slate-200 p-4">
                   <legend className="px-1 text-sm font-medium text-slate-700">Payment method</legend>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <label className={`cursor-pointer rounded-lg border p-3 text-sm ${paymentMethod === 'paynow' ? 'border-teal-500 bg-teal-50' : 'border-slate-200'}`}>
+                    <label className={`cursor-pointer rounded-lg border p-3 text-sm ${paymentMethod === 'paynow' ? 'border-nexo-500 bg-nexo-50' : 'border-slate-200'}`}>
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -188,7 +188,7 @@ export function RequestServicePage() {
                     Est. {formatCurrency(totalPrice)} · {paymentMethod === 'cash' ? 'Cash' : 'PayNow'}
                   </p>
                 )}
-                <button type="submit" disabled={createBooking.isPending} className="mt-4 w-full rounded-lg bg-teal-700 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50">
+                <button type="submit" disabled={createBooking.isPending} className="mt-4 w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                   {createBooking.isPending ? 'Sending…' : 'Send request to providers'}
                 </button>
               </aside>

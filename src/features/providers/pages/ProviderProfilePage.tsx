@@ -243,7 +243,7 @@ export function ProviderProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+              className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save profile'}
             </button>

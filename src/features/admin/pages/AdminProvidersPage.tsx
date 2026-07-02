@@ -52,7 +52,7 @@ export function AdminProvidersPage() {
                       type="button"
                       onClick={() => toggleVerified(p.id, p.isVerified)}
                       disabled={setVerified.isPending}
-                      className="text-teal-700 hover:underline disabled:opacity-50"
+                      className="text-nexo-700 hover:underline disabled:opacity-50"
                     >
                       {p.isVerified ? 'Remove verification' : 'Verify'}
                     </button>

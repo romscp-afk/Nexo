@@ -75,7 +75,7 @@ export function AdminPaymentsPage() {
                         type="button"
                         onClick={() => void handleConfirm(payment.id)}
                         disabled={confirmPayment.isPending}
-                        className="rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                        className="rounded-lg bg-nexo-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
                       >
                         Confirm received
                       </button>
