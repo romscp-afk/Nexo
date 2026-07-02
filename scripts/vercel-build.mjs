@@ -34,3 +34,13 @@ if (!files.includes('index.html')) {
   console.error('[vercel-build] dist/index.html missing')
   process.exit(1)
 }
+
+// Embed SPA routing in the output so rewrites apply even if dashboard rootDirectory is stale.
+const distVercelConfig = {
+  rewrites: [{ source: '/(.*)', destination: '/index.html' }],
+}
+fs.writeFileSync(
+  path.join(distDir, 'vercel.json'),
+  `${JSON.stringify(distVercelConfig, null, 2)}\n`,
+)
+console.log('[vercel-build] wrote dist/vercel.json SPA rewrites')
