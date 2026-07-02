@@ -6,8 +6,8 @@ export function HomePage() {
   return (
     <div className="overflow-x-hidden bg-white">
       <HomeHero />
-      <HomeTrustBar />
       <HomeServicesGrid />
+      <HomeTrustBar />
       <HomeHowItWorks />
       <HomeAssistantPromo />
       <HomeCta />

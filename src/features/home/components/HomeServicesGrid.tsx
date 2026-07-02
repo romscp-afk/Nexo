@@ -6,12 +6,12 @@ import type { ServiceCategory } from '@/shared/types/catalog'
 import { cn } from '@/shared/lib/utils'
 
 const cardStyles = [
-  'from-emerald-500/90 to-teal-700',
-  'from-teal-500/90 to-cyan-700',
-  'from-lime-500/90 to-emerald-700',
-  'from-cyan-500/90 to-teal-700',
-  'from-green-500/90 to-emerald-800',
-  'from-teal-600/90 to-green-800',
+  'from-emerald-500 to-teal-700',
+  'from-teal-500 to-cyan-700',
+  'from-lime-500 to-emerald-700',
+  'from-cyan-500 to-teal-700',
+  'from-green-500 to-emerald-800',
+  'from-teal-600 to-green-800',
 ]
 
 function HomeCategoryCard({
@@ -25,46 +25,67 @@ function HomeCategoryCard({
 }) {
   const gradient = cardStyles[styleIndex % cardStyles.length]
 
+  if (featured) {
+    return (
+      <Link
+        to={`/services/${category.slug}`}
+        className={cn(
+          'group relative col-span-1 flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br p-8 text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl sm:col-span-2 lg:col-span-3',
+          gradient,
+        )}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-2xl"
+        />
+        <div>
+          <span className="text-5xl" aria-hidden>
+            {category.icon ?? '🛠️'}
+          </span>
+          <h3 className="mt-4 text-2xl font-bold">{category.name}</h3>
+          {category.description && (
+            <p className="mt-2 max-w-xl text-base text-white/85">{category.description}</p>
+          )}
+        </div>
+        <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white">
+          Book now <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+        </span>
+      </Link>
+    )
+  }
+
   return (
     <Link
       to={`/services/${category.slug}`}
       className={cn(
-        'group relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl',
+        'group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl',
         gradient,
-        featured ? 'sm:col-span-2 sm:row-span-2 sm:p-8' : 'min-h-[140px]',
       )}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-xl transition group-hover:bg-white/20"
+        className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10 blur-xl"
       />
-      <span className={cn('block', featured ? 'text-5xl' : 'text-3xl')} aria-hidden>
+      <span className="text-3xl" aria-hidden>
         {category.icon ?? '🛠️'}
       </span>
-      <h3 className={cn('mt-3 font-bold', featured ? 'text-2xl' : 'text-lg')}>{category.name}</h3>
+      <h3 className="mt-3 text-lg font-bold">{category.name}</h3>
       {category.description && (
-        <p
-          className={cn(
-            'mt-1.5 line-clamp-2 text-white/80',
-            featured ? 'text-base' : 'text-sm',
-          )}
-        >
-          {category.description}
-        </p>
+        <p className="mt-1.5 line-clamp-2 text-sm text-white/80">{category.description}</p>
       )}
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/90 opacity-0 transition group-hover:opacity-100">
-        Book now <ArrowRight className="h-3.5 w-3.5" />
+      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-white/90">
+        View <ArrowRight className="h-3.5 w-3.5" />
       </span>
     </Link>
   )
 }
 
 export function HomeServicesGrid() {
-  const { data: categories, isLoading, error } = useCategories()
-  const items = categories?.slice(0, 6) ?? []
+  const { data: categories, isLoading, error, refetch, isFetching } = useCategories()
+  const items = categories ?? []
 
   return (
-    <section className="py-20">
+    <section className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -91,20 +112,43 @@ export function HomeServicesGrid() {
           <QueryState
             loading={isLoading}
             error={error}
-            empty={!items.length}
-            emptyMessage="Run supabase/seed.sql to populate service categories."
+            empty={!isLoading && !isFetching && items.length === 0}
+            emptyMessage="No service categories found. Check your Supabase connection or run supabase/seed.sql."
           >
-            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {items.map((category, i) => (
-                <HomeCategoryCard
-                  key={category.id}
-                  category={category}
-                  featured={i === 0}
-                  styleIndex={i}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {items.slice(0, 1).map((category) => (
+                  <HomeCategoryCard
+                    key={category.id}
+                    category={category}
+                    featured
+                    styleIndex={0}
+                  />
+                ))}
+              </div>
+              {items.length > 1 && (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.slice(1, 7).map((category, i) => (
+                    <HomeCategoryCard
+                      key={category.id}
+                      category={category}
+                      styleIndex={i + 1}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           </QueryState>
+
+          {error && (
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="mt-4 text-sm font-medium text-nexo-700 hover:underline"
+            >
+              Retry loading services
+            </button>
+          )}
         </div>
       </div>
     </section>
