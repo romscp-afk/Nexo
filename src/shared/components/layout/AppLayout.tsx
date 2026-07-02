@@ -12,27 +12,36 @@ export function AppLayout() {
   const isHome = pathname === '/'
 
   return (
-    <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-white' : 'bg-slate-50 text-slate-900')}>
+    <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-50' : 'bg-slate-50 text-slate-900')}>
       <header
         className={cn(
           'sticky top-0 z-50 border-b backdrop-blur-md',
           isHome
-            ? 'border-nexo-100 bg-white/90'
+            ? 'border-nexo-700/30 bg-nexo-800/90 text-white'
             : 'border-slate-200 bg-white',
         )}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Logo to="/" />
+          <Logo
+            to="/"
+            className={isHome ? '[&_span]:text-white' : undefined}
+          />
           <nav className="flex items-center gap-4 text-sm">
             <Link
               to="/services"
-              className="text-slate-600 transition hover:text-nexo-700"
+              className={cn(
+                'transition',
+                isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+              )}
             >
               Services
             </Link>
             <Link
               to="/providers"
-              className="text-slate-600 transition hover:text-nexo-700"
+              className={cn(
+                'transition',
+                isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+              )}
             >
               Providers
             </Link>
@@ -40,23 +49,43 @@ export function AppLayout() {
               <>
                 <Link
                   to={getDashboardPath(user.role)}
-                  className="rounded-lg bg-nexo-600 px-3 py-1.5 font-medium text-white transition hover:bg-nexo-700"
+                  className={cn(
+                    'rounded-lg px-3 py-1.5 font-medium transition',
+                    isHome
+                      ? 'bg-nexo-accent text-nexo-900 hover:bg-white'
+                      : 'bg-nexo-600 text-white hover:bg-nexo-700',
+                  )}
                 >
                   Dashboard
                 </Link>
-                <LogoutButton showIcon={false} />
+                <LogoutButton
+                  showIcon={false}
+                  className={
+                    isHome
+                      ? 'border-transparent bg-transparent text-nexo-mint/90 hover:bg-white/10 hover:text-white'
+                      : undefined
+                  }
+                />
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="text-slate-600 transition hover:text-nexo-700"
+                  className={cn(
+                    'transition',
+                    isHome ? 'text-nexo-mint/90 hover:text-white' : 'text-slate-600 hover:text-nexo-700',
+                  )}
                 >
                   Log in
                 </Link>
                 <Link
                   to="/register"
-                  className="rounded-lg bg-nexo-600 px-3 py-1.5 font-medium text-white transition hover:bg-nexo-700"
+                  className={cn(
+                    'rounded-lg px-3 py-1.5 font-medium transition',
+                    isHome
+                      ? 'bg-nexo-accent text-nexo-900 hover:bg-white'
+                      : 'bg-nexo-600 text-white hover:bg-nexo-700',
+                  )}
                 >
                   Register
                 </Link>
@@ -68,7 +97,7 @@ export function AppLayout() {
       <main className={cn('mx-auto w-full flex-1', isHome ? 'max-w-none px-0 py-0' : 'max-w-5xl px-4 py-8')}>
         <Outlet />
       </main>
-      <SiteFooter className={isHome ? 'border-t border-nexo-100 bg-nexo-50/50' : undefined} />
+      <SiteFooter className={isHome ? 'border-t border-nexo-200 bg-white' : undefined} />
     </div>
   )
 }

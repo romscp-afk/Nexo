@@ -51,7 +51,7 @@ export function AssistantWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-nexo-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-nexo-700 hover:shadow-xl"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-nexo-600 px-4 py-3 text-sm font-medium text-white shadow-lg shadow-nexo-900/30 transition hover:bg-nexo-700 hover:shadow-xl"
           aria-label="Open Nexo Assistant"
         >
           <MessageCircle className="h-5 w-5" />
@@ -65,12 +65,12 @@ export function AssistantWidget() {
           role="dialog"
           aria-label="Nexo Assistant"
         >
-          <header className="flex items-center justify-between border-b border-nexo-100 bg-gradient-to-r from-nexo-100 to-nexo-50 px-4 py-3 text-slate-900">
+          <header className="flex items-center justify-between border-b border-nexo-200 bg-gradient-to-r from-nexo-700 to-nexo-600 px-4 py-3 text-white">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-nexo-600" />
+              <Sparkles className="h-5 w-5 text-nexo-accent" />
               <div>
                 <p className="font-semibold leading-tight">Nexo Assistant</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-nexo-mint/80">
                   {isAiEnabled ? 'AI-powered help' : 'Built-in help guide'}
                 </p>
               </div>
@@ -79,14 +79,14 @@ export function AssistantWidget() {
               <button
                 type="button"
                 onClick={reset}
-                className="rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-nexo-100"
+                className="rounded-lg px-2 py-1 text-xs text-nexo-mint/80 hover:bg-white/10"
               >
                 Reset
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-slate-600 hover:bg-nexo-100"
+                className="rounded-lg p-1 text-nexo-mint/80 hover:bg-white/10"
                 aria-label="Close assistant"
               >
                 <X className="h-5 w-5" />

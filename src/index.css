@@ -2,17 +2,22 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --color-nexo-50: #f3faf5;
-  --color-nexo-100: #e4f4ea;
-  --color-nexo-200: #cdebd8;
-  --color-nexo-300: #a8dcc0;
-  --color-nexo-400: #7ec8a3;
-  --color-nexo-500: #5cb587;
-  --color-nexo-600: #449a6e;
-  --color-nexo-700: #377d59;
-  --color-nexo-800: #2f6348;
-  --color-nexo-900: #28513c;
-  --color-nexo-950: #142b21;
+  /* Balanced sage — rich enough to pop, light enough to breathe */
+  --color-nexo-50: #f0f7f3;
+  --color-nexo-100: #dceee3;
+  --color-nexo-200: #b8ddc9;
+  --color-nexo-300: #8bc4a8;
+  --color-nexo-400: #5aad7f;
+  --color-nexo-500: #3d9468;
+  --color-nexo-600: #2f7a56;
+  --color-nexo-700: #256647;
+  --color-nexo-800: #1e5239;
+  --color-nexo-900: #184030;
+  --color-nexo-950: #0f2a1f;
+  /* Eye-catching accents */
+  --color-nexo-accent: #7ee787;
+  --color-nexo-glow: #4ade80;
+  --color-nexo-mint: #bbf7d0;
 }
 
 body {
@@ -45,12 +50,12 @@ body {
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.4;
     transform: scale(1);
   }
   50% {
-    opacity: 0.55;
-    transform: scale(1.04);
+    opacity: 0.65;
+    transform: scale(1.05);
   }
 }
 

@@ -4,7 +4,7 @@ import { HomeTrustBar, HomeHowItWorks, HomeCta } from '@/features/home/component
 
 export function HomePage() {
   return (
-    <div className="overflow-x-hidden bg-nexo-50/30">
+    <div className="overflow-x-hidden bg-nexo-50">
       <HomeHero />
       <HomeServicesGrid />
       <HomeTrustBar />
