@@ -12,7 +12,11 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "setup:db": "node scripts/apply-schema.mjs",
+    "setup:email-registration": "node scripts/apply-email-registration.mjs",
     "setup:phone-verification": "node scripts/apply-phone-verification.mjs",
+    "deploy:whatsapp-otp": "node scripts/deploy-whatsapp-otp.mjs",
+    "setup:whatsapp-twilio": "node scripts/setup-whatsapp-twilio.mjs",
+    "setup:whatsapp-dev": "node scripts/setup-whatsapp-dev.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
   "dependencies": {

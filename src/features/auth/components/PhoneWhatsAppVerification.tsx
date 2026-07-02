@@ -94,7 +94,7 @@ export function PhoneWhatsAppVerification({
     setResendIn(60)
     setInfo(
       data.devOtp
-        ? `Dev mode: your code is ${data.devOtp} (also sent via WhatsApp when configured).`
+        ? `Testing mode — your code is ${data.devOtp}. It was not sent to WhatsApp. Use this code below to verify.`
         : `We sent a 6-digit code to WhatsApp ${data.maskedPhone}.`,
     )
   }
@@ -211,7 +211,17 @@ export function PhoneWhatsAppVerification({
           </p>
         )}
         {info && (
-          <p className="rounded-lg bg-white px-3 py-2 text-sm text-nexo-800 ring-1 ring-nexo-200" role="status">
+          <p
+            className={cn(
+              'rounded-lg px-3 py-2 text-sm ring-1',
+              verified
+                ? 'bg-white text-nexo-800 ring-nexo-200'
+                : info.includes('Testing mode')
+                  ? 'bg-amber-50 font-medium text-amber-950 ring-amber-200'
+                  : 'bg-white text-nexo-800 ring-nexo-200',
+            )}
+            role="status"
+          >
             {verified ? (
               <>
                 {info}

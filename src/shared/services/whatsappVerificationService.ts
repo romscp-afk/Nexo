@@ -19,7 +19,15 @@ async function invokeWhatsAppOtp<T>(body: Record<string, string>): Promise<{ dat
   const { data, error } = await supabase.functions.invoke('whatsapp-otp', { body })
 
   if (error) {
-    return { data: null, error: error.message ?? 'WhatsApp verification unavailable' }
+    const msg = error.message ?? 'WhatsApp verification unavailable'
+    if (/failed to send a request to the edge function|not found|404/i.test(msg)) {
+      return {
+        data: null,
+        error:
+          'WhatsApp verification service is not deployed yet. Ask your admin to deploy the whatsapp-otp Supabase Edge Function.',
+      }
+    }
+    return { data: null, error: msg }
   }
 
   const payload = data as { error?: string } & T

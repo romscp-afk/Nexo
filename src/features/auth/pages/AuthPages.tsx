@@ -1,10 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
-import {
-  PhoneWhatsAppVerification,
-  type PhoneVerificationState,
-} from '@/features/auth/components/PhoneWhatsAppVerification'
 import { getDashboardPath, ROLES, SINGAPORE_AREAS, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, isAdminEmail } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
@@ -278,7 +274,6 @@ export function LoginPage() {
 
 export function RegisterPage() {
   const { signUp } = useAuth()
-  const navigate = useNavigate()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -296,19 +291,9 @@ export function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
-  const [phoneVerification, setPhoneVerification] = useState<PhoneVerificationState>({
-    verified: false,
-    verificationId: null,
-    phoneE164: null,
-    maskedPhone: null,
-  })
-
-  const handlePhoneVerifiedChange = useCallback((state: PhoneVerificationState) => {
-    setPhoneVerification(state)
-  }, [])
 
   const inputClass = 'mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm'
-  const formLocked = loading || Boolean(success) || !phoneVerification.verified
+  const formLocked = loading || Boolean(success)
 
   const toggleServiceArea = (area: string) => {
     setServiceAreas((prev) =>
@@ -328,8 +313,8 @@ export function RegisterPage() {
       return
     }
 
-    if (!phoneVerification.verified || !phoneVerification.verificationId) {
-      setError('Verify your phone number via WhatsApp before creating an account.')
+    if (!phone.trim()) {
+      setError('Enter your mobile number.')
       setLoading(false)
       return
     }
@@ -340,7 +325,6 @@ export function RegisterPage() {
       role,
       fullName,
       phone,
-      phoneVerificationId: phoneVerification.verificationId,
       addressLine1: role === 'customer' ? addressLine1 : undefined,
       addressLine2: role === 'customer' ? addressLine2 : undefined,
       postalCode: role === 'customer' ? postalCode : undefined,
@@ -357,17 +341,18 @@ export function RegisterPage() {
       return
     }
     if (needsEmailConfirmation) {
-      setSuccess('Account created. Check your email to confirm, then log in.')
+      setSuccess(`Account created. We sent a confirmation link to ${email}. Check your inbox, then log in.`)
       return
     }
-    setSuccess('Account created successfully. Redirecting to login…')
-    setTimeout(() => navigate('/login'), 1500)
+    setSuccess('Account created. You can log in now.')
   }
 
   return (
     <div>
       <h2 className="text-xl font-semibold text-slate-900">Create account</h2>
-      <p className="mt-1 text-sm text-slate-500">Join Nexo as a customer or service provider</p>
+      <p className="mt-1 text-sm text-slate-500">
+        Join Nexo as a customer or service provider. We&apos;ll verify your email before you can log in.
+      </p>
 
       <ConfigBanner />
       <DatabaseSetupBanner />
@@ -404,21 +389,6 @@ export function RegisterPage() {
           </div>
         </div>
 
-        <PhoneWhatsAppVerification
-          phone={phone}
-          onPhoneChange={setPhone}
-          disabled={loading || Boolean(success)}
-          onVerifiedChange={handlePhoneVerifiedChange}
-          inputClass={inputClass}
-        />
-
-        {!phoneVerification.verified && (
-          <p className="text-xs text-slate-500">
-            Complete WhatsApp verification above to unlock the rest of the registration form.
-          </p>
-        )}
-
-        <fieldset disabled={formLocked} className="space-y-4 disabled:opacity-60">
         <div>
           <label htmlFor="full-name" className="block text-sm font-medium text-slate-700">
             Full name
@@ -429,6 +399,38 @@ export function RegisterPage() {
             autoComplete="name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            className={inputClass}
+            required
+            disabled={loading}
+          />
+        </div>
+        <div>
+          <label htmlFor="reg-email" className="block text-sm font-medium text-slate-700">
+            Email
+          </label>
+          <input
+            id="reg-email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+            required
+            disabled={loading}
+          />
+        </div>
+        <div>
+          <label htmlFor="reg-phone" className="block text-sm font-medium text-slate-700">
+            Mobile (Singapore)
+          </label>
+          <input
+            id="reg-phone"
+            type="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="91234567"
+            pattern="[689]\d{7}"
             className={inputClass}
             required
             disabled={loading}
@@ -450,20 +452,6 @@ export function RegisterPage() {
             />
           </div>
         )}
-        <div>
-          <label htmlFor="reg-email" className="block text-sm font-medium text-slate-700">
-            Email
-          </label>
-          <input
-            id="reg-email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
-            required
-          />
-        </div>
         {role === 'customer' && (
           <>
             <div>
@@ -476,6 +464,7 @@ export function RegisterPage() {
                 onChange={(e) => setPreferredArea(e.target.value)}
                 className={inputClass}
                 required
+                disabled={loading}
               >
                 <option value="">Select your area</option>
                 {SINGAPORE_AREAS.map((area) => (
@@ -497,6 +486,7 @@ export function RegisterPage() {
                 placeholder="Blk 123 Tampines Street 11"
                 className={inputClass}
                 required
+                disabled={loading}
               />
             </div>
             <div>
@@ -511,6 +501,7 @@ export function RegisterPage() {
                 placeholder="#08-456"
                 className={inputClass}
                 required
+                disabled={loading}
               />
             </div>
             <div>
@@ -526,6 +517,7 @@ export function RegisterPage() {
                 pattern="\d{6}"
                 className={inputClass}
                 required
+                disabled={loading}
               />
             </div>
           </>
@@ -610,9 +602,9 @@ export function RegisterPage() {
             className={inputClass}
             minLength={6}
             required
+            disabled={loading}
           />
         </div>
-        </fieldset>
         <button
           type="submit"
           disabled={formLocked}
