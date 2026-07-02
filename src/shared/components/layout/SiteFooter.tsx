@@ -15,9 +15,9 @@ export function SiteFooter({ className, compact = false }: SiteFooterProps) {
         className,
       )}
     >
-      <p>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
-      <p className={cn('text-nexo-600/50', compact ? 'mt-0.5' : 'mt-1')}>
-        Developed by {DEVELOPER_NAME}
+      <p>
+        © {new Date().getFullYear()} {APP_NAME}. All rights reserved.{' '}
+        <span className="text-nexo-600/50">Developed by {DEVELOPER_NAME}</span>
       </p>
       {!compact && (
         <p className="mt-1 text-nexo-600/50">{APP_TAGLINE}</p>
