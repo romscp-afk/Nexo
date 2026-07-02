@@ -51,7 +51,7 @@ export function AssistantWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-teal-700 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 hover:shadow-xl"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-nexo-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:bg-nexo-700 hover:shadow-xl"
           aria-label="Open Nexo Assistant"
         >
           <MessageCircle className="h-5 w-5" />
@@ -65,12 +65,12 @@ export function AssistantWidget() {
           role="dialog"
           aria-label="Nexo Assistant"
         >
-          <header className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-teal-700 to-teal-800 px-4 py-3 text-white">
+          <header className="flex items-center justify-between border-b border-nexo-100 bg-gradient-to-r from-nexo-100 to-nexo-50 px-4 py-3 text-slate-900">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
+              <Sparkles className="h-5 w-5 text-nexo-600" />
               <div>
                 <p className="font-semibold leading-tight">Nexo Assistant</p>
-                <p className="text-xs text-teal-100">
+                <p className="text-xs text-slate-500">
                   {isAiEnabled ? 'AI-powered help' : 'Built-in help guide'}
                 </p>
               </div>
@@ -79,14 +79,14 @@ export function AssistantWidget() {
               <button
                 type="button"
                 onClick={reset}
-                className="rounded-lg px-2 py-1 text-xs text-teal-100 hover:bg-teal-600/50"
+                className="rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-nexo-100"
               >
                 Reset
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1 hover:bg-teal-600/50"
+                className="rounded-lg p-1 text-slate-600 hover:bg-nexo-100"
                 aria-label="Close assistant"
               >
                 <X className="h-5 w-5" />
@@ -101,7 +101,7 @@ export function AssistantWidget() {
                 className={cn(
                   'max-w-[90%] rounded-2xl px-3 py-2 text-sm leading-relaxed',
                   msg.role === 'user'
-                    ? 'ml-auto bg-teal-700 text-white'
+                    ? 'ml-auto bg-nexo-600 text-white'
                     : 'mr-auto bg-slate-100 text-slate-800',
                 )}
               >
@@ -131,7 +131,7 @@ export function AssistantWidget() {
                     key={q}
                     type="button"
                     onClick={() => void send(q)}
-                    className="rounded-full bg-slate-100 px-2.5 py-1 text-left text-xs text-slate-700 hover:bg-teal-50 hover:text-teal-800"
+                    className="rounded-full bg-slate-100 px-2.5 py-1 text-left text-xs text-slate-700 hover:bg-nexo-50 hover:text-nexo-800"
                   >
                     {q}
                   </button>
@@ -147,12 +147,12 @@ export function AssistantWidget() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything about Nexo…"
               disabled={loading}
-              className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+              className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-nexo-400 focus:ring-1 focus:ring-nexo-400"
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="flex shrink-0 items-center justify-center rounded-xl bg-teal-700 p-2.5 text-white hover:bg-teal-800 disabled:opacity-50"
+              className="flex shrink-0 items-center justify-center rounded-xl bg-nexo-600 p-2.5 text-white hover:bg-nexo-700 disabled:opacity-50"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />

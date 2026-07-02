@@ -31,7 +31,7 @@ export function Logo({ to = '/', className, showName = true, size = 'md' }: Logo
         className={cn('shrink-0 object-contain', imageSizes[size])}
       />
       {showName && (
-        <span className={cn('text-teal-700', nameSizes[size])}>{APP_NAME}</span>
+        <span className={cn('text-nexo-700', nameSizes[size])}>{APP_NAME}</span>
       )}
     </>
   )

@@ -3,51 +3,30 @@ import { ArrowRight } from 'lucide-react'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import type { ServiceCategory } from '@/shared/types/catalog'
-import { cn } from '@/shared/lib/utils'
-
-const cardStyles = [
-  'from-emerald-500 to-teal-700',
-  'from-teal-500 to-cyan-700',
-  'from-lime-500 to-emerald-700',
-  'from-cyan-500 to-teal-700',
-  'from-green-500 to-emerald-800',
-  'from-teal-600 to-green-800',
-]
 
 function HomeCategoryCard({
   category,
   featured,
-  styleIndex,
 }: {
   category: ServiceCategory
   featured?: boolean
-  styleIndex: number
 }) {
-  const gradient = cardStyles[styleIndex % cardStyles.length]
-
   if (featured) {
     return (
       <Link
         to={`/services/${category.slug}`}
-        className={cn(
-          'group relative col-span-1 flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br p-8 text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl sm:col-span-2 lg:col-span-3',
-          gradient,
-        )}
+        className="group relative col-span-1 flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl border border-nexo-200 bg-gradient-to-br from-nexo-50 to-white p-8 shadow-sm transition hover:-translate-y-0.5 hover:border-nexo-300 hover:shadow-md sm:col-span-2 lg:col-span-3"
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-2xl"
-        />
         <div>
           <span className="text-5xl" aria-hidden>
             {category.icon ?? '🛠️'}
           </span>
-          <h3 className="mt-4 text-2xl font-bold">{category.name}</h3>
+          <h3 className="mt-4 text-2xl font-bold text-slate-900">{category.name}</h3>
           {category.description && (
-            <p className="mt-2 max-w-xl text-base text-white/85">{category.description}</p>
+            <p className="mt-2 max-w-xl text-base text-slate-600">{category.description}</p>
           )}
         </div>
-        <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-white">
+        <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-nexo-700">
           Book now <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
         </span>
       </Link>
@@ -57,23 +36,16 @@ function HomeCategoryCard({
   return (
     <Link
       to={`/services/${category.slug}`}
-      className={cn(
-        'group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl',
-        gradient,
-      )}
+      className="group flex min-h-[160px] flex-col rounded-2xl border border-nexo-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-nexo-200 hover:bg-nexo-50/50 hover:shadow-md"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10 blur-xl"
-      />
       <span className="text-3xl" aria-hidden>
         {category.icon ?? '🛠️'}
       </span>
-      <h3 className="mt-3 text-lg font-bold">{category.name}</h3>
+      <h3 className="mt-3 text-lg font-bold text-slate-900">{category.name}</h3>
       {category.description && (
-        <p className="mt-1.5 line-clamp-2 text-sm text-white/80">{category.description}</p>
+        <p className="mt-1.5 line-clamp-2 text-sm text-slate-600">{category.description}</p>
       )}
-      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-white/90">
+      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-nexo-600">
         View <ArrowRight className="h-3.5 w-3.5" />
       </span>
     </Link>
@@ -101,7 +73,7 @@ export function HomeServicesGrid() {
           </div>
           <Link
             to="/services"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-nexo-700 transition hover:text-nexo-900"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-nexo-700 transition hover:text-nexo-800"
           >
             View all services
             <ArrowRight className="h-4 w-4" />
@@ -118,22 +90,13 @@ export function HomeServicesGrid() {
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.slice(0, 1).map((category) => (
-                  <HomeCategoryCard
-                    key={category.id}
-                    category={category}
-                    featured
-                    styleIndex={0}
-                  />
+                  <HomeCategoryCard key={category.id} category={category} featured />
                 ))}
               </div>
               {items.length > 1 && (
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {items.slice(1, 7).map((category, i) => (
-                    <HomeCategoryCard
-                      key={category.id}
-                      category={category}
-                      styleIndex={i + 1}
-                    />
+                  {items.slice(1, 7).map((category) => (
+                    <HomeCategoryCard key={category.id} category={category} />
                   ))}
                 </div>
               )}

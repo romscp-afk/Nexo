@@ -7,12 +7,12 @@ export function CategoryCard({ category }: { category: ServiceCategory }) {
   return (
     <Link
       to={`/services/${category.slug}`}
-      className="group rounded-xl border border-slate-200 bg-white p-5 transition hover:border-teal-200 hover:shadow-sm"
+      className="group rounded-xl border border-nexo-100 bg-white p-5 transition hover:border-nexo-200 hover:bg-nexo-50/50 hover:shadow-sm"
     >
       <span className="text-3xl" aria-hidden>
         {category.icon ?? '🛠️'}
       </span>
-      <h3 className="mt-3 font-semibold text-slate-900 group-hover:text-teal-700">
+      <h3 className="mt-3 font-semibold text-slate-900 group-hover:text-nexo-700">
         {category.name}
       </h3>
       {category.description && (
@@ -77,7 +77,7 @@ export function PageHeader({
   return (
     <div className="mb-8">
       {backTo && (
-        <Link to={backTo} className="text-sm text-teal-700 hover:underline">
+        <Link to={backTo} className="text-sm text-nexo-700 hover:underline">
           ← {backLabel ?? 'Back'}
         </Link>
       )}
