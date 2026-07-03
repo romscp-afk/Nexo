@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Create / repair admin romalgk@gmail.com (password Test@123)
+ * Create / repair admin romscp@gmail.com (password Test@123)
  * Usage: node scripts/seed-admin.mjs
  */
 import { readFileSync } from 'node:fs'
@@ -54,7 +54,7 @@ for (const url of candidates) {
     await client.connect()
     console.log('Connected. Creating admin account…')
     await client.query(sql)
-    console.log('Done. Login: romalgk@gmail.com / Test@123')
+    console.log('Done. Login: romscp@gmail.com / Test@123')
     await client.end()
     process.exit(0)
   } catch (err) {

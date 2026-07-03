@@ -1,2 +1,2 @@
 -- Admin portal — run fix-admin-login.sql instead.
--- Login: romalgk@gmail.com / Test@123
+-- Login: romscp@gmail.com / Test@123

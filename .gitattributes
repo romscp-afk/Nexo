@@ -1,0 +1,2 @@
+# Map legacy local hostname commits to the canonical GitHub email.
+.mailmap merge=union

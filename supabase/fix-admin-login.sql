@@ -1,18 +1,18 @@
 -- Fix admin login — paste ALL into Supabase SQL Editor and click Run.
--- Login: romalgk@gmail.com / Test@123
+-- Login: romscp@gmail.com / Test@123
 -- Prerequisite: run schema.sql first (profiles table must exist).
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE OR REPLACE FUNCTION nexo_admin_emails()
 RETURNS TEXT[] AS $$
-  SELECT ARRAY['romalgk@gmail.com']::TEXT[];
+  SELECT ARRAY['romscp@gmail.com']::TEXT[];
 $$ LANGUAGE sql IMMUTABLE;
 
 DO $$
 DECLARE
   inst_id UUID;
-  admin_email TEXT := 'romalgk@gmail.com';
+  admin_email TEXT := 'romscp@gmail.com';
   admin_password TEXT := 'Test@123';
   default_admin_id UUID := 'a9999999-9999-9999-9999-999999999901'::UUID;
   v_uid UUID;
@@ -109,7 +109,7 @@ BEGIN
 END $$;
 
 SELECT 'auth.users' AS step, id::text AS user_id, email, email_confirmed_at IS NOT NULL AS confirmed
-FROM auth.users WHERE lower(email) = 'romalgk@gmail.com';
+FROM auth.users WHERE lower(email) = 'romscp@gmail.com';
 
 SELECT 'profiles' AS step, user_id::text, email, role
-FROM profiles WHERE lower(email) = 'romalgk@gmail.com';
+FROM profiles WHERE lower(email) = 'romscp@gmail.com';
