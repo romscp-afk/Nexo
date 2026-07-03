@@ -113,6 +113,7 @@ export function downloadReceiptPdf(receipt: Receipt, booking?: Booking | null): 
 
 export function receiptSummaryLines(receipt: Receipt, booking?: Booking | null) {
   const d = receipt.details
+  const pricingSnapshot = (booking?.pricingSnapshot ?? null) as PriceBreakdown | null
   return {
     serviceName: String(d.service_name ?? booking?.serviceName ?? 'Service'),
     providerName: d.provider_name != null ? String(d.provider_name) : booking?.providerName,
@@ -121,5 +122,7 @@ export function receiptSummaryLines(receipt: Receipt, booking?: Booking | null) 
     platformFee: booking?.platformFee ?? (typeof d.platform_fee === 'number' ? d.platform_fee : null),
     quantity: booking?.quantity ?? (typeof d.quantity === 'number' ? d.quantity : null),
     durationHours: booking?.durationHours ?? (typeof d.duration_hours === 'number' ? d.duration_hours : null),
+    ceilingHeight: pricingSnapshot?.ceilingHeight ?? null,
+    breakdownLines: pricingSnapshot?.lines ?? [],
   }
 }

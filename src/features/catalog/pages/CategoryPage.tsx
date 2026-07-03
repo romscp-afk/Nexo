@@ -57,6 +57,7 @@ export function CategoryPage() {
               </div>
               <p className="text-sm font-medium text-nexo-700">
                 from {formatCurrency(service.basePrice)}
+                {service.pricingModel === 'per_unit' ? `/${service.unitLabel ?? 'unit'}` : ''}
               </p>
             </div>
           ))}

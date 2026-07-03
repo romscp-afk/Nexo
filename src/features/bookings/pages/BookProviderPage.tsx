@@ -69,6 +69,19 @@ export function BookProviderPage() {
     })
   }, [selectedService, provider, duration, unitCount, ceilingHeight, isPerUnit])
 
+  useEffect(() => {
+    if (preselectedService && !serviceId) {
+      setServiceId(preselectedService)
+    }
+  }, [preselectedService, serviceId])
+
+  useEffect(() => {
+    if (!isPerUnit) {
+      setCeilingHeight('normal')
+      setQuantity('1')
+    }
+  }, [selectedServiceId, isPerUnit])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')

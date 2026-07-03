@@ -60,6 +60,13 @@ export function RequestServicePage() {
     })
   }, [selectedService, duration, unitCount, ceilingHeight, isPerUnit])
 
+  useEffect(() => {
+    if (!isPerUnit) {
+      setCeilingHeight('normal')
+      setQuantity('1')
+    }
+  }, [serviceId, isPerUnit])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')

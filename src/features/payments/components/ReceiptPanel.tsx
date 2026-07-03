@@ -2,6 +2,7 @@ import { Download, FileText } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { receiptService } from '@/shared/services/receiptService'
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
+import { ceilingHeightLabel } from '@/shared/lib/pricing'
 import { downloadReceiptPdf, receiptSummaryLines } from '@/shared/lib/receiptPdf'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import type { Booking } from '@/shared/types/booking'
@@ -74,17 +75,27 @@ export function ReceiptPanel({ bookingId, booking }: { bookingId: string; bookin
                         : summary.durationHours != null
                           ? `${summary.durationHours} hour${summary.durationHours === 1 ? '' : 's'}`
                           : '—'}
+                      {summary.ceilingHeight && (
+                        <span className="text-slate-500"> · {ceilingHeightLabel(summary.ceilingHeight)}</span>
+                      )}
                     </dd>
                   </div>
                 </dl>
 
                 <div className="mt-4 space-y-1 border-t border-slate-200 pt-3 text-sm">
-                  {summary.subtotal != null && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>Service subtotal</span>
-                      <span>{formatCurrency(summary.subtotal)}</span>
-                    </div>
-                  )}
+                  {summary.breakdownLines.length > 0
+                    ? summary.breakdownLines.map((line) => (
+                        <div key={line.label} className="flex justify-between text-slate-600">
+                          <span>{line.label}</span>
+                          <span>{formatCurrency(line.amount)}</span>
+                        </div>
+                      ))
+                    : summary.subtotal != null && (
+                        <div className="flex justify-between text-slate-600">
+                          <span>Service subtotal</span>
+                          <span>{formatCurrency(summary.subtotal)}</span>
+                        </div>
+                      )}
                   {summary.platformFee != null && (
                     <div className="flex justify-between text-slate-600">
                       <span>Platform fee</span>
