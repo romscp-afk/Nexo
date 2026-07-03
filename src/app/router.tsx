@@ -18,13 +18,14 @@ import {
 } from '@/features/bookings/pages/CustomerBookingsPages'
 import { SavedProvidersPage } from '@/features/customer/pages/SavedProvidersPage'
 import { CustomerProfilePage } from '@/features/customer/pages/CustomerProfilePage'
-import { CustomerNotificationsPage } from '@/features/customer/pages/CustomerNotificationsPage'
+import { CustomerNotificationsPage, ProviderNotificationsPage } from '@/features/customer/pages/CustomerNotificationsPage'
 import { CustomerReviewsPage } from '@/features/customer/pages/CustomerReviewsPage'
 import {
   ProviderDashboardPage,
   ProviderBookingsPage,
 } from '@/features/bookings/pages/ProviderBookingsPages'
 import { BookingDetailPage } from '@/features/bookings/pages/BookingDetailPage'
+import { BookingChatsPage } from '@/features/bookings/pages/BookingChatsPage'
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage'
 import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage'
 import { AdminProvidersPage } from '@/features/admin/pages/AdminProvidersPage'
@@ -88,6 +89,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/dashboard', element: <CustomerDashboardPage /> },
               { path: '/dashboard/bookings', element: <CustomerBookingsPage /> },
+              { path: '/dashboard/messages', element: <BookingChatsPage role="customer" /> },
               { path: '/dashboard/reviews', element: <CustomerReviewsPage /> },
               { path: '/dashboard/notifications', element: <CustomerNotificationsPage /> },
               { path: '/dashboard/saved-providers', element: <SavedProvidersPage /> },
@@ -108,6 +110,8 @@ export const router = createBrowserRouter([
             children: [
               { path: '/provider', element: <ProviderDashboardPage /> },
               { path: '/provider/bookings', element: <ProviderBookingsPage /> },
+              { path: '/provider/messages', element: <BookingChatsPage role="provider" /> },
+              { path: '/provider/notifications', element: <ProviderNotificationsPage /> },
               {
                 path: '/provider/bookings/:id',
                 element: <BookingDetailPage role="provider" backPath="/provider/bookings" />,

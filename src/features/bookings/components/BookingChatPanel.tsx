@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MessageCircle, Send } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/features/auth/context/AuthProvider'
-import { useBookingMessages, useSendBookingMessage } from '@/features/bookings/hooks/useBookingChat'
+import {
+  useBookingMessages,
+  useMarkBookingChatRead,
+  useSendBookingMessage,
+} from '@/features/bookings/hooks/useBookingChat'
 import {
   canSendBookingChatMessage,
   shouldLoadBookingChatMessages,
@@ -23,11 +27,17 @@ export function BookingChatPanel({
   const loadMessages = shouldLoadBookingChatMessages(access)
   const { data: messages, isLoading } = useBookingMessages(bookingId, loadMessages)
   const sendMessage = useSendBookingMessage()
+  const markRead = useMarkBookingChatRead()
   const [body, setBody] = useState('')
   const [error, setError] = useState('')
 
   const canSend = canSendBookingChatMessage(access)
   const title = role === 'customer' ? 'Chat with provider' : 'Chat with customer'
+
+  useEffect(() => {
+    if (!loadMessages || isLoading) return
+    markRead.mutate(bookingId)
+  }, [bookingId, loadMessages, isLoading, messages?.length])
 
   if (access.state === 'hidden') {
     return null
@@ -35,7 +45,7 @@ export function BookingChatPanel({
 
   if (access.state === 'locked') {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <section id="chat" className="rounded-xl border border-slate-200 bg-white p-6 scroll-mt-6">
         <h2 className="flex items-center gap-2 font-semibold text-slate-900">
           <MessageCircle className="h-5 w-5 text-slate-400" />
           {title}
@@ -60,7 +70,7 @@ export function BookingChatPanel({
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6">
+    <section id="chat" className="rounded-xl border border-slate-200 bg-white p-6 scroll-mt-6">
       <h2 className="flex items-center gap-2 font-semibold text-slate-900">
         <MessageCircle className="h-5 w-5 text-nexo-700" />
         {title}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Phone, User } from 'lucide-react'
 import { BookingStatusTimeline } from '@/features/bookings/components/BookingStatusTimeline'
@@ -95,6 +95,12 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
       : booking
         ? getBookingChatAccess({ booking, payments: null, statusHistory: statusHistory ?? [] })
         : { state: 'hidden' as const }
+
+  useEffect(() => {
+    if (window.location.hash === '#chat') {
+      document.getElementById('chat')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [booking?.id, chatAccess.state])
 
   return (
     <div>

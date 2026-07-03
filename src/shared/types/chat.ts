@@ -17,6 +17,24 @@ export type BookingMessage = {
   senderName?: string
 }
 
+export type ChatThread = {
+  bookingId: string
+  counterpartName: string
+  serviceName: string | null
+  bookingStatus: string
+  lastMessageBody: string | null
+  lastMessageAt: string | null
+  lastSenderId: string | null
+  unreadCount: number
+  chatState: 'locked' | 'active' | 'read_only'
+}
+
+export type BookingMessageReadRow = {
+  booking_id: string
+  user_id: string
+  last_read_at: string
+}
+
 export function mapBookingMessage(
   row: BookingMessageRow,
   extras?: { senderName?: string },

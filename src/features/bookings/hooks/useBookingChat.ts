@@ -24,7 +24,48 @@ export function useSendBookingMessage() {
     },
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['booking-messages', data.bookingId] })
+      void queryClient.invalidateQueries({ queryKey: ['chat-inbox'] })
+      void queryClient.invalidateQueries({ queryKey: ['chat-unread'] })
       void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+  })
+}
+
+export function useMarkBookingChatRead() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await chatService.markBookingRead(bookingId)
+      if (error) throw new Error(error)
+    },
+    onSuccess: (_data, bookingId) => {
+      void queryClient.invalidateQueries({ queryKey: ['chat-inbox'] })
+      void queryClient.invalidateQueries({ queryKey: ['chat-unread'] })
+      void queryClient.invalidateQueries({ queryKey: ['booking-messages', bookingId] })
+    },
+  })
+}
+
+export function useChatInbox(role: 'customer' | 'provider') {
+  return useQuery({
+    queryKey: ['chat-inbox', role],
+    queryFn: async () => {
+      const { data, error } = await chatService.listInbox(role)
+      if (error) throw new Error(error)
+      return data
+    },
+    refetchInterval: 15000,
+  })
+}
+
+export function useUnreadChatCount(role: 'customer' | 'provider') {
+  return useQuery({
+    queryKey: ['chat-unread', role],
+    queryFn: async () => {
+      const { data, error } = await chatService.getTotalUnreadCount(role)
+      if (error) throw new Error(error)
+      return data
+    },
+    refetchInterval: 15000,
   })
 }

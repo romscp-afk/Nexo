@@ -4,25 +4,31 @@ import { type UserRole } from '@/shared/lib/constants'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
+import { useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 
-type NavItem = { to: string; label: string; exact?: boolean; badge?: boolean }
+type BadgeKind = 'notifications' | 'messages'
+
+type NavItem = { to: string; label: string; exact?: boolean; badge?: BadgeKind }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   customer: [
     { to: '/dashboard', label: 'Dashboard', exact: true },
     { to: '/providers', label: 'Browse providers' },
     { to: '/dashboard/bookings', label: 'My bookings' },
+    { to: '/dashboard/messages', label: 'Messages', badge: 'messages' },
     { to: '/dashboard/reviews', label: 'My reviews' },
     { to: '/dashboard/saved-providers', label: 'Saved providers' },
-    { to: '/dashboard/notifications', label: 'Notifications', badge: true },
+    { to: '/dashboard/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/dashboard/profile', label: 'Profile' },
   ],
   provider: [
     { to: '/provider', label: 'Dashboard', exact: true },
     { to: '/provider/bookings', label: 'Bookings' },
+    { to: '/provider/messages', label: 'Messages', badge: 'messages' },
+    { to: '/provider/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/provider/profile', label: 'Profile' },
   ],
   admin: [
@@ -42,12 +48,12 @@ type DashboardLayoutProps = {
 function NavLink({
   item,
   isActive,
-  unreadCount,
+  badgeCount,
   onNavigate,
 }: {
   item: NavItem
   isActive: boolean
-  unreadCount: number
+  badgeCount: number
   onNavigate?: () => void
 }) {
   return (
@@ -60,9 +66,9 @@ function NavLink({
       )}
     >
       <span>{item.label}</span>
-      {item.badge && unreadCount > 0 && (
+      {item.badge && badgeCount > 0 && (
         <span className="rounded-full bg-nexo-700 px-1.5 py-0.5 text-xs text-white">
-          {unreadCount}
+          {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}
     </Link>
@@ -74,9 +80,18 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const sidebarOpen = useAppStore((s) => s.sidebarOpen)
   const setSidebarOpen = useAppStore((s) => s.setSidebarOpen)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
-  const unreadCount = useUnreadNotificationCount()
+  const unreadNotifications = useUnreadNotificationCount()
+  const { data: unreadChat = 0 } = useUnreadChatCount(
+    role === 'customer' || role === 'provider' ? role : 'customer',
+  )
 
   const nav = NAV_BY_ROLE[role]
+
+  const badgeForItem = (item: NavItem) => {
+    if (item.badge === 'messages') return unreadChat
+    if (item.badge === 'notifications') return unreadNotifications
+    return 0
+  }
 
   const isActive = (item: NavItem) => {
     if (item.exact) return location.pathname === item.to
@@ -95,7 +110,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               key={item.to}
               item={item}
               isActive={isActive(item)}
-              unreadCount={unreadCount}
+              badgeCount={badgeForItem(item)}
             />
           ))}
           <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-nexo-700">
@@ -123,7 +138,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
                   key={item.to}
                   item={item}
                   isActive={isActive(item)}
-                  unreadCount={unreadCount}
+                  badgeCount={badgeForItem(item)}
                   onNavigate={() => setSidebarOpen(false)}
                 />
               ))}

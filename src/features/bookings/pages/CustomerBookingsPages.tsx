@@ -10,6 +10,7 @@ import { BookingList } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { useSavedProviders } from '@/features/customer/hooks/useSavedProviders'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
+import { useChatInbox, useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
 import type { Booking } from '@/shared/types/booking'
 
 export function CustomerDashboardPage() {
@@ -17,6 +18,8 @@ export function CustomerDashboardPage() {
   const { data: bookings, isLoading, error } = useCustomerBookings()
   const { data: reviews } = useCustomerReviews()
   const unreadNotifications = useUnreadNotificationCount()
+  const { data: unreadMessages = 0 } = useUnreadChatCount('customer')
+  const { data: chatThreads } = useChatInbox('customer')
   const { data: savedProviders } = useSavedProviders()
 
   const providerFilters = user?.preferredArea ? { area: user.preferredArea } : {}
@@ -65,7 +68,7 @@ export function CustomerDashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Active bookings</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{upcoming.length}</p>
@@ -82,6 +85,14 @@ export function CustomerDashboardPage() {
           <p className="text-sm text-slate-500">Reviews left</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{reviews?.length ?? 0}</p>
         </div>
+        <Link
+          to="/dashboard/messages"
+          className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-nexo-200"
+        >
+          <p className="text-sm text-slate-500">Messages</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{unreadMessages}</p>
+          <p className="text-xs text-slate-500">unread</p>
+        </Link>
         <Link
           to="/dashboard/notifications"
           className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-nexo-200"
@@ -122,6 +133,39 @@ export function CustomerDashboardPage() {
           </Link>
           .
         </p>
+      )}
+
+      {(chatThreads?.some((t) => t.unreadCount > 0) || (chatThreads?.length ?? 0) > 0) && (
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900">Recent messages</h2>
+            <Link to="/dashboard/messages" className="text-sm text-nexo-700 hover:underline">
+              View all
+            </Link>
+          </div>
+          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+            {chatThreads?.slice(0, 3).map((thread) => (
+              <li key={thread.bookingId}>
+                <Link
+                  to={`/dashboard/bookings/${thread.bookingId}#chat`}
+                  className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-slate-900">{thread.counterpartName}</p>
+                    <p className="truncate text-sm text-slate-500">
+                      {thread.lastMessageBody ?? 'No messages yet'}
+                    </p>
+                  </div>
+                  {thread.unreadCount > 0 && (
+                    <span className="shrink-0 rounded-full bg-nexo-700 px-2 py-0.5 text-xs text-white">
+                      {thread.unreadCount}
+                    </span>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <section>
