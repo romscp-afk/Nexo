@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CalendarClock } from 'lucide-react'
 import { useRescheduleBooking } from '@/features/bookings/hooks/useBookings'
+import { providerAvailabilityService } from '@/shared/services/providerAvailabilityService'
 import { formatDateTime } from '@/shared/lib/utils'
 import type { Booking } from '@/shared/types/booking'
 
@@ -20,6 +21,18 @@ export function RescheduleBookingPanel({ booking }: { booking: Booking }) {
     if (!scheduledAt) {
       setError('Choose a new date and time.')
       return
+    }
+    if (booking.providerId) {
+      const slotCheck = await providerAvailabilityService.checkSlot(
+        booking.providerId,
+        new Date(scheduledAt).toISOString(),
+        booking.durationHours,
+        booking.id,
+      )
+      if (slotCheck.error || !slotCheck.data?.ok) {
+        setError(slotCheck.data?.reason ?? slotCheck.error ?? 'Time slot not available.')
+        return
+      }
     }
     try {
       await reschedule.mutateAsync({

@@ -11,6 +11,7 @@ import { buildPriceBreakdown, type CeilingHeight } from '@/shared/lib/pricing'
 import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { uploadBookingPhotos } from '@/shared/lib/bookingPhotos'
 import { bookingService } from '@/shared/services/bookingService'
+import { providerAvailabilityService } from '@/shared/services/providerAvailabilityService'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
@@ -96,6 +97,16 @@ export function BookProviderPage() {
     }
     if (!breakdown) {
       setFormError('Unable to calculate price.')
+      return
+    }
+
+    const slotCheck = await providerAvailabilityService.checkSlot(
+      id,
+      new Date(scheduledAt).toISOString(),
+      isPerUnit ? 1 : duration,
+    )
+    if (slotCheck.error || !slotCheck.data?.ok) {
+      setFormError(slotCheck.data?.reason ?? slotCheck.error ?? 'Time slot not available.')
       return
     }
 

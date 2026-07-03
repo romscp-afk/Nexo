@@ -6,6 +6,7 @@ import { BadgeCheck, Briefcase, Heart, MapPin, Star, User } from 'lucide-react'
 import { useProvider } from '@/features/providers/hooks/useProviders'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PublicReviewList } from '@/features/reviews/components/PublicReviewList'
+import { ProviderWeeklyHoursDisplay } from '@/features/providers/pages/ProviderSchedulePage'
 import { formatCurrency } from '@/shared/lib/utils'
 
 export function ProviderDetailPage() {
@@ -78,6 +79,8 @@ export function ProviderDetailPage() {
                   )}
                 </section>
 
+                <ProviderWeeklyHoursDisplay providerId={provider.id} />
+
                 <section className="rounded-xl border border-slate-200 bg-white p-6">
                   <h2 className="font-semibold text-slate-900">Services offered</h2>
                   {provider.services.length === 0 ? (
@@ -145,7 +148,7 @@ export function ProviderDetailPage() {
                   </>
                 )}
                 <p className="mt-3 text-xs text-slate-500">
-                  Availability shown at booking — pick your preferred date and time.
+                  Book within the provider&apos;s working hours (Singapore time).
                 </p>
 
                 {isCustomer ? (

@@ -28,6 +28,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   provider: [
     { to: '/provider', label: 'Dashboard', exact: true },
     { to: '/provider/bookings', label: 'Bookings' },
+    { to: '/provider/schedule', label: 'Schedule' },
     { to: '/provider/messages', label: 'Messages', badge: 'messages' },
     { to: '/provider/earnings', label: 'Earnings' },
     { to: '/provider/notifications', label: 'Notifications', badge: 'notifications' },

@@ -31,6 +31,7 @@
     "setup:admin-chat-email": "node scripts/apply-admin-chat-email.mjs",
     "deploy:chat-email": "node scripts/deploy-chat-email.mjs",
     "setup:chat-email-resend": "node scripts/setup-chat-email-resend.mjs",
+    "setup:provider-availability": "node scripts/apply-provider-availability.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
