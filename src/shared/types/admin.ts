@@ -24,6 +24,19 @@ export type AdminBooking = Booking & {
   customerEmail?: string
 }
 
+export type AdminChatThread = {
+  bookingId: string
+  messageCount: number
+  lastMessageBody: string
+  lastMessageAt: string
+  lastSenderName: string
+  bookingStatus: string
+  serviceName: string | null
+  providerName: string | null
+  customerName: string
+  customerEmail: string | null
+}
+
 type BookingAdminRow = BookingRow & {
   providers: { business_name: string } | null
   services: { name: string } | null

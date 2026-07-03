@@ -42,9 +42,14 @@ export function AdminDashboardPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Recent bookings</h2>
-          <Link to="/admin/bookings" className="text-sm text-nexo-700 hover:underline">
-            View all
-          </Link>
+          <div className="flex gap-3 text-sm">
+            <Link to="/admin/chats" className="text-nexo-700 hover:underline">
+              Booking chats
+            </Link>
+            <Link to="/admin/bookings" className="text-nexo-700 hover:underline">
+              View all
+            </Link>
+          </div>
         </div>
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <table className="min-w-full text-sm">
