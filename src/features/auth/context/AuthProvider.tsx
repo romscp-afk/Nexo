@@ -17,7 +17,7 @@ type AuthContextValue = {
   profileError: string | null
   signIn: (email: string, password: string) => Promise<{ error: string | null; role: UserRole | null }>
   setupDemoAdmin: () => Promise<{ error: string | null; role: UserRole | null; message: string | null }>
-  signUp: (input: SignUpInput) => Promise<{ error: string | null; needsEmailConfirmation: boolean }>
+  signUp: (input: SignUpInput) => Promise<{ error: string | null; needsEmailConfirmation: boolean; role?: UserRole }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -145,7 +145,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (input: SignUpInput) => {
     const { data, error } = await authService.signUp(input)
-    return { error, needsEmailConfirmation: data.needsEmailConfirmation }
+    if (error) return { error, needsEmailConfirmation: data.needsEmailConfirmation }
+    if (data.needsEmailConfirmation) {
+      return { error: null, needsEmailConfirmation: true }
+    }
+    await refreshProfile()
+    return { error: null, needsEmailConfirmation: false, role: input.role }
   }
 
   const signOut = async () => {

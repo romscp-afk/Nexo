@@ -116,6 +116,22 @@ export function useOpenProviderRequests() {
   })
 }
 
+export function useRescheduleBooking() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, scheduledAt }: { id: string; scheduledAt: string }) => {
+      const { data, error } = await bookingService.reschedule(id, scheduledAt)
+      if (error) throw new Error(error)
+      return data
+    },
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      void queryClient.invalidateQueries({ queryKey: ['booking', data.id] })
+      void queryClient.invalidateQueries({ queryKey: ['booking-history', data.id] })
+    },
+  })
+}
+
 export function useAcceptBooking() {
   const queryClient = useQueryClient()
   return useMutation({

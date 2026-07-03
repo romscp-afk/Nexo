@@ -1,19 +1,25 @@
 import { supabase } from '@/shared/lib/supabase'
+import { parseUnitPrices } from '@/shared/lib/pricing'
 import {
   mapProviderListing,
   type ProviderFilters,
   type ProviderListing,
   type ProviderRow,
   type ProviderServiceSummary,
+  type PricingModel,
+  type UnitPrices,
 } from '@/shared/types/catalog'
 import type { AuthResult } from '@/shared/services/authService'
 
 type ProviderServiceJoin = {
   price_from: number
+  unit_prices: Record<string, number> | null
   services: {
     id: string
     name: string
     slug: string
+    pricing_model: PricingModel | null
+    unit_label: string | null
     service_categories: {
       slug: string
       name: string
@@ -36,12 +42,16 @@ function mapProviderServices(rows: ProviderServiceJoin[] | null): ProviderServic
       categorySlug: row.services!.service_categories!.slug,
       categoryName: row.services!.service_categories!.name,
       priceFrom: Number(row.price_from),
+      pricingModel: row.services!.pricing_model ?? 'hourly',
+      unitLabel: row.services!.unit_label,
+      unitPrices: parseUnitPrices(row.unit_prices),
     }))
 }
 
 function applyFilters(providers: ProviderListing[], filters: ProviderFilters): ProviderListing[] {
   return providers.filter((provider) => {
     if (filters.verifiedOnly && !provider.isVerified) return false
+    if (filters.minRating != null && provider.ratingAvg < filters.minRating) return false
     if (filters.area) {
       const area = filters.area.toLowerCase()
       const matches = provider.serviceAreas.some((a) => a.toLowerCase().includes(area))
@@ -51,8 +61,44 @@ function applyFilters(providers: ProviderListing[], filters: ProviderFilters): P
       const matches = provider.services.some((s) => s.categorySlug === filters.categorySlug)
       if (!matches) return false
     }
+    const minPrice = provider.services.length
+      ? Math.min(...provider.services.map((s) => s.priceFrom))
+      : provider.hourlyRate
+    if (filters.minPrice != null && minPrice < filters.minPrice) return false
+    if (filters.maxPrice != null && minPrice > filters.maxPrice) return false
     return true
   })
+}
+
+async function enrichProviders(providers: ProviderListing[]): Promise<ProviderListing[]> {
+  if (!providers.length) return providers
+
+  const userIds = providers.map((p) => p.userId)
+  const providerIds = providers.map((p) => p.id)
+
+  const [{ data: profiles }, { data: completed }] = await Promise.all([
+    supabase.from('profiles').select('user_id, avatar_url').in('user_id', userIds),
+    supabase
+      .from('bookings')
+      .select('provider_id')
+      .in('provider_id', providerIds)
+      .eq('status', 'completed'),
+  ])
+
+  const avatarByUser = new Map(
+    (profiles ?? []).map((p) => [p.user_id as string, (p.avatar_url as string | null) ?? null]),
+  )
+  const completedByProvider = new Map<string, number>()
+  for (const row of completed ?? []) {
+    const pid = row.provider_id as string
+    completedByProvider.set(pid, (completedByProvider.get(pid) ?? 0) + 1)
+  }
+
+  return providers.map((provider) => ({
+    ...provider,
+    avatarUrl: avatarByUser.get(provider.userId) ?? null,
+    completedJobs: completedByProvider.get(provider.id) ?? 0,
+  }))
 }
 
 export type UpdateProviderInput = {
@@ -66,6 +112,17 @@ export type UpdateProviderInput = {
 export type ProviderServicePriceInput = {
   serviceId: string
   priceFrom: number
+  unitPrices?: UnitPrices
+}
+
+function unitPricesToJson(prices: UnitPrices | undefined): Record<string, number> {
+  if (!prices) return {}
+  const out: Record<string, number> = {}
+  for (const [units, price] of Object.entries(prices)) {
+    const n = Number(units)
+    if (n >= 1 && price > 0) out[String(n)] = price
+  }
+  return out
 }
 
 async function getCurrentUserId(): Promise<string | null> {
@@ -82,10 +139,13 @@ export const providerService = {
         *,
         provider_services (
           price_from,
+          unit_prices,
           services (
             id,
             name,
             slug,
+            pricing_model,
+            unit_label,
             service_categories ( slug, name )
           )
         )
@@ -102,7 +162,7 @@ export const providerService = {
     })
 
     return {
-      data: applyFilters(listings, filters),
+      data: await enrichProviders(applyFilters(listings, filters)),
       error: null,
     }
   },
@@ -115,10 +175,13 @@ export const providerService = {
         *,
         provider_services (
           price_from,
+          unit_prices,
           services (
             id,
             name,
             slug,
+            pricing_model,
+            unit_label,
             service_categories ( slug, name )
           )
         )
@@ -133,8 +196,10 @@ export const providerService = {
 
     const row = data as ProviderWithServices
     const { provider_services, ...provider } = row
+    const listing = mapProviderListing(provider, mapProviderServices(provider_services))
+    const [enriched] = await enrichProviders([listing])
     return {
-      data: mapProviderListing(provider, mapProviderServices(provider_services)),
+      data: enriched ?? listing,
       error: null,
     }
   },
@@ -150,10 +215,13 @@ export const providerService = {
         *,
         provider_services (
           price_from,
+          unit_prices,
           services (
             id,
             name,
             slug,
+            pricing_model,
+            unit_label,
             service_categories ( slug, name )
           )
         )
@@ -167,8 +235,10 @@ export const providerService = {
 
     const row = data as ProviderWithServices
     const { provider_services, ...provider } = row
+    const listing = mapProviderListing(provider, mapProviderServices(provider_services))
+    const [enriched] = await enrichProviders([listing])
     return {
-      data: mapProviderListing(provider, mapProviderServices(provider_services)),
+      data: enriched ?? listing,
       error: null,
     }
   },
@@ -224,6 +294,7 @@ export const providerService = {
           provider_id: providerId,
           service_id: s.serviceId,
           price_from: s.priceFrom,
+          unit_prices: unitPricesToJson(s.unitPrices),
         })),
       )
       if (insertError) return { data: null as unknown as ProviderListing, error: insertError.message }

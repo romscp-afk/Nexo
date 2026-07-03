@@ -1,1 +1,2 @@
-export const ADMIN_FEE_SGD = 25
+export const ADMIN_FEE_SGD = 3
+export const PLATFORM_FEE_SGD = 3

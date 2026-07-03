@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useProvider } from '@/features/providers/hooks/useProviders'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
+import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { formatCurrency } from '@/shared/lib/utils'
+import { buildPriceBreakdown } from '@/shared/lib/pricing'
+import { uploadBookingPhotos } from '@/shared/lib/bookingPhotos'
+import { bookingService } from '@/shared/services/bookingService'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
@@ -22,11 +26,13 @@ export function BookProviderPage() {
   const [serviceId, setServiceId] = useState('')
   const [scheduledAt, setScheduledAt] = useState('')
   const [durationHours, setDurationHours] = useState('2')
+  const [quantity, setQuantity] = useState('1')
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
   const [postalCode, setPostalCode] = useState('')
   const [serviceArea, setServiceArea] = useState('')
   const [notes, setNotes] = useState('')
+  const [photos, setPhotos] = useState<File[]>([])
   const [paymentMethod, setPaymentMethod] = useState<BookingPaymentMethod>('paynow')
   const [formError, setFormError] = useState('')
   const [prefilled, setPrefilled] = useState(false)
@@ -42,11 +48,22 @@ export function BookProviderPage() {
 
   const selectedServiceId = serviceId || preselectedService
   const selectedService = provider?.services.find((s) => s.serviceId === selectedServiceId)
+  const isPerUnit = selectedService?.pricingModel === 'per_unit'
 
   const duration = Number(durationHours) || 1
-  const totalPrice = selectedService
-    ? Math.max(selectedService.priceFrom, (provider?.hourlyRate ?? 0) * duration)
-    : 0
+  const unitCount = Math.max(1, Number(quantity) || 1)
+
+  const breakdown = useMemo(() => {
+    if (!selectedService || !provider) return null
+    return buildPriceBreakdown({
+      pricingModel: selectedService.pricingModel,
+      priceFrom: selectedService.priceFrom,
+      hourlyRate: provider.hourlyRate,
+      durationHours: duration,
+      quantity: unitCount,
+      unitPrices: selectedService.unitPrices,
+    })
+  }, [selectedService, provider, duration, unitCount])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,13 +77,18 @@ export function BookProviderPage() {
       setFormError('Please choose a date and time.')
       return
     }
+    if (!breakdown) {
+      setFormError('Unable to calculate price.')
+      return
+    }
 
     try {
       const booking = await createBooking.mutateAsync({
         providerId: id,
         serviceId: selectedServiceId,
         scheduledAt: new Date(scheduledAt).toISOString(),
-        durationHours: duration,
+        durationHours: isPerUnit ? 1 : duration,
+        quantity: isPerUnit ? unitCount : null,
         addressLine1,
         addressLine2: addressLine2 || undefined,
         postalCode,
@@ -78,8 +100,19 @@ export function BookProviderPage() {
           : serviceArea
             ? `Area: ${serviceArea}`
             : undefined,
-        totalPrice,
+        totalPrice: breakdown.total,
+        serviceSubtotal: breakdown.serviceSubtotal,
+        platformFee: breakdown.platformFee,
+        pricingSnapshot: breakdown,
       })
+      if (photos.length > 0) {
+        try {
+          const urls = await uploadBookingPhotos(photos, booking.id)
+          await bookingService.addPhotos(booking.id, urls)
+        } catch {
+          // Photos optional — booking still created
+        }
+      }
       navigate(`/dashboard/bookings/${booking.id}`)
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Booking failed')
@@ -118,6 +151,7 @@ export function BookProviderPage() {
                     {provider.services.map((s) => (
                       <option key={s.serviceId} value={s.serviceId}>
                         {s.name} — from {formatCurrency(s.priceFrom)}
+                        {s.pricingModel === 'per_unit' ? '/unit' : ''}
                       </option>
                     ))}
                   </select>
@@ -134,19 +168,37 @@ export function BookProviderPage() {
                       required
                     />
                   </label>
-                  <label className="block text-sm">
-                    <span className="font-medium text-slate-700">Duration (hours)</span>
-                    <input
-                      type="number"
-                      min={1}
-                      max={12}
-                      step={0.5}
-                      value={durationHours}
-                      onChange={(e) => setDurationHours(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-                      required
-                    />
-                  </label>
+                  {isPerUnit ? (
+                    <label className="block text-sm">
+                      <span className="font-medium text-slate-700">
+                        Number of {selectedService?.unitLabel ?? 'unit'}s
+                      </span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                        required
+                      />
+                    </label>
+                  ) : (
+                    <label className="block text-sm">
+                      <span className="font-medium text-slate-700">Duration (hours)</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={12}
+                        step={0.5}
+                        value={durationHours}
+                        onChange={(e) => setDurationHours(e.target.value)}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                        required
+                      />
+                    </label>
+                  )}
                 </div>
 
                 <fieldset className="rounded-xl border border-slate-200 p-4">
@@ -218,6 +270,18 @@ export function BookProviderPage() {
                 </label>
 
                 <label className="block text-sm">
+                  <span className="font-medium text-slate-700">Photos (optional)</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => setPhotos(Array.from(e.target.files ?? []))}
+                    className="mt-1 w-full text-sm text-slate-600"
+                  />
+                  <p className="mt-1 text-xs text-slate-500">Upload photos of the job site or units (e.g. aircon).</p>
+                </label>
+
+                <label className="block text-sm">
                   <span className="font-medium text-slate-700">Notes (optional)</span>
                   <textarea
                     value={notes}
@@ -230,8 +294,8 @@ export function BookProviderPage() {
               </div>
 
               <aside className="h-fit rounded-xl border border-slate-200 bg-white p-6">
-                <h2 className="font-semibold text-slate-900">Summary</h2>
-                <dl className="mt-4 space-y-2 text-sm">
+                <h2 className="font-semibold text-slate-900">Price breakdown</h2>
+                <dl className="mt-3 space-y-2 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-slate-500">Provider</dt>
                     <dd className="font-medium">{provider.businessName}</dd>
@@ -242,18 +306,15 @@ export function BookProviderPage() {
                       <dd className="font-medium">{selectedService.name}</dd>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-slate-100 pt-2">
-                    <dt className="text-slate-500">Estimated total</dt>
-                    <dd className="text-lg font-bold text-nexo-700">
-                      {formatCurrency(totalPrice)}
-                    </dd>
-                  </div>
                 </dl>
-                <p className="mt-3 text-xs text-slate-500">
-                  {paymentMethod === 'paynow'
-                    ? 'Pay via PayNow after the provider confirms.'
-                    : `Cash on completion. Provider pays ${formatCurrency(ADMIN_FEE_SGD)} platform fee.`}
-                </p>
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <PriceBreakdownPanel breakdown={breakdown} paymentMethod={paymentMethod} compact />
+                </div>
+                {paymentMethod === 'cash' && (
+                  <p className="mt-3 text-xs text-slate-500">
+                    Provider pays {formatCurrency(ADMIN_FEE_SGD)} platform fee on cash jobs.
+                  </p>
+                )}
                 <button
                   type="submit"
                   disabled={createBooking.isPending || provider.services.length === 0}

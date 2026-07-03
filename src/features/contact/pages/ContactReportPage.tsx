@@ -1,30 +1,53 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { Download, FileSpreadsheet, Trash2, Users } from 'lucide-react'
+import { Download, FileSpreadsheet, RefreshCw, Trash2, Users } from 'lucide-react'
+import { useAuth } from '@/features/auth/context/AuthProvider'
 import { contactService } from '@/shared/services/contactService'
 import { exportContactsToExcel } from '@/shared/lib/exportContactsExcel'
+import type { ContactSubmission } from '@/shared/types/contact'
 import { EVENT } from '@/features/gathering/lib/eventConfig'
 import { legacyTheme } from '@/features/gathering/lib/legacyTheme'
 import { cn } from '@/shared/lib/utils'
 
 export function ContactReportPage() {
-  const [refreshKey, setRefreshKey] = useState(0)
+  const { session, loading: authLoading } = useAuth()
+  const [rows, setRows] = useState<ContactSubmission[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [actionError, setActionError] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
-  const rows = useMemo(() => {
-    void refreshKey
-    const { data } = contactService.listAll()
-    return data
-  }, [refreshKey])
+  const loadRows = useCallback(async () => {
+    if (!session) {
+      setRows([])
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    setActionError('')
+    const { data, error } = await contactService.listAll()
+    if (error) {
+      setActionError(error)
+      setRows([])
+    } else {
+      setRows(data)
+    }
+    setLoading(false)
+  }, [session])
+
+  useEffect(() => {
+    if (authLoading) return
+    void loadRows()
+  }, [authLoading, loadRows])
 
   const allSelected = rows.length > 0 && selectedIds.size === rows.length
   const someSelected = selectedIds.size > 0
 
   const refresh = () => {
     setSelectedIds(new Set())
-    setRefreshKey((n) => n + 1)
+    void loadRows()
   }
 
   const toggleAll = () => {
@@ -49,20 +72,13 @@ export function ContactReportPage() {
     exportContactsToExcel(rows, EVENT.excelFilename)
   }
 
-  const handleClear = () => {
+  const handleClear = async () => {
     if (!rows.length) return
-    if (!window.confirm('Delete ALL survey responses from this browser?')) return
+    if (!window.confirm('Delete ALL survey responses from the server? This cannot be undone.')) return
     setActionError('')
-    contactService.clearAll()
-    refresh()
-  }
-
-  const handleDeleteSelected = () => {
-    if (!someSelected) return
-    const count = selectedIds.size
-    if (!window.confirm(`Delete ${count} selected response${count === 1 ? '' : 's'}?`)) return
-    setActionError('')
-    const { error } = contactService.deleteByIds([...selectedIds])
+    setDeleting(true)
+    const { error } = await contactService.clearAll()
+    setDeleting(false)
     if (error) {
       setActionError(error)
       return
@@ -70,10 +86,27 @@ export function ContactReportPage() {
     refresh()
   }
 
-  const handleDeleteOne = (id: string, name: string) => {
+  const handleDeleteSelected = async () => {
+    if (!someSelected) return
+    const count = selectedIds.size
+    if (!window.confirm(`Delete ${count} selected response${count === 1 ? '' : 's'}?`)) return
+    setActionError('')
+    setDeleting(true)
+    const { error } = await contactService.deleteByIds([...selectedIds])
+    setDeleting(false)
+    if (error) {
+      setActionError(error)
+      return
+    }
+    refresh()
+  }
+
+  const handleDeleteOne = async (id: string, name: string) => {
     if (!window.confirm(`Delete submission for "${name}"?`)) return
     setActionError('')
-    const { error } = contactService.deleteById(id)
+    setDeleting(true)
+    const { error } = await contactService.deleteById(id)
+    setDeleting(false)
     if (error) {
       setActionError(error)
       return
@@ -83,7 +116,7 @@ export function ContactReportPage() {
       next.delete(id)
       return next
     })
-    setRefreshKey((n) => n + 1)
+    void loadRows()
   }
 
   return (
@@ -93,7 +126,7 @@ export function ContactReportPage() {
         <h1 className={`mt-2 text-2xl sm:text-3xl ${legacyTheme.heading}`}>Survey Report</h1>
         <p className={`mt-2 ${legacyTheme.tagline}`}>&ldquo;{EVENT.tagline}&rdquo;</p>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-legacy-silver">
-          All survey responses for {EVENT.title}. Export to Excel or review the grid below.
+          All survey responses from every device and location. Export to Excel or review the grid below.
         </p>
       </div>
 
@@ -109,7 +142,9 @@ export function ContactReportPage() {
             <Users className="h-6 w-6" />
           </span>
           <div>
-            <p className="text-2xl font-bold text-legacy-silver-light">{rows.length}</p>
+            <p className="text-2xl font-bold text-legacy-silver-light">
+              {loading ? '…' : rows.length}
+            </p>
             <p className="text-sm text-legacy-silver">
               Survey response{rows.length === 1 ? '' : 's'}
               {someSelected && ` · ${selectedIds.size} selected`}
@@ -122,8 +157,17 @@ export function ContactReportPage() {
           </Link>
           <button
             type="button"
+            onClick={refresh}
+            disabled={loading || authLoading}
+            className={`inline-flex items-center gap-2 disabled:opacity-50 ${legacyTheme.btnSecondary}`}
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+          <button
+            type="button"
             onClick={handleExport}
-            disabled={!rows.length}
+            disabled={!rows.length || loading}
             className={`inline-flex items-center gap-2 disabled:opacity-50 ${legacyTheme.btnPrimary}`}
           >
             <Download className="h-4 w-4" />
@@ -132,7 +176,7 @@ export function ContactReportPage() {
           <button
             type="button"
             onClick={handleDeleteSelected}
-            disabled={!someSelected}
+            disabled={!someSelected || deleting}
             className={`inline-flex items-center gap-2 disabled:opacity-50 ${legacyTheme.btnSecondary}`}
           >
             <Trash2 className="h-4 w-4" />
@@ -141,7 +185,7 @@ export function ContactReportPage() {
           <button
             type="button"
             onClick={handleClear}
-            disabled={!rows.length}
+            disabled={!rows.length || deleting}
             className={`inline-flex items-center gap-2 disabled:opacity-50 ${legacyTheme.btnSecondary}`}
           >
             <Trash2 className="h-4 w-4" />
@@ -168,7 +212,7 @@ export function ContactReportPage() {
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
-                    disabled={!rows.length}
+                    disabled={!rows.length || loading}
                     aria-label="Select all"
                     className="h-4 w-4 rounded border-legacy-silver/40 accent-[#c9a96e]"
                   />
@@ -187,7 +231,13 @@ export function ContactReportPage() {
               </tr>
             </thead>
             <tbody className="text-legacy-silver-light">
-              {rows.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={12} className="px-4 py-12 text-center text-legacy-silver">
+                    Loading responses…
+                  </td>
+                </tr>
+              ) : rows.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="px-4 py-12 text-center text-legacy-silver">
                     No responses yet.
@@ -231,7 +281,8 @@ export function ContactReportPage() {
                       <button
                         type="button"
                         onClick={() => handleDeleteOne(row.id, row.fullName)}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-legacy-red hover:bg-legacy-red/10"
+                        disabled={deleting}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-legacy-red hover:bg-legacy-red/10 disabled:opacity-50"
                         aria-label={`Delete ${row.fullName}`}
                       >
                         <Trash2 className="h-4 w-4" />

@@ -2,7 +2,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { cn } from '@/shared/lib/utils'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { EVENT } from '@/features/gathering/lib/eventConfig'
-import { legacyTheme } from '@/features/gathering/lib/legacyTheme'
+import { entryTheme, legacyTheme } from '@/features/gathering/lib/legacyTheme'
 
 const MINIMAL_PAGES = ['/contact', '/contact/entry', '/contact/thank-you']
 
@@ -24,8 +24,9 @@ export function GatheringLayout() {
   }
 
   if (isMinimalPage) {
+    const theme = pathname === '/contact/entry' ? entryTheme : legacyTheme
     return (
-      <div className={legacyTheme.pageBg}>
+      <div className={pathname === '/contact/entry' ? theme.pageShell : theme.pageBg}>
         <Outlet />
       </div>
     )

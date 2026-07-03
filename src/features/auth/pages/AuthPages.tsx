@@ -215,6 +215,7 @@ export function LoginPage() {
 
 export function RegisterPage() {
   const { signUp } = useAuth()
+  const navigate = useNavigate()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -260,7 +261,7 @@ export function RegisterPage() {
       return
     }
 
-    const { error: err, needsEmailConfirmation } = await signUp({
+    const { error: err, needsEmailConfirmation, role } = await signUp({
       email,
       password,
       role,
@@ -283,6 +284,10 @@ export function RegisterPage() {
     }
     if (needsEmailConfirmation) {
       setSuccess(`Account created. We sent a confirmation link to ${email}. Check your inbox, then log in.`)
+      return
+    }
+    if (role) {
+      navigate(getDashboardPath(role))
       return
     }
     setSuccess('Account created. You can log in now.')

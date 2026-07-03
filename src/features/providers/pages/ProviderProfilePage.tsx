@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   useMyProvider,
   useUpdateMyProvider,
@@ -8,11 +8,30 @@ import { useAllServices } from '@/features/catalog/hooks/useAllServices'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { formatCurrency } from '@/shared/lib/utils'
+import type { UnitPrices } from '@/shared/types/catalog'
+
+const UNIT_TIER_COUNTS = [1, 2, 3, 4, 5] as const
 
 type ServicePriceDraft = {
   serviceId: string
   enabled: boolean
   priceFrom: string
+  unitPrices: Record<number, string>
+}
+
+function defaultUnitPrices(basePrice: number, existing?: UnitPrices): Record<number, string> {
+  const out: Record<number, string> = {}
+  for (const n of UNIT_TIER_COUNTS) {
+    const tier = existing?.[n]
+    if (tier != null) {
+      out[n] = String(tier)
+    } else if (n === 1) {
+      out[n] = String(basePrice)
+    } else {
+      out[n] = String(Math.round(basePrice * n * 0.9))
+    }
+  }
+  return out
 }
 
 export function ProviderProfilePage() {
@@ -29,6 +48,15 @@ export function ProviderProfilePage() {
   const [servicePrices, setServicePrices] = useState<ServicePriceDraft[]>([])
   const [success, setSuccess] = useState('')
   const [formError, setFormError] = useState('')
+
+  const hasHourlyServices = useMemo(
+    () =>
+      servicePrices.some((row) => {
+        const catalog = catalogServices?.find((s) => s.id === row.serviceId)
+        return row.enabled && catalog?.pricingModel !== 'per_unit'
+      }),
+    [servicePrices, catalogServices],
+  )
 
   useEffect(() => {
     if (provider) {
@@ -49,6 +77,7 @@ export function ProviderProfilePage() {
           serviceId: service.id,
           enabled: Boolean(existing),
           priceFrom: existing ? String(existing.priceFrom) : String(service.basePrice),
+          unitPrices: defaultUnitPrices(service.basePrice, existing?.unitPrices),
         }
       }),
     )
@@ -63,6 +92,16 @@ export function ProviderProfilePage() {
   const updateServicePrice = (serviceId: string, patch: Partial<ServicePriceDraft>) => {
     setServicePrices((prev) =>
       prev.map((row) => (row.serviceId === serviceId ? { ...row, ...patch } : row)),
+    )
+  }
+
+  const updateUnitPrice = (serviceId: string, units: number, value: string) => {
+    setServicePrices((prev) =>
+      prev.map((row) =>
+        row.serviceId === serviceId
+          ? { ...row, unitPrices: { ...row.unitPrices, [units]: value } }
+          : row,
+      ),
     )
   }
 
@@ -91,10 +130,21 @@ export function ProviderProfilePage() {
         serviceAreas,
       })
       await updateServices.mutateAsync(
-        enabledServices.map((s) => ({
-          serviceId: s.serviceId,
-          priceFrom: Number(s.priceFrom) || 0,
-        })),
+        enabledServices.map((s) => {
+          const catalog = catalogServices?.find((c) => c.id === s.serviceId)
+          const unitPrices: UnitPrices = {}
+          if (catalog?.pricingModel === 'per_unit') {
+            for (const n of UNIT_TIER_COUNTS) {
+              const price = Number(s.unitPrices[n]) || 0
+              if (price > 0) unitPrices[n] = price
+            }
+          }
+          return {
+            serviceId: s.serviceId,
+            priceFrom: Number(s.unitPrices[1] ?? s.priceFrom) || Number(s.priceFrom) || 0,
+            unitPrices: catalog?.pricingModel === 'per_unit' ? unitPrices : undefined,
+          }
+        }),
       )
       setSuccess('Profile and service prices updated.')
     } catch (err) {
@@ -153,17 +203,20 @@ export function ProviderProfilePage() {
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
                   />
                 </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-slate-700">Hourly rate (SGD)</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={hourlyRate}
-                    onChange={(e) => setHourlyRate(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-                  />
-                </label>
+                {hasHourlyServices && (
+                  <label className="block text-sm">
+                    <span className="font-medium text-slate-700">Hourly rate (SGD)</span>
+                    <p className="text-xs text-slate-500">For cleaning and other hourly services</p>
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={hourlyRate}
+                      onChange={(e) => setHourlyRate(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                    />
+                  </label>
+                )}
               </div>
 
               <fieldset>
@@ -188,7 +241,7 @@ export function ProviderProfilePage() {
               <div>
                 <h2 className="font-semibold text-slate-900">Services & pricing</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Enable services you offer and set your starting price for each.
+                  Cleaners use hourly rates. Aircon services use per-unit tier pricing (1 unit, 2 units, etc.).
                 </p>
               </div>
 
@@ -196,9 +249,12 @@ export function ProviderProfilePage() {
                 {servicePrices.map((row) => {
                   const catalog = catalogServices?.find((s) => s.id === row.serviceId)
                   if (!catalog) return null
+                  const isPerUnit = catalog.pricingModel === 'per_unit'
+                  const unitLabel = catalog.unitLabel ?? 'unit'
+
                   return (
-                    <li key={row.serviceId} className="flex flex-wrap items-center gap-3 py-3">
-                      <label className="flex min-w-[12rem] flex-1 items-start gap-2 text-sm">
+                    <li key={row.serviceId} className="space-y-3 py-4">
+                      <label className="flex items-start gap-2 text-sm">
                         <input
                           type="checkbox"
                           checked={row.enabled}
@@ -210,25 +266,51 @@ export function ProviderProfilePage() {
                         <span>
                           <span className="font-medium text-slate-900">{catalog.name}</span>
                           <span className="block text-xs text-slate-500">
-                            {catalog.categoryName} · catalog from {formatCurrency(catalog.basePrice)}
+                            {catalog.categoryName} ·{' '}
+                            {isPerUnit ? 'Per-unit pricing' : 'Hourly pricing'} · catalog from{' '}
+                            {formatCurrency(catalog.basePrice)}
                           </span>
                         </span>
                       </label>
-                      <label className="flex items-center gap-2 text-sm">
-                        <span className="text-slate-500">From</span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1}
-                          disabled={!row.enabled}
-                          value={row.priceFrom}
-                          onChange={(e) =>
-                            updateServicePrice(row.serviceId, { priceFrom: e.target.value })
-                          }
-                          className="w-24 rounded-lg border border-slate-200 px-2 py-1 disabled:bg-slate-50"
-                        />
-                        <span className="text-slate-500">SGD</span>
-                      </label>
+
+                      {row.enabled && isPerUnit && (
+                        <div className="ml-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {UNIT_TIER_COUNTS.map((n) => (
+                            <label key={n} className="flex items-center gap-2 text-sm">
+                              <span className="w-16 text-slate-600">
+                                {n} {unitLabel}
+                                {n === 1 ? '' : 's'}
+                              </span>
+                              <input
+                                type="number"
+                                min={0}
+                                step={1}
+                                value={row.unitPrices[n] ?? ''}
+                                onChange={(e) => updateUnitPrice(row.serviceId, n, e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 px-2 py-1"
+                              />
+                              <span className="text-slate-400">SGD</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+
+                      {row.enabled && !isPerUnit && (
+                        <label className="ml-6 flex items-center gap-2 text-sm">
+                          <span className="text-slate-500">Starting from</span>
+                          <input
+                            type="number"
+                            min={0}
+                            step={1}
+                            value={row.priceFrom}
+                            onChange={(e) =>
+                              updateServicePrice(row.serviceId, { priceFrom: e.target.value })
+                            }
+                            className="w-24 rounded-lg border border-slate-200 px-2 py-1"
+                          />
+                          <span className="text-slate-500">SGD</span>
+                        </label>
+                      )}
                     </li>
                   )
                 })}

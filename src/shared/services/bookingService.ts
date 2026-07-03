@@ -1,4 +1,5 @@
 import { supabase } from '@/shared/lib/supabase'
+import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import type { AuthResult } from '@/shared/services/authService'
 import {
   mapBooking,
@@ -61,11 +62,16 @@ export const bookingService = {
       service_id: input.serviceId,
       scheduled_at: input.scheduledAt,
       duration_hours: input.durationHours,
+      quantity: input.quantity ?? null,
       address_line1: input.addressLine1,
       address_line2: input.addressLine2 ?? null,
       postal_code: input.postalCode,
       notes: notesWithPayment,
       total_price: input.totalPrice,
+      service_subtotal: input.serviceSubtotal,
+      platform_fee: input.platformFee ?? PLATFORM_FEE_SGD,
+      pricing_snapshot: input.pricingSnapshot ?? {},
+      photo_urls: input.photoUrls ?? [],
       status: 'pending' as const,
     }
 
@@ -79,6 +85,27 @@ export const bookingService = {
       ;({ data, error } = await supabase
         .from('bookings')
         .insert(payload)
+        .select(BOOKING_SELECT)
+        .single())
+    }
+
+    if (error?.message && (error.message.includes('quantity') || error.message.includes('pricing_snapshot') || error.message.includes('service_subtotal') || error.message.includes('platform_fee'))) {
+      const legacyPayload = {
+        customer_id: userId,
+        provider_id: input.providerId ?? null,
+        service_id: input.serviceId,
+        scheduled_at: input.scheduledAt,
+        duration_hours: input.durationHours,
+        address_line1: input.addressLine1,
+        address_line2: input.addressLine2 ?? null,
+        postal_code: input.postalCode,
+        notes: notesWithPayment,
+        total_price: input.totalPrice,
+        status: 'pending' as const,
+      }
+      ;({ data, error } = await supabase
+        .from('bookings')
+        .insert({ ...legacyPayload, payment_method: input.paymentMethod })
         .select(BOOKING_SELECT)
         .single())
     }
@@ -195,7 +222,63 @@ export const bookingService = {
       booking.customerPhone = profile.phone ?? undefined
     }
 
+    if (booking.providerId) {
+      const { data: providerRow } = await supabase
+        .from('providers')
+        .select('user_id')
+        .eq('id', booking.providerId)
+        .maybeSingle()
+
+      if (providerRow?.user_id) {
+        const { data: providerProfile } = await supabase
+          .from('profiles')
+          .select('full_name, phone')
+          .eq('user_id', providerRow.user_id)
+          .maybeSingle()
+
+        if (
+          providerProfile &&
+          ['confirmed', 'in_progress', 'completed'].includes(booking.status)
+        ) {
+          booking.providerPhone = providerProfile.phone ?? undefined
+        }
+      }
+    }
+
     return { data: booking, error: null }
+  },
+
+  async reschedule(id: string, scheduledAt: string): Promise<AuthResult<Booking>> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ scheduled_at: scheduledAt })
+      .eq('id', id)
+      .in('status', ['pending', 'confirmed'])
+      .select(BOOKING_SELECT)
+      .single()
+
+    if (error) return { data: null as unknown as Booking, error: error.message }
+    return { data: mapJoinRow(data as BookingJoinRow), error: null }
+  },
+
+  async addPhotos(id: string, photoUrls: string[]): Promise<AuthResult<Booking>> {
+    const { data: existing } = await supabase
+      .from('bookings')
+      .select('photo_urls')
+      .eq('id', id)
+      .maybeSingle()
+
+    const merged = [...(existing?.photo_urls ?? []), ...photoUrls]
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ photo_urls: merged })
+      .eq('id', id)
+      .select(BOOKING_SELECT)
+      .single()
+
+    if (error) return { data: null as unknown as Booking, error: error.message }
+    return { data: mapJoinRow(data as BookingJoinRow), error: null }
   },
 
   async updateStatus(id: string, status: BookingStatus): Promise<AuthResult<Booking>> {

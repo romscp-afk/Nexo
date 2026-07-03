@@ -97,6 +97,9 @@ export const reviewService = {
         provider_id: input.providerId,
         rating: input.rating,
         comment: input.comment ?? null,
+        quality_rating: input.qualityRating ?? input.rating,
+        punctuality_rating: input.punctualityRating ?? input.rating,
+        professionalism_rating: input.professionalismRating ?? input.rating,
       })
       .select('*')
       .single()

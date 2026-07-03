@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCategories'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
+import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { formatCurrency } from '@/shared/lib/utils'
-import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { buildPriceBreakdown } from '@/shared/lib/pricing'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function RequestServicePage() {
@@ -21,6 +23,7 @@ export function RequestServicePage() {
   const [paymentMethod, setPaymentMethod] = useState<BookingPaymentMethod>('paynow')
   const [scheduledAt, setScheduledAt] = useState('')
   const [durationHours, setDurationHours] = useState('2')
+  const [quantity, setQuantity] = useState('1')
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
   const [postalCode, setPostalCode] = useState('')
@@ -37,8 +40,21 @@ export function RequestServicePage() {
   }, [user])
 
   const selectedService = services?.find((s) => s.id === serviceId)
+  const isPerUnit = selectedService?.pricingModel === 'per_unit'
   const duration = Number(durationHours) || 1
-  const totalPrice = selectedService ? Math.max(selectedService.basePrice, selectedService.basePrice * (duration / 2)) : 0
+  const unitCount = Math.max(1, Number(quantity) || 1)
+
+  const breakdown = useMemo(() => {
+    if (!selectedService) return null
+    return buildPriceBreakdown({
+      pricingModel: selectedService.pricingModel,
+      priceFrom: selectedService.basePrice,
+      hourlyRate: selectedService.basePrice,
+      durationHours: duration,
+      quantity: unitCount,
+      unitPrices: {},
+    })
+  }, [selectedService, duration, unitCount])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,11 +63,16 @@ export function RequestServicePage() {
       setFormError('Please select a service and time.')
       return
     }
+    if (!breakdown) {
+      setFormError('Unable to calculate price.')
+      return
+    }
     try {
       const booking = await createBooking.mutateAsync({
         serviceId,
         scheduledAt: new Date(scheduledAt).toISOString(),
-        durationHours: duration,
+        durationHours: isPerUnit ? 1 : duration,
+        quantity: isPerUnit ? unitCount : null,
         addressLine1,
         addressLine2: addressLine2 || undefined,
         postalCode,
@@ -63,7 +84,10 @@ export function RequestServicePage() {
           : serviceArea
             ? `Area: ${serviceArea}`
             : undefined,
-        totalPrice,
+        totalPrice: breakdown.total,
+        serviceSubtotal: breakdown.serviceSubtotal,
+        platformFee: breakdown.platformFee,
+        pricingSnapshot: breakdown,
       })
       navigate(`/dashboard/bookings/${booking.id}`)
     } catch (err) {
@@ -104,6 +128,7 @@ export function RequestServicePage() {
                     {services?.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name} — from {formatCurrency(s.basePrice)}
+                        {s.pricingModel === 'per_unit' ? '/unit' : ''}
                       </option>
                     ))}
                   </select>
@@ -134,7 +159,7 @@ export function RequestServicePage() {
                         className="mr-2"
                       />
                       <span className="font-bold text-amber-900">Cash on completion</span>
-                      <p className="mt-1 text-xs text-amber-800">Provider pays {formatCurrency(ADMIN_FEE_SGD)} admin fee via PayNow.</p>
+                      <p className="mt-1 text-xs text-amber-800">Provider pays {formatCurrency(ADMIN_FEE_SGD)} platform fee via PayNow.</p>
                     </label>
                   </div>
                 </fieldset>
@@ -144,10 +169,19 @@ export function RequestServicePage() {
                     <span className="font-medium text-slate-700">Date & time</span>
                     <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
                   </label>
-                  <label className="block text-sm">
-                    <span className="font-medium text-slate-700">Duration (hours)</span>
-                    <input type="number" min={1} max={12} step={0.5} value={durationHours} onChange={(e) => setDurationHours(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
-                  </label>
+                  {isPerUnit ? (
+                    <label className="block text-sm">
+                      <span className="font-medium text-slate-700">
+                        Number of {selectedService?.unitLabel ?? 'unit'}s
+                      </span>
+                      <input type="number" min={1} max={10} step={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
+                    </label>
+                  ) : (
+                    <label className="block text-sm">
+                      <span className="font-medium text-slate-700">Duration (hours)</span>
+                      <input type="number" min={1} max={12} step={0.5} value={durationHours} onChange={(e) => setDurationHours(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
+                    </label>
+                  )}
                 </div>
 
                 <label className="block text-sm">
@@ -179,15 +213,13 @@ export function RequestServicePage() {
               </div>
 
               <aside className="h-fit rounded-xl border border-slate-200 bg-white p-6">
-                <h2 className="font-semibold text-slate-900">Summary</h2>
+                <h2 className="font-semibold text-slate-900">Price breakdown</h2>
                 <p className="mt-2 text-sm text-slate-600">
                   Broadcast to all <strong>{category.name}</strong> providers.
                 </p>
-                {selectedService && (
-                  <p className="mt-3 text-sm">
-                    Est. {formatCurrency(totalPrice)} · {paymentMethod === 'cash' ? 'Cash' : 'PayNow'}
-                  </p>
-                )}
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <PriceBreakdownPanel breakdown={breakdown} paymentMethod={paymentMethod} compact />
+                </div>
                 <button type="submit" disabled={createBooking.isPending} className="mt-4 w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
                   {createBooking.isPending ? 'Sending…' : 'Send request to providers'}
                 </button>

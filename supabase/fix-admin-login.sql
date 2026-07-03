@@ -35,6 +35,11 @@ BEGIN
 
   SELECT id INTO v_uid FROM auth.users WHERE lower(email) = lower(admin_email) LIMIT 1;
 
+  -- Reuse the seeded admin row if the email changed (e.g. romalgk → romscp).
+  IF v_uid IS NULL THEN
+    SELECT id INTO v_uid FROM auth.users WHERE id = default_admin_id LIMIT 1;
+  END IF;
+
   IF v_uid IS NULL THEN
     v_uid := default_admin_id;
 
@@ -51,6 +56,7 @@ BEGIN
     );
   ELSE
     UPDATE auth.users SET
+      email = admin_email,
       encrypted_password = encrypted_pw,
       email_confirmed_at = COALESCE(email_confirmed_at, now()),
       confirmation_token = COALESCE(confirmation_token, ''),

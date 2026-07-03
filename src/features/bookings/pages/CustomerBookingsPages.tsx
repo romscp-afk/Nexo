@@ -8,6 +8,7 @@ import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
 import { BookingList } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
+import { useSavedProviders } from '@/features/customer/hooks/useSavedProviders'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import type { Booking } from '@/shared/types/booking'
 
@@ -16,6 +17,7 @@ export function CustomerDashboardPage() {
   const { data: bookings, isLoading, error } = useCustomerBookings()
   const { data: reviews } = useCustomerReviews()
   const unreadNotifications = useUnreadNotificationCount()
+  const { data: savedProviders } = useSavedProviders()
 
   const providerFilters = user?.preferredArea ? { area: user.preferredArea } : {}
   const {
@@ -58,7 +60,7 @@ export function CustomerDashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Active bookings</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{upcoming.length}</p>
@@ -67,6 +69,10 @@ export function CustomerDashboardPage() {
           <p className="text-sm text-slate-500">Total bookings</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{bookings?.length ?? 0}</p>
         </div>
+        <Link to="/dashboard/saved-providers" className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-nexo-200">
+          <p className="text-sm text-slate-500">Saved providers</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">{savedProviders?.length ?? 0}</p>
+        </Link>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Reviews left</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{reviews?.length ?? 0}</p>

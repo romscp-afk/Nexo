@@ -16,6 +16,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { to: '/providers', label: 'Browse providers' },
     { to: '/dashboard/bookings', label: 'My bookings' },
     { to: '/dashboard/reviews', label: 'My reviews' },
+    { to: '/dashboard/saved-providers', label: 'Saved providers' },
     { to: '/dashboard/notifications', label: 'Notifications', badge: true },
     { to: '/dashboard/profile', label: 'Profile' },
   ],

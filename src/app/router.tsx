@@ -16,6 +16,7 @@ import {
   CustomerDashboardPage,
   CustomerBookingsPage,
 } from '@/features/bookings/pages/CustomerBookingsPages'
+import { SavedProvidersPage } from '@/features/customer/pages/SavedProvidersPage'
 import { CustomerProfilePage } from '@/features/customer/pages/CustomerProfilePage'
 import { CustomerNotificationsPage } from '@/features/customer/pages/CustomerNotificationsPage'
 import { CustomerReviewsPage } from '@/features/customer/pages/CustomerReviewsPage'
@@ -89,6 +90,7 @@ export const router = createBrowserRouter([
               { path: '/dashboard/bookings', element: <CustomerBookingsPage /> },
               { path: '/dashboard/reviews', element: <CustomerReviewsPage /> },
               { path: '/dashboard/notifications', element: <CustomerNotificationsPage /> },
+              { path: '/dashboard/saved-providers', element: <SavedProvidersPage /> },
               { path: '/dashboard/profile', element: <CustomerProfilePage /> },
               {
                 path: '/dashboard/bookings/:id',

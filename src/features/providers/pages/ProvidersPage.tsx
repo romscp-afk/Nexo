@@ -14,68 +14,118 @@ function ProviderFiltersBar({
   categorySlug,
   area,
   verifiedOnly,
+  minRating,
+  minPrice,
+  maxPrice,
   onCategoryChange,
   onAreaChange,
   onVerifiedChange,
+  onMinRatingChange,
+  onMinPriceChange,
+  onMaxPriceChange,
   showCategoryFilter,
 }: {
   categories: { slug: string; name: string }[] | undefined
   categorySlug: string
   area: string
   verifiedOnly: boolean
+  minRating: number
+  minPrice: string
+  maxPrice: string
   onCategoryChange: (slug: string) => void
   onAreaChange: (area: string) => void
   onVerifiedChange: (value: boolean) => void
+  onMinRatingChange: (value: number) => void
+  onMinPriceChange: (value: string) => void
+  onMaxPriceChange: (value: string) => void
   showCategoryFilter?: boolean
 }) {
   return (
-    <div
-      className={`mb-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 ${showCategoryFilter ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
-    >
-      {showCategoryFilter ? (
+    <div className="mb-6 space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+      <div className={`grid gap-3 ${showCategoryFilter ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'}`}>
+        {showCategoryFilter ? (
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Category</span>
+            <select
+              value={categorySlug}
+              onChange={(e) => onCategoryChange(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+            >
+              <option value="">All categories</option>
+              {categories?.map((category) => (
+                <option key={category.slug} value={category.slug}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
         <label className="block text-sm">
-          <span className="font-medium text-slate-700">Category</span>
+          <span className="font-medium text-slate-700">Area</span>
           <select
-            value={categorySlug}
-            onChange={(e) => onCategoryChange(e.target.value)}
+            value={area}
+            onChange={(e) => onAreaChange(e.target.value)}
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
           >
-            <option value="">All categories</option>
-            {categories?.map((category) => (
-              <option key={category.slug} value={category.slug}>
-                {category.name}
+            <option value="">All areas</option>
+            {SINGAPORE_AREAS.map((item) => (
+              <option key={item} value={item}>
+                {item}
               </option>
             ))}
           </select>
         </label>
-      ) : null}
 
-      <label className="block text-sm">
-        <span className="font-medium text-slate-700">Area</span>
-        <select
-          value={area}
-          onChange={(e) => onAreaChange(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-        >
-          <option value="">All areas</option>
-          {SINGAPORE_AREAS.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Min rating</span>
+          <select
+            value={minRating}
+            onChange={(e) => onMinRatingChange(Number(e.target.value))}
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+          >
+            <option value={0}>Any rating</option>
+            <option value={3}>3+ stars</option>
+            <option value={4}>4+ stars</option>
+            <option value={4.5}>4.5+ stars</option>
+          </select>
+        </label>
+      </div>
 
-      <label className="flex items-end gap-2 pb-2 text-sm">
-        <input
-          id="verified-only"
-          type="checkbox"
-          checked={verifiedOnly}
-          onChange={(e) => onVerifiedChange(e.target.checked)}
-          className="rounded border-slate-300"
-        />
-        <span className="text-slate-700">Verified only</span>
-      </label>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Min price (SGD)</span>
+          <input
+            type="number"
+            min={0}
+            value={minPrice}
+            onChange={(e) => onMinPriceChange(e.target.value)}
+            placeholder="e.g. 30"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Max price (SGD)</span>
+          <input
+            type="number"
+            min={0}
+            value={maxPrice}
+            onChange={(e) => onMaxPriceChange(e.target.value)}
+            placeholder="e.g. 150"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+          />
+        </label>
+        <label className="flex items-end gap-2 pb-2 text-sm">
+          <input
+            id="verified-only"
+            type="checkbox"
+            checked={verifiedOnly}
+            onChange={(e) => onVerifiedChange(e.target.checked)}
+            className="rounded border-slate-300"
+          />
+          <span className="text-slate-700">Verified only</span>
+        </label>
+      </div>
     </div>
   )
 }
@@ -91,7 +141,7 @@ export function ProvidersPage() {
   const categorySlug = routeCategorySlug ?? legacyCategory
   const isCategoryView = Boolean(categorySlug)
 
-  const { categorySlug: storeCategorySlug, verifiedOnly, area, setCategorySlug, setVerifiedOnly, setArea } =
+  const { categorySlug: storeCategorySlug, verifiedOnly, area, minRating, minPrice, maxPrice, setCategorySlug, setVerifiedOnly, setArea, setMinRating, setMinPrice, setMaxPrice } =
     useProviderFilterStore()
 
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategories()
@@ -114,8 +164,11 @@ export function ProvidersPage() {
     () => ({
       verifiedOnly,
       area: area.trim() || undefined,
+      minRating: minRating || undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
     }),
-    [verifiedOnly, area],
+    [verifiedOnly, area, minRating, minPrice, maxPrice],
   )
 
   const categoryFilters = useMemo(
@@ -123,8 +176,11 @@ export function ProvidersPage() {
       categorySlug: categorySlug || storeCategorySlug || undefined,
       verifiedOnly,
       area: area.trim() || undefined,
+      minRating: minRating || undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
     }),
-    [categorySlug, storeCategorySlug, verifiedOnly, area],
+    [categorySlug, storeCategorySlug, verifiedOnly, area, minRating, minPrice, maxPrice],
   )
 
   const { data: browseProviders, isLoading: browseLoading, error: browseError } = useProviders(browseFilters)
@@ -188,9 +244,15 @@ export function ProvidersPage() {
           categorySlug={categorySlug}
           area={area}
           verifiedOnly={verifiedOnly}
+          minRating={minRating}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
           onCategoryChange={handleCategoryChange}
           onAreaChange={handleAreaChange}
           onVerifiedChange={setVerifiedOnly}
+          onMinRatingChange={setMinRating}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
           showCategoryFilter
         />
 
@@ -229,9 +291,15 @@ export function ProvidersPage() {
         categorySlug=""
         area={area}
         verifiedOnly={verifiedOnly}
+        minRating={minRating}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
         onCategoryChange={handleCategoryChange}
         onAreaChange={handleAreaChange}
         onVerifiedChange={setVerifiedOnly}
+        onMinRatingChange={setMinRating}
+        onMinPriceChange={setMinPrice}
+        onMaxPriceChange={setMaxPrice}
       />
 
       <QueryState

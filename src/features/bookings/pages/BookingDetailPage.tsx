@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Phone, User } from 'lucide-react'
 import { BookingStatusTimeline } from '@/features/bookings/components/BookingStatusTimeline'
+import { BookingChatPanel } from '@/features/bookings/components/BookingChatPanel'
+import { RescheduleBookingPanel } from '@/features/bookings/components/RescheduleBookingPanel'
 import { PaymentMethodBadge } from '@/features/bookings/components/PaymentMethodBadge'
 import {
   useAcceptBooking,
@@ -120,11 +122,29 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     <dd className="font-medium">{formatDateTime(booking.scheduledAt)}</dd>
                   </div>
                   <div>
-                    <dt className="text-slate-500">Duration</dt>
-                    <dd className="font-medium">{booking.durationHours} hours</dd>
+                    <dt className="text-slate-500">
+                      {booking.quantity != null ? 'Units' : 'Duration'}
+                    </dt>
+                    <dd className="font-medium">
+                      {booking.quantity != null
+                        ? `${booking.quantity} unit${booking.quantity === 1 ? '' : 's'}`
+                        : `${booking.durationHours} hours`}
+                    </dd>
                   </div>
+                  {booking.serviceSubtotal != null && (
+                    <div>
+                      <dt className="text-slate-500">Service subtotal</dt>
+                      <dd className="font-medium">{formatCurrency(booking.serviceSubtotal)}</dd>
+                    </div>
+                  )}
+                  {booking.platformFee != null && (
+                    <div>
+                      <dt className="text-slate-500">Platform fee</dt>
+                      <dd className="font-medium">{formatCurrency(booking.platformFee)}</dd>
+                    </div>
+                  )}
                   <div>
-                    <dt className="text-slate-500">Estimated total</dt>
+                    <dt className="text-slate-500">Total</dt>
                     <dd className="font-medium text-nexo-700">
                       {booking.totalPrice != null ? formatCurrency(booking.totalPrice) : '—'}
                     </dd>
@@ -152,9 +172,40 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                       <dd className="font-medium">{booking.notes}</dd>
                     </div>
                   )}
+                  {booking.photoUrls.length > 0 && (
+                    <div>
+                      <dt className="text-slate-500">Photos</dt>
+                      <dd className="mt-1 flex flex-wrap gap-2">
+                        {booking.photoUrls.map((url) => (
+                          <a key={url} href={url} target="_blank" rel="noreferrer">
+                            <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover ring-1 ring-slate-200" />
+                          </a>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
                 </dl>
               </section>
             </div>
+
+            {role === 'customer' &&
+              booking.providerId &&
+              ['confirmed', 'in_progress', 'completed'].includes(booking.status) &&
+              booking.providerPhone && (
+              <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+                <h2 className="font-semibold text-slate-900">Provider contact</h2>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                  <span className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-nexo-700" />
+                    {booking.providerName}
+                  </span>
+                  <a href={`tel:${booking.providerPhone}`} className="flex items-center gap-2 text-nexo-800 hover:underline">
+                    <Phone className="h-4 w-4" />
+                    {booking.providerPhone}
+                  </a>
+                </div>
+              </section>
+            )}
 
             {role === 'provider' && booking.customerContactShared && booking.customerName && (
               <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
@@ -194,6 +245,14 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
               </p>
             )}
 
+            {role === 'customer' && booking.providerId && (
+              <RescheduleBookingPanel booking={booking} />
+            )}
+
+            {booking.providerId && (
+              <BookingChatPanel bookingId={booking.id} status={booking.status} />
+            )}
+
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h2 className="font-semibold text-slate-900">Status timeline</h2>
               <div className="mt-4">
@@ -204,9 +263,9 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             <section className="rounded-xl border border-slate-200 bg-white p-6">
               <h2 className="font-semibold text-slate-900">Actions</h2>
               <div className="mt-4 flex flex-wrap gap-2">
-                {role === 'customer' && booking.status === 'pending' && (
+                {role === 'customer' && ['pending', 'confirmed'].includes(booking.status) && (
                   <button type="button" onClick={handleCancel} disabled={isPending} className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">
-                    Cancel request
+                    Cancel booking
                   </button>
                 )}
 
@@ -250,7 +309,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             </section>
 
             {(booking.status === 'completed' || payments?.customerAdvance?.status === 'paid') && (
-              <ReceiptPanel bookingId={booking.id} />
+              <ReceiptPanel bookingId={booking.id} booking={booking} />
             )}
 
             {role === 'customer' && booking.providerId && <ReviewSection booking={booking} />}

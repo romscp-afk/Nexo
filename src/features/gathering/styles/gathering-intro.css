@@ -1,35 +1,295 @@
 /* Silver Legacy cinematic intro — scoped via .legacy-intro */
 
 .legacy-intro {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ─── Dark theme (thank-you fallback if needed) ─────────────────────────── */
+
+.legacy-intro:not(.legacy-intro--light) {
   --legacy-ground: #07060a;
   --legacy-cream: #f4f0e8;
   --legacy-gold: #c9a96e;
   --legacy-gold-dim: rgba(201, 169, 110, 0.35);
+  --legacy-text-muted: rgba(244, 240, 232, 0.75);
+  --legacy-text-faint: rgba(244, 240, 232, 0.35);
   cursor: none;
   background-color: var(--legacy-ground);
   color: var(--legacy-cream);
-  position: relative;
-  width: 100%;
-  max-width: 100%;
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
 }
 
-html:has(.legacy-intro),
-body:has(.legacy-intro) {
+/* ─── White holding-page theme ───────────────────────────────────────────── */
+
+.legacy-intro--light {
+  --legacy-ground: #ffffff;
+  --legacy-cream: #0f172a;
+  --legacy-gold: #a67c3d;
+  --legacy-gold-dim: rgba(166, 124, 61, 0.22);
+  --legacy-text-muted: #475569;
+  --legacy-text-faint: #94a3b8;
+  cursor: auto;
+  color: var(--legacy-cream);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 48%, #ffffff 100%) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  min-height: 100dvh;
+  max-height: none;
+}
+
+.legacy-intro--light,
+.legacy-intro--light * {
+  cursor: auto;
+}
+
+html:has(.legacy-intro--light),
+body:has(.legacy-intro--light) {
+  overflow: auto;
+  height: auto;
+}
+
+#root:has(.legacy-intro--light) {
+  height: auto;
+  overflow: visible;
+}
+
+.legacy-intro--light .legacy-intro__grid {
+  background-image:
+    linear-gradient(rgba(166, 124, 61, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(166, 124, 61, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 20%, black 10%, transparent 72%);
+}
+
+.legacy-intro--light .legacy-intro__glow {
+  background: radial-gradient(
+    ellipse 60% 40% at 50% 18%,
+    rgba(201, 169, 110, 0.14) 0%,
+    rgba(201, 169, 110, 0.04) 40%,
+    transparent 72%
+  );
+}
+
+.legacy-intro--light .legacy-intro__vignette {
+  background: none;
+}
+
+.legacy-intro:not(.legacy-intro--light) .legacy-intro__vignette {
+  background: radial-gradient(
+    ellipse 85% 75% at 50% 50%,
+    transparent 35%,
+    rgba(7, 6, 10, 0.55) 70%,
+    rgba(7, 6, 10, 0.92) 100%
+  );
+}
+
+.legacy-intro--light .legacy-intro__ring {
+  border-color: rgba(166, 124, 61, 0.18);
+}
+
+.legacy-intro--light .legacy-intro__ticker-bar {
+  position: sticky;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.legacy-intro--light .legacy-intro__flash {
+  background: #ffffff;
+}
+
+.legacy-intro--light .legacy-intro__main {
+  min-height: calc(100dvh - 3.5rem);
+  justify-content: flex-start;
+  padding-top: 4.5rem;
+  padding-bottom: 2rem;
+  overflow: visible;
+}
+
+.legacy-intro--light .legacy-intro__cursor {
+  display: none !important;
+}
+
+/* School crest gallery */
+
+.legacy-intro__schools {
+  margin-top: 2.5rem;
+  width: 100%;
+  max-width: 56rem;
+}
+
+.legacy-intro__schools-label {
+  color: var(--legacy-text-faint);
+  margin-bottom: 1.25rem;
+}
+
+.legacy-intro__schools-orbit {
+  display: none;
+}
+
+.legacy-intro__schools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 0.5rem;
+}
+
+.legacy-intro__school-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.legacy-intro__school-card:hover {
+  transform: translateY(-4px);
+}
+
+.legacy-intro__school-card-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 5.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow:
+    0 4px 16px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding: 0.45rem;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.legacy-intro__school-card:hover .legacy-intro__school-card-frame {
+  border-color: rgba(201, 169, 110, 0.45);
+  box-shadow:
+    0 8px 24px rgba(201, 169, 110, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.legacy-intro__school-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.08));
+}
+
+.legacy-intro__school-card-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--legacy-text-faint);
+  line-height: 1.3;
+  max-width: 5.5rem;
+}
+
+@media (min-width: 640px) {
+  .legacy-intro__schools-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem 0.75rem;
+  }
+
+  .legacy-intro__school-card-frame {
+    max-width: 4.75rem;
+  }
+
+  .legacy-intro__school-card-name {
+    font-size: 0.6rem;
+    max-width: 4.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .legacy-intro__schools {
+    position: relative;
+    margin-top: 3rem;
+    padding-top: 1rem;
+  }
+
+  .legacy-intro__schools-orbit {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: -7.5rem;
+    width: min(36rem, 92vw);
+    height: 8rem;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .legacy-intro__school-orbit-item {
+    --crest-angle: calc(var(--crest-i) * 40deg - 160deg);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3.25rem;
+    height: 3.25rem;
+    transform: translate(-50%, -50%) rotate(var(--crest-angle)) translateY(-4.5rem)
+      rotate(calc(-1 * var(--crest-angle)));
+    opacity: 0.55;
+    animation: legacy-crest-float 6s ease-in-out infinite;
+    animation-delay: calc(var(--crest-i) * -0.45s);
+  }
+
+  .legacy-intro__school-orbit-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.1));
+  }
+
+  .legacy-intro__schools-grid {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .legacy-intro__school-card-frame {
+    max-width: 4.25rem;
+  }
+}
+
+@keyframes legacy-crest-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--crest-angle)) translateY(-4.5rem)
+      rotate(calc(-1 * var(--crest-angle)));
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(var(--crest-angle)) translateY(-5rem)
+      rotate(calc(-1 * var(--crest-angle)));
+    opacity: 0.7;
+  }
+}
+
+/* ─── Base intro (dark + shared) ─────────────────────────────────────────── */
+
+html:has(.legacy-intro:not(.legacy-intro--light)),
+body:has(.legacy-intro:not(.legacy-intro--light)) {
   overflow: hidden;
   height: 100%;
   overscroll-behavior: none;
 }
 
-#root:has(.legacy-intro) {
+#root:has(.legacy-intro:not(.legacy-intro--light)) {
   height: 100%;
   overflow: hidden;
 }
 
-.legacy-intro * {
+.legacy-intro:not(.legacy-intro--light) * {
   cursor: none;
 }
 
@@ -39,7 +299,7 @@ body:has(.legacy-intro) {
   max-width: 100%;
 }
 
-.legacy-intro__grid {
+.legacy-intro:not(.legacy-intro--light) .legacy-intro__grid {
   background-image:
     linear-gradient(rgba(201, 169, 110, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(201, 169, 110, 0.04) 1px, transparent 1px);
@@ -47,21 +307,12 @@ body:has(.legacy-intro) {
   mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, black 20%, transparent 75%);
 }
 
-.legacy-intro__glow {
+.legacy-intro:not(.legacy-intro--light) .legacy-intro__glow {
   background: radial-gradient(
     ellipse 55% 45% at 50% 42%,
     rgba(201, 169, 110, 0.12) 0%,
     rgba(201, 169, 110, 0.04) 35%,
     transparent 70%
-  );
-}
-
-.legacy-intro__vignette {
-  background: radial-gradient(
-    ellipse 85% 75% at 50% 50%,
-    transparent 35%,
-    rgba(7, 6, 10, 0.55) 70%,
-    rgba(7, 6, 10, 0.92) 100%
   );
 }
 
@@ -150,6 +401,11 @@ body:has(.legacy-intro) {
   transition: color 0.45s ease;
 }
 
+.legacy-intro--light .legacy-intro__enter {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(166, 124, 61, 0.12);
+}
+
 .legacy-intro__enter::before {
   content: '';
   position: absolute;
@@ -171,12 +427,17 @@ body:has(.legacy-intro) {
   color: var(--legacy-ground);
 }
 
+.legacy-intro--light .legacy-intro__enter:hover,
+.legacy-intro--light .legacy-intro__enter:focus-visible {
+  color: #ffffff;
+}
+
 .legacy-intro__enter-label {
   position: relative;
   z-index: 1;
 }
 
-.legacy-intro__ticker-bar {
+.legacy-intro:not(.legacy-intro--light) .legacy-intro__ticker-bar {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -187,6 +448,10 @@ body:has(.legacy-intro) {
   background: rgba(7, 6, 10, 0.8);
   padding-block: 0.75rem;
   backdrop-filter: blur(4px);
+}
+
+.legacy-intro__ticker-bar {
+  padding-block: 0.75rem;
 }
 
 .legacy-intro__ticker-track {
@@ -264,29 +529,33 @@ body:has(.legacy-intro) {
     animation: none;
   }
 
-  .legacy-intro,
-  .legacy-intro * {
+  .legacy-intro__school-orbit-item {
+    animation: none;
+  }
+
+  .legacy-intro:not(.legacy-intro--light),
+  .legacy-intro:not(.legacy-intro--light) * {
     cursor: auto;
   }
 
-  .legacy-intro__cursor {
+  .legacy-intro:not(.legacy-intro--light) .legacy-intro__cursor {
     display: none;
   }
 }
 
 @media (max-width: 640px) {
-  .legacy-intro,
-  .legacy-intro * {
+  .legacy-intro:not(.legacy-intro--light),
+  .legacy-intro:not(.legacy-intro--light) * {
     cursor: auto;
   }
 
-  .legacy-intro__cursor {
+  .legacy-intro:not(.legacy-intro--light) .legacy-intro__cursor {
     display: none;
   }
 }
 
 @media (max-height: 760px) {
-  .legacy-intro__main {
+  .legacy-intro:not(.legacy-intro--light) .legacy-intro__main {
     justify-content: flex-start;
     overflow-y: auto;
     overscroll-behavior: contain;

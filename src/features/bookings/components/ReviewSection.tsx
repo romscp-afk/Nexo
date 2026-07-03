@@ -3,10 +3,44 @@ import { Star } from 'lucide-react'
 import { useCreateReview, useReviewForBooking } from '@/features/bookings/hooks/useReviews'
 import type { Booking } from '@/shared/types/booking'
 
+function StarRating({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: number
+  onChange: (n: number) => void
+}) {
+  return (
+    <div>
+      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <div className="mt-1 flex gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onChange(n)}
+            className="rounded p-0.5"
+            aria-label={`${n} stars`}
+          >
+            <Star
+              className={`h-5 w-5 ${n <= value ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function ReviewSection({ booking }: { booking: Booking }) {
   const { data: review, isLoading } = useReviewForBooking(booking.id)
   const createReview = useCreateReview()
   const [rating, setRating] = useState(5)
+  const [qualityRating, setQualityRating] = useState(5)
+  const [punctualityRating, setPunctualityRating] = useState(5)
+  const [professionalismRating, setProfessionalismRating] = useState(5)
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -23,6 +57,26 @@ export function ReviewSection({ booking }: { booking: Booking }) {
             <Star key={i} className="h-4 w-4 fill-current" />
           ))}
         </div>
+        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+          {review.qualityRating != null && (
+            <div>
+              <dt className="text-slate-500">Service quality</dt>
+              <dd className="font-medium">{review.qualityRating}/5</dd>
+            </div>
+          )}
+          {review.punctualityRating != null && (
+            <div>
+              <dt className="text-slate-500">Punctuality</dt>
+              <dd className="font-medium">{review.punctualityRating}/5</dd>
+            </div>
+          )}
+          {review.professionalismRating != null && (
+            <div>
+              <dt className="text-slate-500">Professionalism</dt>
+              <dd className="font-medium">{review.professionalismRating}/5</dd>
+            </div>
+          )}
+        </dl>
         {review.comment && <p className="mt-2 text-sm text-slate-700">{review.comment}</p>}
       </section>
     )
@@ -38,6 +92,9 @@ export function ReviewSection({ booking }: { booking: Booking }) {
         providerId: booking.providerId!,
         rating,
         comment: comment || undefined,
+        qualityRating,
+        punctualityRating,
+        professionalismRating,
       })
       setSuccess('Thank you for your review!')
     } catch (err) {
@@ -54,20 +111,16 @@ export function ReviewSection({ booking }: { booking: Booking }) {
         {error && <p className="text-sm text-red-700">{error}</p>}
         {success && <p className="text-sm text-green-700">{success}</p>}
 
-        <label className="block text-sm">
-          <span className="font-medium text-slate-700">Rating</span>
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            className="mt-1 rounded-lg border border-slate-200 px-3 py-2"
-          >
-            {[5, 4, 3, 2, 1].map((n) => (
-              <option key={n} value={n}>
-                {n} star{n > 1 ? 's' : ''}
-              </option>
-            ))}
-          </select>
-        </label>
+        <StarRating label="Overall rating" value={rating} onChange={setRating} />
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StarRating label="Service quality" value={qualityRating} onChange={setQualityRating} />
+          <StarRating label="Punctuality" value={punctualityRating} onChange={setPunctualityRating} />
+          <StarRating
+            label="Professionalism"
+            value={professionalismRating}
+            onChange={setProfessionalismRating}
+          />
+        </div>
 
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Comment (optional)</span>

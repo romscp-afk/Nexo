@@ -9,6 +9,10 @@ export type ServiceCategoryRow = {
   created_at: string
 }
 
+export type PricingModel = 'hourly' | 'per_unit'
+
+export type UnitPrices = Record<number, number>
+
 export type ServiceRow = {
   id: string
   category_id: string
@@ -16,6 +20,8 @@ export type ServiceRow = {
   slug: string
   description: string | null
   base_price: number
+  pricing_model?: PricingModel
+  unit_label?: string | null
   is_active: boolean
   sort_order: number
   created_at: string
@@ -53,6 +59,8 @@ export type CatalogService = {
   slug: string
   description: string | null
   basePrice: number
+  pricingModel: PricingModel
+  unitLabel: string | null
   sortOrder: number
   categoryName?: string
   categorySlug?: string
@@ -65,6 +73,9 @@ export type ProviderServiceSummary = {
   categorySlug: string
   categoryName: string
   priceFrom: number
+  pricingModel: PricingModel
+  unitLabel: string | null
+  unitPrices: UnitPrices
 }
 
 export type ProviderListing = {
@@ -78,6 +89,8 @@ export type ProviderListing = {
   isVerified: boolean
   ratingAvg: number
   ratingCount: number
+  completedJobs: number
+  avatarUrl: string | null
   services: ProviderServiceSummary[]
 }
 
@@ -85,6 +98,9 @@ export type ProviderFilters = {
   categorySlug?: string
   verifiedOnly?: boolean
   area?: string
+  minRating?: number
+  minPrice?: number
+  maxPrice?: number
 }
 
 export function mapCategory(row: ServiceCategoryRow): ServiceCategory {
@@ -106,6 +122,8 @@ export function mapService(row: ServiceRow): CatalogService {
     slug: row.slug,
     description: row.description,
     basePrice: Number(row.base_price),
+    pricingModel: row.pricing_model ?? 'hourly',
+    unitLabel: row.unit_label ?? null,
     sortOrder: row.sort_order,
   }
 }
@@ -125,6 +143,8 @@ export function mapProviderListing(
     isVerified: row.is_verified,
     ratingAvg: Number(row.rating_avg),
     ratingCount: row.rating_count,
+    completedJobs: 0,
+    avatarUrl: null,
     services,
   }
 }
