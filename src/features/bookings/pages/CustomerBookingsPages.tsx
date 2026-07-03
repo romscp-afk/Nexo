@@ -25,6 +25,11 @@ export function CustomerDashboardPage() {
     isLoading: providersLoading,
     error: providersError,
   } = useProviders(providerFilters)
+  const { data: allProviders, isLoading: allProvidersLoading } = useProviders({})
+
+  const recommendedProviders =
+    (nearbyProviders?.length ? nearbyProviders : allProviders)?.slice(0, 4) ?? []
+  const showingAllAreas = Boolean(user?.preferredArea) && !nearbyProviders?.length && Boolean(allProviders?.length)
 
   const upcoming = bookings?.filter((b) => !['completed', 'cancelled'].includes(b.status)) ?? []
   const pendingReview = Math.max(
@@ -123,11 +128,15 @@ export function CustomerDashboardPage() {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-slate-900">
-              {user?.preferredArea
+              {user?.preferredArea && nearbyProviders?.length
                 ? `Providers near ${user.preferredArea}`
                 : 'Recommended providers'}
             </h2>
-            <p className="text-sm text-slate-600">Browse verified professionals and book a service.</p>
+            <p className="text-sm text-slate-600">
+              {showingAllAreas
+                ? `No providers in ${user?.preferredArea} yet — showing all available providers.`
+                : 'Browse verified professionals and book a service.'}
+            </p>
           </div>
           <Link
             to={
@@ -141,17 +150,17 @@ export function CustomerDashboardPage() {
           </Link>
         </div>
         <QueryState
-          loading={providersLoading}
+          loading={providersLoading || allProvidersLoading}
           error={providersError}
-          empty={!nearbyProviders?.length}
+          empty={!recommendedProviders.length}
           emptyMessage={
             user?.preferredArea
-              ? `No providers in ${user.preferredArea} yet. Run supabase/seed-demo.sql or try All areas on the providers page.`
+              ? `No providers in ${user.preferredArea} yet. Try All areas on the providers page.`
               : 'No providers yet. Run supabase/seed-demo.sql in the Supabase SQL Editor.'
           }
         >
           <div className="grid gap-4 lg:grid-cols-2">
-            {nearbyProviders?.slice(0, 4).map((provider) => (
+            {recommendedProviders.map((provider) => (
               <ProviderCard key={provider.id} provider={provider} />
             ))}
           </div>

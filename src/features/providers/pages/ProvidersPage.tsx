@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
@@ -134,7 +133,6 @@ export function ProvidersPage() {
   const { slug: routeCategorySlug } = useParams<{ slug?: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const legacyCategory = searchParams.get('category') ?? ''
   const areaFromUrl = searchParams.get('area') ?? ''
@@ -146,19 +144,19 @@ export function ProvidersPage() {
 
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategories()
 
+  const areaInitRef = useRef(false)
+
   useEffect(() => {
     if (categorySlug) setCategorySlug(categorySlug)
   }, [categorySlug, setCategorySlug])
 
   useEffect(() => {
+    if (areaInitRef.current) return
     if (areaFromUrl) {
       setArea(areaFromUrl)
-      return
     }
-    if (user?.role === 'customer' && user.preferredArea && !area) {
-      setArea(user.preferredArea)
-    }
-  }, [areaFromUrl, user?.role, user?.preferredArea, area, setArea])
+    areaInitRef.current = true
+  }, [areaFromUrl, setArea])
 
   const browseFilters = useMemo(
     () => ({
@@ -188,17 +186,26 @@ export function ProvidersPage() {
     categoryFilters,
     { enabled: isCategoryView },
   )
+  const { data: allProvidersForCounts } = useProviders({}, { enabled: !isCategoryView })
+  const { data: unfilteredCategoryProviders } = useProviders(
+    { categorySlug: categorySlug || storeCategorySlug || undefined },
+    { enabled: isCategoryView && Boolean(area.trim()) },
+  )
+
+  const hasAreaFilter = Boolean(area.trim())
+  const areaFilteredEmpty = isCategoryView && hasAreaFilter && !categoryProviders?.length && Boolean(unfilteredCategoryProviders?.length)
 
   const providerCountByCategory = useMemo(() => {
     const counts = new Map<string, number>()
-    for (const provider of browseProviders ?? []) {
+    const source = allProvidersForCounts ?? browseProviders ?? []
+    for (const provider of source) {
       const slugs = new Set(provider.services.map((service) => service.categorySlug))
       for (const slug of slugs) {
         counts.set(slug, (counts.get(slug) ?? 0) + 1)
       }
     }
     return counts
-  }, [browseProviders])
+  }, [allProvidersForCounts, browseProviders])
 
   const activeCategory = categories?.find((category) => category.slug === categorySlug)
 
@@ -255,6 +262,21 @@ export function ProvidersPage() {
           onMaxPriceChange={setMaxPrice}
           showCategoryFilter
         />
+
+        {areaFilteredEmpty && (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            No providers in <strong>{area}</strong> for this category, but{' '}
+            {unfilteredCategoryProviders?.length} provider
+            {unfilteredCategoryProviders?.length === 1 ? '' : 's'} cover other areas.{' '}
+            <button
+              type="button"
+              onClick={() => setArea('')}
+              className="font-medium text-nexo-700 underline hover:text-nexo-800"
+            >
+              Show all areas
+            </button>
+          </div>
+        )}
 
         <QueryState
           loading={categoryLoading || categoriesLoading}
@@ -318,6 +340,27 @@ export function ProvidersPage() {
           ))}
         </div>
       </QueryState>
+
+      <section className="mt-10">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">All providers</h2>
+            <p className="text-sm text-slate-600">Browse every active provider on Nexo.</p>
+          </div>
+        </div>
+        <QueryState
+          loading={browseLoading}
+          error={browseError}
+          empty={!browseProviders?.length}
+          emptyMessage="No providers listed yet. Service professionals appear here after registering and adding services."
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            {browseProviders?.map((provider) => (
+              <ProviderCard key={provider.id} provider={provider} />
+            ))}
+          </div>
+        </QueryState>
+      </section>
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Are you a service professional?{' '}

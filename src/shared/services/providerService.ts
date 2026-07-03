@@ -53,8 +53,11 @@ function applyFilters(providers: ProviderListing[], filters: ProviderFilters): P
     if (filters.verifiedOnly && !provider.isVerified) return false
     if (filters.minRating != null && provider.ratingAvg < filters.minRating) return false
     if (filters.area) {
-      const area = filters.area.toLowerCase()
-      const matches = provider.serviceAreas.some((a) => a.toLowerCase().includes(area))
+      const area = filters.area.toLowerCase().trim()
+      const matches = provider.serviceAreas.some((a) => {
+        const normalized = a.toLowerCase().trim()
+        return normalized === area || normalized.includes(area) || area.includes(normalized)
+      })
       if (!matches) return false
     }
     if (filters.categorySlug) {
