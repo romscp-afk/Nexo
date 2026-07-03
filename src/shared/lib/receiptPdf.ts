@@ -1,4 +1,5 @@
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
+import { ceilingHeightLabel, type PriceBreakdown } from '@/shared/lib/pricing'
 import type { Receipt } from '@/shared/types/receipt'
 import type { Booking } from '@/shared/types/booking'
 
@@ -8,6 +9,7 @@ function receiptDocumentHtml(receipt: Receipt, booking?: Booking | null): string
   const providerName = String(d.provider_name ?? booking?.providerName ?? '—')
   const categoryName = String(d.category_name ?? booking?.categoryName ?? '')
   const paymentLabel = receipt.paymentMethod === 'cash' ? 'Cash on completion' : 'PayNow'
+  const pricingSnapshot = (booking?.pricingSnapshot ?? null) as PriceBreakdown | null
   const subtotal =
     booking?.serviceSubtotal ??
     (typeof d.service_subtotal === 'number' ? d.service_subtotal : null)
@@ -15,13 +17,34 @@ function receiptDocumentHtml(receipt: Receipt, booking?: Booking | null): string
     booking?.platformFee ?? (typeof d.platform_fee === 'number' ? d.platform_fee : null)
   const quantity = booking?.quantity ?? (typeof d.quantity === 'number' ? d.quantity : null)
   const duration = booking?.durationHours ?? (typeof d.duration_hours === 'number' ? d.duration_hours : null)
+  const ceilingHeight = pricingSnapshot?.ceilingHeight ?? null
 
-  const lineRows = subtotal != null
-    ? `<tr><td>Service subtotal</td><td style="text-align:right">${formatCurrency(subtotal)}</td></tr>`
-    : ''
-  const feeRow = platformFee != null
-    ? `<tr><td>Platform fee</td><td style="text-align:right">${formatCurrency(platformFee)}</td></tr>`
-    : ''
+  const jobParts: string[] = []
+  if (quantity != null) {
+    jobParts.push(`${quantity} unit${quantity === 1 ? '' : 's'}`)
+    if (ceilingHeight) jobParts.push(ceilingHeightLabel(ceilingHeight))
+  } else if (duration != null) {
+    jobParts.push(`${duration} hour${duration === 1 ? '' : 's'}`)
+  }
+  jobParts.push(paymentLabel)
+  const jobDetails = jobParts.length > 1 ? jobParts.join(' · ') : jobParts[0] ?? '—'
+
+  const lineRows =
+    pricingSnapshot?.lines?.length
+      ? pricingSnapshot.lines
+          .map(
+            (line) =>
+              `<tr><td>${line.label}</td><td style="text-align:right">${formatCurrency(line.amount)}</td></tr>`,
+          )
+          .join('')
+      : subtotal != null
+        ? `<tr><td>Service subtotal</td><td style="text-align:right">${formatCurrency(subtotal)}</td></tr>`
+        : ''
+  const resolvedPlatformFee = pricingSnapshot?.platformFee ?? platformFee
+  const feeRow =
+    resolvedPlatformFee != null
+      ? `<tr><td>Platform fee</td><td style="text-align:right">${formatCurrency(resolvedPlatformFee)}</td></tr>`
+      : ''
 
   return `<!DOCTYPE html>
 <html>
@@ -56,10 +79,7 @@ function receiptDocumentHtml(receipt: Receipt, booking?: Booking | null): string
 
   <div class="section">
     <p class="label">Job details</p>
-    <p>
-      ${quantity != null ? `${quantity} unit${quantity === 1 ? '' : 's'}` : duration != null ? `${duration} hour${duration === 1 ? '' : 's'}` : '—'}
-      · ${paymentLabel}
-    </p>
+    <p>${jobDetails}</p>
   </div>
 
   <table>

@@ -1,5 +1,7 @@
-import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { PLATFORM_FEE_SGD, HIGH_CEILING_SURCHARGE_SGD } from '@/shared/lib/marketplaceConfig'
 import type { PricingModel, UnitPrices } from '@/shared/types/catalog'
+
+export type CeilingHeight = 'normal' | 'high'
 
 export type PriceLine = {
   label: string
@@ -10,6 +12,7 @@ export type PriceBreakdown = {
   pricingModel: PricingModel
   quantity: number | null
   durationHours: number | null
+  ceilingHeight: CeilingHeight | null
   lines: PriceLine[]
   serviceSubtotal: number
   platformFee: number
@@ -38,13 +41,13 @@ export function calculateUnitSubtotal(
   if (tierPrice != null) {
     return {
       subtotal: tierPrice,
-      lineLabel: `${q} unit${q === 1 ? '' : 's'} (tier rate)`,
+      lineLabel: `${q} aircon unit${q === 1 ? '' : 's'}`,
     }
   }
   const subtotal = priceFrom * q
   return {
     subtotal,
-    lineLabel: `${q} unit${q === 1 ? '' : 's'} × ${priceFrom.toFixed(2)}`,
+    lineLabel: `${q} aircon unit${q === 1 ? '' : 's'} × ${priceFrom.toFixed(2)}`,
   }
 }
 
@@ -70,10 +73,12 @@ export function buildPriceBreakdown(input: {
   durationHours: number
   quantity: number
   unitPrices?: UnitPrices
+  ceilingHeight?: CeilingHeight
   platformFee?: number
 }): PriceBreakdown {
   const platformFee = input.platformFee ?? PLATFORM_FEE_SGD
   const lines: PriceLine[] = []
+  const ceilingHeight = input.pricingModel === 'per_unit' ? (input.ceilingHeight ?? 'normal') : null
 
   if (input.pricingModel === 'per_unit') {
     const { subtotal, lineLabel } = calculateUnitSubtotal(
@@ -82,14 +87,23 @@ export function buildPriceBreakdown(input: {
       input.priceFrom,
     )
     lines.push({ label: lineLabel, amount: subtotal })
+    let serviceSubtotal = subtotal
+    if (ceilingHeight === 'high') {
+      lines.push({
+        label: 'High ceiling surcharge',
+        amount: HIGH_CEILING_SURCHARGE_SGD,
+      })
+      serviceSubtotal += HIGH_CEILING_SURCHARGE_SGD
+    }
     return {
       pricingModel: 'per_unit',
       quantity: input.quantity,
       durationHours: null,
+      ceilingHeight,
       lines,
-      serviceSubtotal: subtotal,
+      serviceSubtotal,
       platformFee,
-      total: subtotal + platformFee,
+      total: serviceSubtotal + platformFee,
     }
   }
 
@@ -103,9 +117,16 @@ export function buildPriceBreakdown(input: {
     pricingModel: 'hourly',
     quantity: null,
     durationHours: input.durationHours,
+    ceilingHeight: null,
     lines,
     serviceSubtotal: subtotal,
     platformFee,
     total: subtotal + platformFee,
   }
+}
+
+export function ceilingHeightLabel(height: CeilingHeight | null | undefined): string {
+  if (height === 'high') return 'High ceiling'
+  if (height === 'normal') return 'Normal ceiling'
+  return '—'
 }

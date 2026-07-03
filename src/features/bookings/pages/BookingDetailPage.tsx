@@ -19,6 +19,9 @@ import { ReceiptPanel } from '@/features/payments/components/ReceiptPanel'
 import { useBookingPayments } from '@/features/payments/hooks/usePayments'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
+import { ceilingHeightLabel } from '@/shared/lib/pricing'
+import type { PriceBreakdown } from '@/shared/lib/pricing'
+import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import type { BookingStatus } from '@/shared/types/booking'
 
 type BookingDetailPageProps = {
@@ -78,6 +81,9 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
   const isPending = updateStatus.isPending || cancelBooking.isPending || acceptBooking.isPending
 
+  const pricingSnapshot = booking?.pricingSnapshot as PriceBreakdown | null | undefined
+  const ceilingFromSnapshot = pricingSnapshot?.ceilingHeight ?? null
+
   return (
     <div>
       <Link to={backPath} className="text-sm text-nexo-700 hover:underline">
@@ -121,16 +127,41 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     <dt className="text-slate-500">When</dt>
                     <dd className="font-medium">{formatDateTime(booking.scheduledAt)}</dd>
                   </div>
-                  <div>
-                    <dt className="text-slate-500">
-                      {booking.quantity != null ? 'Units' : 'Duration'}
-                    </dt>
-                    <dd className="font-medium">
-                      {booking.quantity != null
-                        ? `${booking.quantity} unit${booking.quantity === 1 ? '' : 's'}`
-                        : `${booking.durationHours} hours`}
-                    </dd>
-                  </div>
+                  {booking.quantity != null && (
+                    <>
+                      <div>
+                        <dt className="text-slate-500">Aircon units</dt>
+                        <dd className="font-medium">
+                          {booking.quantity} unit{booking.quantity === 1 ? '' : 's'}
+                        </dd>
+                      </div>
+                      {ceilingFromSnapshot && (
+                        <div>
+                          <dt className="text-slate-500">Ceiling height</dt>
+                          <dd className="font-medium">{ceilingHeightLabel(ceilingFromSnapshot)}</dd>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {booking.quantity == null && (
+                    <div>
+                      <dt className="text-slate-500">Duration</dt>
+                      <dd className="font-medium">{booking.durationHours} hours</dd>
+                    </div>
+                  )}
+                  {pricingSnapshot?.lines?.length ? (
+                    <div className="border-t border-slate-100 pt-3">
+                      <dt className="mb-2 text-slate-500">Price breakdown</dt>
+                      <dd>
+                        <PriceBreakdownPanel
+                          breakdown={pricingSnapshot}
+                          paymentMethod={booking.paymentMethod}
+                          compact
+                        />
+                      </dd>
+                    </div>
+                  ) : (
+                    <>
                   {booking.serviceSubtotal != null && (
                     <div>
                       <dt className="text-slate-500">Service subtotal</dt>
@@ -149,6 +180,8 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                       {booking.totalPrice != null ? formatCurrency(booking.totalPrice) : '—'}
                     </dd>
                   </div>
+                    </>
+                  )}
                 </dl>
               </section>
 

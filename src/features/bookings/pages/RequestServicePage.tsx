@@ -5,8 +5,10 @@ import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCa
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
+import { AirconBookingFields } from '@/shared/components/AirconBookingFields'
 import { formatCurrency } from '@/shared/lib/utils'
-import { buildPriceBreakdown } from '@/shared/lib/pricing'
+import { buildPriceBreakdown, type CeilingHeight } from '@/shared/lib/pricing'
+import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
@@ -24,6 +26,7 @@ export function RequestServicePage() {
   const [scheduledAt, setScheduledAt] = useState('')
   const [durationHours, setDurationHours] = useState('2')
   const [quantity, setQuantity] = useState('1')
+  const [ceilingHeight, setCeilingHeight] = useState<CeilingHeight>('normal')
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
   const [postalCode, setPostalCode] = useState('')
@@ -53,8 +56,9 @@ export function RequestServicePage() {
       durationHours: duration,
       quantity: unitCount,
       unitPrices: {},
+      ceilingHeight: isPerUnit ? ceilingHeight : undefined,
     })
-  }, [selectedService, duration, unitCount])
+  }, [selectedService, duration, unitCount, ceilingHeight, isPerUnit])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,13 +81,12 @@ export function RequestServicePage() {
         addressLine2: addressLine2 || undefined,
         postalCode,
         paymentMethod,
-        notes: notes
-          ? serviceArea
-            ? `Area: ${serviceArea}. ${notes}`
-            : notes
-          : serviceArea
-            ? `Area: ${serviceArea}`
-            : undefined,
+        notes: appendAirconBookingNotes({
+          serviceArea: serviceArea || undefined,
+          notes: notes || undefined,
+          quantity: isPerUnit ? unitCount : undefined,
+          ceilingHeight: isPerUnit ? ceilingHeight : undefined,
+        }),
         totalPrice: breakdown.total,
         serviceSubtotal: breakdown.serviceSubtotal,
         platformFee: breakdown.platformFee,
@@ -169,20 +172,23 @@ export function RequestServicePage() {
                     <span className="font-medium text-slate-700">Date & time</span>
                     <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
                   </label>
-                  {isPerUnit ? (
-                    <label className="block text-sm">
-                      <span className="font-medium text-slate-700">
-                        Number of {selectedService?.unitLabel ?? 'unit'}s
-                      </span>
-                      <input type="number" min={1} max={10} step={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
-                    </label>
-                  ) : (
+                  {!isPerUnit && (
                     <label className="block text-sm">
                       <span className="font-medium text-slate-700">Duration (hours)</span>
                       <input type="number" min={1} max={12} step={0.5} value={durationHours} onChange={(e) => setDurationHours(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" required />
                     </label>
                   )}
                 </div>
+
+                {isPerUnit && (
+                  <AirconBookingFields
+                    quantity={quantity}
+                    onQuantityChange={setQuantity}
+                    ceilingHeight={ceilingHeight}
+                    onCeilingHeightChange={setCeilingHeight}
+                    unitLabel={selectedService?.unitLabel ?? 'unit'}
+                  />
+                )}
 
                 <label className="block text-sm">
                   <span className="font-medium text-slate-700">Area</span>

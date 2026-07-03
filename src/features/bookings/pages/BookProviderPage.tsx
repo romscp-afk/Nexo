@@ -5,8 +5,10 @@ import { useProvider } from '@/features/providers/hooks/useProviders'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
+import { AirconBookingFields } from '@/shared/components/AirconBookingFields'
 import { formatCurrency } from '@/shared/lib/utils'
-import { buildPriceBreakdown } from '@/shared/lib/pricing'
+import { buildPriceBreakdown, type CeilingHeight } from '@/shared/lib/pricing'
+import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { uploadBookingPhotos } from '@/shared/lib/bookingPhotos'
 import { bookingService } from '@/shared/services/bookingService'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
@@ -27,6 +29,7 @@ export function BookProviderPage() {
   const [scheduledAt, setScheduledAt] = useState('')
   const [durationHours, setDurationHours] = useState('2')
   const [quantity, setQuantity] = useState('1')
+  const [ceilingHeight, setCeilingHeight] = useState<CeilingHeight>('normal')
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
   const [postalCode, setPostalCode] = useState('')
@@ -62,8 +65,9 @@ export function BookProviderPage() {
       durationHours: duration,
       quantity: unitCount,
       unitPrices: selectedService.unitPrices,
+      ceilingHeight: isPerUnit ? ceilingHeight : undefined,
     })
-  }, [selectedService, provider, duration, unitCount])
+  }, [selectedService, provider, duration, unitCount, ceilingHeight, isPerUnit])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -93,13 +97,12 @@ export function BookProviderPage() {
         addressLine2: addressLine2 || undefined,
         postalCode,
         paymentMethod,
-        notes: notes
-          ? serviceArea
-            ? `Area: ${serviceArea}. ${notes}`
-            : notes
-          : serviceArea
-            ? `Area: ${serviceArea}`
-            : undefined,
+        notes: appendAirconBookingNotes({
+          serviceArea: serviceArea || undefined,
+          notes: notes || undefined,
+          quantity: isPerUnit ? unitCount : undefined,
+          ceilingHeight: isPerUnit ? ceilingHeight : undefined,
+        }),
         totalPrice: breakdown.total,
         serviceSubtotal: breakdown.serviceSubtotal,
         platformFee: breakdown.platformFee,
@@ -168,23 +171,7 @@ export function BookProviderPage() {
                       required
                     />
                   </label>
-                  {isPerUnit ? (
-                    <label className="block text-sm">
-                      <span className="font-medium text-slate-700">
-                        Number of {selectedService?.unitLabel ?? 'unit'}s
-                      </span>
-                      <input
-                        type="number"
-                        min={1}
-                        max={10}
-                        step={1}
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-                        required
-                      />
-                    </label>
-                  ) : (
+                  {!isPerUnit && (
                     <label className="block text-sm">
                       <span className="font-medium text-slate-700">Duration (hours)</span>
                       <input
@@ -200,6 +187,16 @@ export function BookProviderPage() {
                     </label>
                   )}
                 </div>
+
+                {isPerUnit && (
+                  <AirconBookingFields
+                    quantity={quantity}
+                    onQuantityChange={setQuantity}
+                    ceilingHeight={ceilingHeight}
+                    onCeilingHeightChange={setCeilingHeight}
+                    unitLabel={selectedService?.unitLabel ?? 'unit'}
+                  />
+                )}
 
                 <fieldset className="rounded-xl border border-slate-200 p-4">
                   <legend className="px-1 text-sm font-medium text-slate-700">Payment</legend>
