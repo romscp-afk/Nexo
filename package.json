@@ -25,6 +25,7 @@
     "setup:whatsapp-twilio": "node scripts/setup-whatsapp-twilio.mjs",
     "setup:whatsapp-dev": "node scripts/setup-whatsapp-dev.mjs",
     "setup:customer-flow": "node scripts/apply-customer-flow.mjs",
+    "setup:booking-chat": "node scripts/apply-booking-chat-rules.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },

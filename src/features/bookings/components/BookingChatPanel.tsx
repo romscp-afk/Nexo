@@ -1,32 +1,55 @@
 import { useState } from 'react'
 import { MessageCircle, Send } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useBookingMessages, useSendBookingMessage } from '@/features/bookings/hooks/useBookingChat'
+import {
+  canSendBookingChatMessage,
+  shouldLoadBookingChatMessages,
+  type BookingChatAccess,
+} from '@/shared/lib/bookingChat'
 import { formatDateTime } from '@/shared/lib/utils'
-import type { BookingStatus } from '@/shared/types/booking'
-
-const CHAT_STATUSES: BookingStatus[] = ['pending', 'confirmed', 'in_progress']
 
 export function BookingChatPanel({
   bookingId,
-  status,
+  access,
+  role,
 }: {
   bookingId: string
-  status: BookingStatus
+  access: BookingChatAccess
+  role: 'customer' | 'provider'
 }) {
   const { user } = useAuth()
-  const { data: messages, isLoading } = useBookingMessages(bookingId)
+  const loadMessages = shouldLoadBookingChatMessages(access)
+  const { data: messages, isLoading } = useBookingMessages(bookingId, loadMessages)
   const sendMessage = useSendBookingMessage()
   const [body, setBody] = useState('')
   const [error, setError] = useState('')
 
-  if (!CHAT_STATUSES.includes(status)) {
+  const canSend = canSendBookingChatMessage(access)
+  const title = role === 'customer' ? 'Chat with provider' : 'Chat with customer'
+
+  if (access.state === 'hidden') {
     return null
+  }
+
+  if (access.state === 'locked') {
+    return (
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
+        <h2 className="flex items-center gap-2 font-semibold text-slate-900">
+          <MessageCircle className="h-5 w-5 text-slate-400" />
+          {title}
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">
+          {access.reason ?? 'Chat is not available for this booking yet.'}
+        </p>
+      </section>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!body.trim()) return
+    if (!body.trim() || !canSend) return
     setError('')
     try {
       await sendMessage.mutateAsync({ bookingId, body: body.trim() })
@@ -40,16 +63,22 @@ export function BookingChatPanel({
     <section className="rounded-xl border border-slate-200 bg-white p-6">
       <h2 className="flex items-center gap-2 font-semibold text-slate-900">
         <MessageCircle className="h-5 w-5 text-nexo-700" />
-        Chat with provider
+        {title}
       </h2>
       <p className="mt-1 text-sm text-slate-500">
-        Coordinate details about this booking. Messages are saved here.
+        {access.state === 'read_only'
+          ? 'This chat is closed. You can still read past messages.'
+          : access.closesAt
+            ? `Chat closes ${formatDistanceToNow(new Date(access.closesAt), { addSuffix: true })} (6 hours after job completion).`
+            : 'Coordinate job details here. Messages are saved for this booking.'}
       </p>
 
       <div className="mt-4 max-h-64 space-y-3 overflow-y-auto rounded-lg border border-slate-100 bg-slate-50 p-3">
         {isLoading && <p className="text-sm text-slate-500">Loading messages…</p>}
         {!isLoading && !messages?.length && (
-          <p className="text-sm text-slate-500">No messages yet. Say hello to your provider.</p>
+          <p className="text-sm text-slate-500">
+            {canSend ? 'No messages yet. Start the conversation.' : 'No messages were sent in this chat.'}
+          </p>
         )}
         {messages?.map((msg) => {
           const isMine = msg.senderId === user?.id
@@ -81,25 +110,33 @@ export function BookingChatPanel({
         })}
       </div>
 
+      {access.state === 'read_only' && access.closedAt && (
+        <p className="mt-3 text-xs text-slate-500">
+          Chat closed on {formatDateTime(access.closedAt)}.
+        </p>
+      )}
+
       {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
-        <input
-          type="text"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Type a message…"
-          className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          disabled={sendMessage.isPending || !body.trim()}
-          className="inline-flex items-center gap-1 rounded-lg bg-nexo-700 px-3 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
-        >
-          <Send className="h-4 w-4" />
-          Send
-        </button>
-      </form>
+      {canSend && (
+        <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
+          <input
+            type="text"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Type a message…"
+            className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            disabled={sendMessage.isPending || !body.trim()}
+            className="inline-flex items-center gap-1 rounded-lg bg-nexo-700 px-3 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
+          >
+            <Send className="h-4 w-4" />
+            Send
+          </button>
+        </form>
+      )}
     </section>
   )
 }

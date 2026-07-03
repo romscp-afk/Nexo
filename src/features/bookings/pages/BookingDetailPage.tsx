@@ -22,6 +22,7 @@ import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
 import { ceilingHeightLabel } from '@/shared/lib/pricing'
 import type { PriceBreakdown } from '@/shared/lib/pricing'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
+import { getBookingChatAccess } from '@/shared/lib/bookingChat'
 import type { BookingStatus } from '@/shared/types/booking'
 
 type BookingDetailPageProps = {
@@ -83,6 +84,17 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
   const pricingSnapshot = booking?.pricingSnapshot as PriceBreakdown | null | undefined
   const ceilingFromSnapshot = pricingSnapshot?.ceilingHeight ?? null
+
+  const chatAccess =
+    booking && payments
+      ? getBookingChatAccess({
+          booking,
+          payments,
+          statusHistory: statusHistory ?? [],
+        })
+      : booking
+        ? getBookingChatAccess({ booking, payments: null, statusHistory: statusHistory ?? [] })
+        : { state: 'hidden' as const }
 
   return (
     <div>
@@ -283,7 +295,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             )}
 
             {booking.providerId && (
-              <BookingChatPanel bookingId={booking.id} status={booking.status} />
+              <BookingChatPanel bookingId={booking.id} access={chatAccess} role={role} />
             )}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6">

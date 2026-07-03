@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { chatService } from '@/shared/services/chatService'
 
-export function useBookingMessages(bookingId: string) {
+export function useBookingMessages(bookingId: string, enabled = true) {
   return useQuery({
     queryKey: ['booking-messages', bookingId],
     queryFn: async () => {
@@ -9,8 +9,8 @@ export function useBookingMessages(bookingId: string) {
       if (error) throw new Error(error)
       return data
     },
-    enabled: Boolean(bookingId),
-    refetchInterval: 8000,
+    enabled: Boolean(bookingId) && enabled,
+    refetchInterval: enabled ? 8000 : false,
   })
 }
 
