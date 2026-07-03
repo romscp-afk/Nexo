@@ -29,14 +29,16 @@ export function BookingCard({
   booking,
   detailPath,
   showPaymentMethod,
+  unreadCount = 0,
 }: {
   booking: Booking
   detailPath: string
   showPaymentMethod?: boolean
+  unreadCount?: number
 }) {
   return (
     <Link
-      to={detailPath}
+      to={unreadCount > 0 ? `${detailPath}#chat` : detailPath}
       className={cn(
         'block rounded-xl border bg-white p-5 transition hover:shadow-sm',
         booking.paymentMethod === 'cash' ? 'border-amber-300 hover:border-amber-400' : 'border-slate-200 hover:border-nexo-200',
@@ -56,7 +58,14 @@ export function BookingCard({
           </p>
         </div>
         <div className="text-right">
-          <BookingStatusBadge status={booking.status} />
+          <div className="flex items-center justify-end gap-2">
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-nexo-700 px-2 py-0.5 text-xs font-medium text-white">
+                {unreadCount} new
+              </span>
+            )}
+            <BookingStatusBadge status={booking.status} />
+          </div>
           {booking.totalPrice != null && (
             <p className="mt-2 text-sm font-medium text-slate-900">
               {formatCurrency(booking.totalPrice)}
@@ -73,11 +82,13 @@ export function BookingList({
   detailPathPrefix,
   emptyMessage,
   showPaymentMethod,
+  unreadByBookingId,
 }: {
   bookings: Booking[]
   detailPathPrefix: string
   emptyMessage: string
   showPaymentMethod?: boolean
+  unreadByBookingId?: Record<string, number>
 }) {
   if (bookings.length === 0) {
     return (
@@ -95,6 +106,7 @@ export function BookingList({
           booking={booking}
           detailPath={`${detailPathPrefix}/${booking.id}`}
           showPaymentMethod={showPaymentMethod}
+          unreadCount={unreadByBookingId?.[booking.id] ?? 0}
         />
       ))}
     </div>

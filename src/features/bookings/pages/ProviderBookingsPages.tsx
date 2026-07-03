@@ -4,6 +4,7 @@ import { useChatInbox, useUnreadChatCount } from '@/features/bookings/hooks/useB
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import { BookingList } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
+import { formatCurrency } from '@/shared/lib/utils'
 
 export function ProviderDashboardPage() {
   const { data: bookings, isLoading, error } = useProviderBookings()
@@ -11,6 +12,13 @@ export function ProviderDashboardPage() {
   const { data: unreadMessages = 0 } = useUnreadChatCount('provider')
   const unreadNotifications = useUnreadNotificationCount()
   const { data: chatThreads } = useChatInbox('provider')
+  const unreadByBookingId = Object.fromEntries(
+    (chatThreads ?? []).map((t) => [t.bookingId, t.unreadCount]),
+  )
+  const totalEarned =
+    bookings
+      ?.filter((b) => b.status === 'completed')
+      .reduce((sum, b) => sum + (b.serviceSubtotal ?? Math.max(0, (b.totalPrice ?? 0) - (b.platformFee ?? 3))), 0) ?? 0
   const pending = bookings?.filter((b) => b.status === 'pending') ?? []
   const active = bookings?.filter((b) => ['confirmed', 'in_progress'].includes(b.status)) ?? []
   const cashJobs = bookings?.filter((b) => b.paymentMethod === 'cash' && b.status !== 'cancelled') ?? []
@@ -39,6 +47,11 @@ export function ProviderDashboardPage() {
           <p className="text-sm font-medium text-amber-900">Cash jobs</p>
           <p className="mt-1 text-2xl font-bold text-amber-800">{cashJobs.length}</p>
         </div>
+        <Link to="/provider/earnings" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:border-emerald-300">
+          <p className="text-sm text-emerald-800">Total earned</p>
+          <p className="mt-1 text-2xl font-bold text-emerald-900">{formatCurrency(totalEarned)}</p>
+          <p className="text-xs text-emerald-700">View earnings →</p>
+        </Link>
         <Link to="/provider/messages" className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-nexo-200">
           <p className="text-sm text-slate-500">Messages</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{unreadMessages}</p>
@@ -97,7 +110,7 @@ export function ProviderDashboardPage() {
           <Link to="/provider/bookings" className="text-sm text-nexo-700 hover:underline">View all</Link>
         </div>
         <QueryState loading={isLoading} error={error} empty={!bookings?.length}>
-          <BookingList bookings={bookings?.slice(0, 5) ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No bookings yet." showPaymentMethod />
+          <BookingList bookings={bookings?.slice(0, 5) ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No bookings yet." showPaymentMethod unreadByBookingId={unreadByBookingId} />
         </QueryState>
       </section>
     </div>
@@ -107,6 +120,10 @@ export function ProviderDashboardPage() {
 export function ProviderBookingsPage() {
   const { data: bookings, isLoading, error } = useProviderBookings()
   const { data: openRequests, isLoading: openLoading, error: openError } = useOpenProviderRequests()
+  const { data: chatThreads } = useChatInbox('provider')
+  const unreadByBookingId = Object.fromEntries(
+    (chatThreads ?? []).map((t) => [t.bookingId, t.unreadCount]),
+  )
 
   return (
     <div className="space-y-10">
@@ -124,7 +141,7 @@ export function ProviderBookingsPage() {
         <h2 className="text-xl font-bold text-slate-900">Assigned to you</h2>
         <div className="mt-6">
           <QueryState loading={isLoading} error={error} empty={!bookings?.length}>
-            <BookingList bookings={bookings ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No assigned bookings." showPaymentMethod />
+            <BookingList bookings={bookings ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No assigned bookings." showPaymentMethod unreadByBookingId={unreadByBookingId} />
           </QueryState>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import { useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
+import { useChatRealtimeSync } from '@/features/bookings/hooks/useChatRealtime'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
@@ -28,6 +29,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { to: '/provider', label: 'Dashboard', exact: true },
     { to: '/provider/bookings', label: 'Bookings' },
     { to: '/provider/messages', label: 'Messages', badge: 'messages' },
+    { to: '/provider/earnings', label: 'Earnings' },
     { to: '/provider/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/provider/profile', label: 'Profile' },
   ],
@@ -84,6 +86,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const { data: unreadChat = 0 } = useUnreadChatCount(
     role === 'customer' || role === 'provider' ? role : 'customer',
   )
+
+  useChatRealtimeSync(role === 'customer' || role === 'provider')
 
   const nav = NAV_BY_ROLE[role]
 

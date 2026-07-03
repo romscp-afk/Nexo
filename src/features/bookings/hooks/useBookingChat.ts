@@ -10,7 +10,7 @@ export function useBookingMessages(bookingId: string, enabled = true) {
       return data
     },
     enabled: Boolean(bookingId) && enabled,
-    refetchInterval: enabled ? 8000 : false,
+    refetchInterval: enabled ? 30000 : false,
   })
 }
 
@@ -54,7 +54,7 @@ export function useChatInbox(role: 'customer' | 'provider') {
       if (error) throw new Error(error)
       return data
     },
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   })
 }
 
@@ -66,6 +66,6 @@ export function useUnreadChatCount(role: 'customer' | 'provider') {
       if (error) throw new Error(error)
       return data
     },
-    refetchInterval: 15000,
+    refetchInterval: 30000,
   })
 }

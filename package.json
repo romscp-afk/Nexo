@@ -27,6 +27,7 @@
     "setup:customer-flow": "node scripts/apply-customer-flow.mjs",
     "setup:booking-chat": "node scripts/apply-booking-chat-rules.mjs",
     "setup:booking-chat-inbox": "node scripts/apply-booking-chat-inbox.mjs",
+    "setup:booking-chat-realtime": "node scripts/apply-booking-chat-realtime.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },

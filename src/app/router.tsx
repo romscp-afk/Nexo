@@ -26,6 +26,7 @@ import {
 } from '@/features/bookings/pages/ProviderBookingsPages'
 import { BookingDetailPage } from '@/features/bookings/pages/BookingDetailPage'
 import { BookingChatsPage } from '@/features/bookings/pages/BookingChatsPage'
+import { ProviderEarningsPage } from '@/features/providers/pages/ProviderEarningsPage'
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage'
 import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage'
 import { AdminProvidersPage } from '@/features/admin/pages/AdminProvidersPage'
@@ -111,6 +112,7 @@ export const router = createBrowserRouter([
               { path: '/provider', element: <ProviderDashboardPage /> },
               { path: '/provider/bookings', element: <ProviderBookingsPage /> },
               { path: '/provider/messages', element: <BookingChatsPage role="provider" /> },
+              { path: '/provider/earnings', element: <ProviderEarningsPage /> },
               { path: '/provider/notifications', element: <ProviderNotificationsPage /> },
               {
                 path: '/provider/bookings/:id',

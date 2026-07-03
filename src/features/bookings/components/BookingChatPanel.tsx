@@ -7,6 +7,7 @@ import {
   useMarkBookingChatRead,
   useSendBookingMessage,
 } from '@/features/bookings/hooks/useBookingChat'
+import { useBookingChatRealtime } from '@/features/bookings/hooks/useChatRealtime'
 import {
   canSendBookingChatMessage,
   shouldLoadBookingChatMessages,
@@ -25,6 +26,7 @@ export function BookingChatPanel({
 }) {
   const { user } = useAuth()
   const loadMessages = shouldLoadBookingChatMessages(access)
+  useBookingChatRealtime(bookingId, loadMessages)
   const { data: messages, isLoading } = useBookingMessages(bookingId, loadMessages)
   const sendMessage = useSendBookingMessage()
   const markRead = useMarkBookingChatRead()

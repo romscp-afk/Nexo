@@ -20,6 +20,10 @@ export function CustomerDashboardPage() {
   const unreadNotifications = useUnreadNotificationCount()
   const { data: unreadMessages = 0 } = useUnreadChatCount('customer')
   const { data: chatThreads } = useChatInbox('customer')
+
+  const unreadByBookingId = Object.fromEntries(
+    (chatThreads ?? []).map((t) => [t.bookingId, t.unreadCount]),
+  )
   const { data: savedProviders } = useSavedProviders()
 
   const providerFilters = user?.preferredArea ? { area: user.preferredArea } : {}
@@ -223,6 +227,7 @@ export function CustomerDashboardPage() {
             bookings={recent}
             detailPathPrefix="/dashboard/bookings"
             emptyMessage="No bookings yet. Browse providers to schedule your first service."
+            unreadByBookingId={unreadByBookingId}
           />
         </QueryState>
       </section>
@@ -258,6 +263,10 @@ export function CustomerBookingsPage() {
   const [filter, setFilter] = useState<BookingFilter>('all')
 
   const filtered = filterBookings(bookings, filter)
+  const { data: chatThreads } = useChatInbox('customer')
+  const unreadByBookingId = Object.fromEntries(
+    (chatThreads ?? []).map((t) => [t.bookingId, t.unreadCount]),
+  )
 
   return (
     <div>
@@ -291,6 +300,7 @@ export function CustomerBookingsPage() {
                 ? 'No bookings yet.'
                 : `No ${filter} bookings.`
             }
+            unreadByBookingId={unreadByBookingId}
           />
         </QueryState>
       </div>
