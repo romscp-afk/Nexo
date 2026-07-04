@@ -84,3 +84,14 @@ export function useAdminActivityLogs() {
     },
   })
 }
+
+export function useAdminReports() {
+  return useQuery({
+    queryKey: ['admin', 'reports'],
+    queryFn: async () => {
+      const { data, error } = await adminService.getReports()
+      if (error) throw new Error(error)
+      return data
+    },
+  })
+}

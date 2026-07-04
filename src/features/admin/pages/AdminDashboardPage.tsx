@@ -92,6 +92,12 @@ export function AdminDashboardPage() {
           PayNow payments →
         </Link>
         <Link
+          to="/admin/reports"
+          className="rounded-xl border border-nexo-200 bg-nexo-50 p-4 text-sm font-medium text-nexo-800 hover:bg-nexo-100"
+        >
+          Analytics & reports →
+        </Link>
+        <Link
           to="/admin/activity"
           className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium text-nexo-700 hover:border-nexo-200"
         >

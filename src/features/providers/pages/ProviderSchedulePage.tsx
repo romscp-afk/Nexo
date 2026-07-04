@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarDays, Clock } from 'lucide-react'
+import { CalendarDays, Clock, CalendarX } from 'lucide-react'
 import {
+  useAddTimeOff,
+  useDeleteTimeOff,
+  useMyTimeOff,
   useMyWeeklyHours,
   useProviderWeeklyHours,
   useUpdateMyWeeklyHours,
@@ -135,6 +138,128 @@ export function ProviderWeeklyHoursEditor() {
   )
 }
 
+export function ProviderTimeOffEditor() {
+  const { data: blocks, isLoading, error } = useMyTimeOff()
+  const addBlock = useAddTimeOff()
+  const deleteBlock = useDeleteTimeOff()
+  const [startAt, setStartAt] = useState('')
+  const [endAt, setEndAt] = useState('')
+  const [label, setLabel] = useState('')
+  const [formError, setFormError] = useState('')
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError('')
+    if (!startAt || !endAt) {
+      setFormError('Start and end are required.')
+      return
+    }
+    if (new Date(endAt) <= new Date(startAt)) {
+      setFormError('End must be after start.')
+      return
+    }
+    try {
+      await addBlock.mutateAsync({
+        startAt: new Date(startAt).toISOString(),
+        endAt: new Date(endAt).toISOString(),
+        label: label.trim() || undefined,
+      })
+      setStartAt('')
+      setEndAt('')
+      setLabel('')
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Failed to add time off')
+    }
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <div className="flex items-start gap-3">
+        <CalendarX className="mt-0.5 h-5 w-5 text-nexo-700" />
+        <div>
+          <h2 className="font-semibold text-slate-900">Time off / blocked dates</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Block periods when you cannot take jobs. Customers cannot book during these times.
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleAdd} className="mt-5 space-y-3">
+        {formError && <p className="text-sm text-red-700">{formError}</p>}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">From</span>
+            <input
+              type="datetime-local"
+              value={startAt}
+              onChange={(e) => setStartAt(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Until</span>
+            <input
+              type="datetime-local"
+              value={endAt}
+              onChange={(e) => setEndAt(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+            />
+          </label>
+        </div>
+        <label className="block text-sm">
+          <span className="font-medium text-slate-700">Label (optional)</span>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder="e.g. Holiday, medical leave"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={addBlock.isPending}
+          className="rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
+        >
+          {addBlock.isPending ? 'Adding…' : 'Add blocked period'}
+        </button>
+      </form>
+
+      <div className="mt-6">
+        <QueryState
+          loading={isLoading}
+          error={error}
+          empty={!blocks?.length}
+          emptyMessage="No upcoming blocked periods."
+        >
+          <ul className="divide-y divide-slate-100">
+            {blocks?.map((block) => (
+              <li key={block.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <div>
+                  <p className="font-medium text-slate-900">
+                    {block.label ?? 'Time off'}
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    {formatDateTime(block.startAt)} → {formatDateTime(block.endAt)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => deleteBlock.mutate(block.id)}
+                  disabled={deleteBlock.isPending}
+                  className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </QueryState>
+      </div>
+    </section>
+  )
+}
+
 export function ProviderSchedulePage() {
   const { data: bookings, isLoading, error } = useProviderBookings()
 
@@ -175,6 +300,8 @@ export function ProviderSchedulePage() {
       </div>
 
       <ProviderWeeklyHoursEditor />
+
+      <ProviderTimeOffEditor />
 
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">

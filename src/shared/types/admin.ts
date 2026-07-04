@@ -16,6 +16,18 @@ export type AdminStats = {
   paidPayments: number
 }
 
+export type AdminReports = {
+  usersByRole: { role: string; count: number }[]
+  bookingsByStatus: { status: string; count: number }[]
+  bookingsByPaymentMethod: { method: string; count: number }[]
+  revenueByMonth: { month: string; amount: number }[]
+  topServices: { name: string; count: number }[]
+  averageRating: number
+  totalReviews: number
+  bookingsLast30Days: { date: string; count: number }[]
+  recentActivityCount: number
+}
+
 export type AdminUser = UserProfile
 
 export type AdminProvider = ProviderListing

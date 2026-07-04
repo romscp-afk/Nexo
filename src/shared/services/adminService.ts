@@ -9,6 +9,7 @@ import {
   type AdminBooking,
   type AdminProvider,
   type AdminStats,
+  type AdminReports,
   type AdminUser,
 } from '@/shared/types/admin'
 import { mapActivityLog, type ActivityLog, type ActivityLogRow } from '@/shared/types/activity'
@@ -55,6 +56,98 @@ export const adminService = {
         totalRevenue,
         pendingPayments,
         paidPayments,
+      },
+      error: null,
+    }
+  },
+
+  async getReports(): Promise<AuthResult<AdminReports>> {
+    const [profiles, bookings, payments, reviews, activity] = await Promise.all([
+      supabase.from('profiles').select('role'),
+      supabase.from('bookings').select('status, payment_method, service_id, created_at, services ( name )'),
+      supabase.from('payments').select('status, amount, created_at'),
+      supabase.from('reviews').select('rating'),
+      supabase.from('activity_logs').select('id', { count: 'exact', head: true }),
+    ])
+
+    if (profiles.error) return { data: null as unknown as AdminReports, error: profiles.error.message }
+    if (bookings.error) return { data: null as unknown as AdminReports, error: bookings.error.message }
+    if (payments.error) return { data: null as unknown as AdminReports, error: payments.error.message }
+    if (reviews.error) return { data: null as unknown as AdminReports, error: reviews.error.message }
+
+    const roleCounts = new Map<string, number>()
+    for (const p of profiles.data ?? []) {
+      const role = (p.role as string) ?? 'customer'
+      roleCounts.set(role, (roleCounts.get(role) ?? 0) + 1)
+    }
+
+    const statusCounts = new Map<string, number>()
+    const paymentMethodCounts = new Map<string, number>()
+    const serviceCounts = new Map<string, number>()
+    const last30 = new Map<string, number>()
+    const now = Date.now()
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000
+
+    for (const b of bookings.data ?? []) {
+      const status = (b.status as string) ?? 'unknown'
+      statusCounts.set(status, (statusCounts.get(status) ?? 0) + 1)
+      const method = (b.payment_method as string) ?? 'unknown'
+      paymentMethodCounts.set(method, (paymentMethodCounts.get(method) ?? 0) + 1)
+      const serviceName = (b.services as { name: string } | null)?.name ?? 'Unknown'
+      serviceCounts.set(serviceName, (serviceCounts.get(serviceName) ?? 0) + 1)
+      const created = new Date(b.created_at as string).getTime()
+      if (created >= thirtyDaysAgo) {
+        const key = new Date(b.created_at as string).toLocaleDateString('en-CA', {
+          timeZone: 'Asia/Singapore',
+        })
+        last30.set(key, (last30.get(key) ?? 0) + 1)
+      }
+    }
+
+    const monthRevenue = new Map<string, number>()
+    for (const p of payments.data ?? []) {
+      if (p.status !== 'paid') continue
+      const key = new Date(p.created_at as string).toLocaleDateString('en-SG', {
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Asia/Singapore',
+      })
+      monthRevenue.set(key, (monthRevenue.get(key) ?? 0) + Number(p.amount ?? 0))
+    }
+
+    const reviewRows = reviews.data ?? []
+    const avgRating =
+      reviewRows.length > 0
+        ? reviewRows.reduce((sum, r) => sum + Number(r.rating ?? 0), 0) / reviewRows.length
+        : 0
+
+    const sortedMonths = [...monthRevenue.entries()]
+      .slice(-6)
+      .map(([month, amount]) => ({ month, amount }))
+
+    const sortedServices = [...serviceCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }))
+
+    const sortedLast30 = [...last30.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, count]) => ({ date, count }))
+
+    return {
+      data: {
+        usersByRole: [...roleCounts.entries()].map(([role, count]) => ({ role, count })),
+        bookingsByStatus: [...statusCounts.entries()].map(([status, count]) => ({ status, count })),
+        bookingsByPaymentMethod: [...paymentMethodCounts.entries()].map(([method, count]) => ({
+          method,
+          count,
+        })),
+        revenueByMonth: sortedMonths,
+        topServices: sortedServices,
+        averageRating: Math.round(avgRating * 10) / 10,
+        totalReviews: reviewRows.length,
+        bookingsLast30Days: sortedLast30,
+        recentActivityCount: activity.count ?? 0,
       },
       error: null,
     }

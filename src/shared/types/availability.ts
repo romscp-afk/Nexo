@@ -23,6 +23,32 @@ export type WeeklyHourInput = {
   endTime: string
 }
 
+export type ProviderTimeOff = {
+  id: string
+  providerId: string
+  startAt: string
+  endAt: string
+  label: string | null
+}
+
+export type ProviderTimeOffRow = {
+  id: string
+  provider_id: string
+  start_at: string
+  end_at: string
+  label: string | null
+}
+
+export function mapTimeOff(row: ProviderTimeOffRow): ProviderTimeOff {
+  return {
+    id: row.id,
+    providerId: row.provider_id,
+    startAt: row.start_at,
+    endAt: row.end_at,
+    label: row.label,
+  }
+}
+
 export const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 export const DAY_LABELS_FULL = [
   'Sunday',

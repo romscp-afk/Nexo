@@ -35,6 +35,7 @@ import { AdminBookingsPage } from '@/features/admin/pages/AdminBookingsPage'
 import { AdminPaymentsPage } from '@/features/admin/pages/AdminPaymentsPage'
 import { AdminActivityPage } from '@/features/admin/pages/AdminActivityPage'
 import { AdminChatsPage, AdminChatDetailPage } from '@/features/admin/pages/AdminChatsPage'
+import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage'
 import { ContactEntryPage } from '@/features/contact/pages/ContactEntryPage'
 import { ContactReportPage } from '@/features/contact/pages/ContactReportPage'
 import { GatheringLayout } from '@/features/gathering/components/GatheringLayout'
@@ -137,6 +138,7 @@ export const router = createBrowserRouter([
               { path: '/admin/providers', element: <AdminProvidersPage /> },
               { path: '/admin/bookings', element: <AdminBookingsPage /> },
               { path: '/admin/payments', element: <AdminPaymentsPage /> },
+              { path: '/admin/reports', element: <AdminReportsPage /> },
               { path: '/admin/chats', element: <AdminChatsPage /> },
               { path: '/admin/chats/:bookingId', element: <AdminChatDetailPage /> },
               { path: '/admin/activity', element: <AdminActivityPage /> },

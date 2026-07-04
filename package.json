@@ -32,6 +32,9 @@
     "deploy:chat-email": "node scripts/deploy-chat-email.mjs",
     "setup:chat-email-resend": "node scripts/setup-chat-email-resend.mjs",
     "setup:provider-availability": "node scripts/apply-provider-availability.mjs",
+    "setup:provider-time-off": "node scripts/apply-provider-time-off.mjs",
+    "setup:booking-whatsapp": "node scripts/apply-booking-whatsapp-alerts.mjs",
+    "deploy:booking-whatsapp": "node scripts/deploy-booking-whatsapp.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
