@@ -10,7 +10,7 @@ export function InstallPrompt() {
   if (installed || !canInstall || dismissed) return null
 
   return (
-    <div className="fixed inset-x-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-md rounded-xl border border-nexo-200 bg-white p-4 shadow-lg md:bottom-4">
+    <div className="fixed inset-x-4 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-md rounded-xl border border-nexo-200 bg-white p-4 shadow-lg md:bottom-4">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-nexo-100 text-nexo-700">
           <Download className="h-5 w-5" />

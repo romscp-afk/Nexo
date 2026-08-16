@@ -5,8 +5,7 @@ import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { MobilePublicNav } from '@/shared/components/layout/MobilePublicNav'
-import { MobileBottomNav } from '@/shared/components/layout/MobileBottomNav'
-import { useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
+import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
 import { cn } from '@/shared/lib/utils'
 
 export function AppLayout() {
@@ -14,7 +13,6 @@ export function AppLayout() {
   const { pathname } = useLocation()
   const isHome = pathname === '/'
   const showCustomerNav = user?.role === 'customer'
-  const { data: unreadChat = 0 } = useUnreadChatCount('customer', { enabled: showCustomerNav })
 
   return (
     <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-pearl' : 'bg-nexo-50 text-nexo-950')}>
@@ -94,7 +92,7 @@ export function AppLayout() {
               </>
             )}
           </nav>
-          <MobilePublicNav isHome={isHome} />
+          {!showCustomerNav && <MobilePublicNav isHome={isHome} />}
         </div>
       </header>
       <main
@@ -107,7 +105,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <SiteFooter className={cn(isHome ? 'border-t border-nexo-200/80 bg-white/80' : undefined, showCustomerNav && 'hidden md:block')} />
-      {showCustomerNav && <MobileBottomNav unreadMessages={unreadChat} />}
+      {showCustomerNav && <CustomerMobileNav />}
     </div>
   )
 }

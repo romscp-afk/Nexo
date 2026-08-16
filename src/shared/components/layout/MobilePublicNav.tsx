@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
-import { LogoutButton } from '@/shared/components/layout/LogoutButton'
+import { Logo } from '@/shared/components/layout/Logo'
 import { cn } from '@/shared/lib/utils'
 
 type MobilePublicNavProps = {
@@ -13,11 +13,16 @@ type MobilePublicNavProps = {
 export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
+  const { pathname } = useLocation()
 
-  const linkClass = cn(
-    'block rounded-lg px-4 py-3 text-base font-medium transition',
-    isHome ? 'text-nexo-mint/90 hover:bg-white/10' : 'text-slate-700 hover:bg-slate-100',
-  )
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  const close = () => setOpen(false)
+
+  const linkClass =
+    'flex items-center rounded-xl px-4 py-3.5 text-base font-medium text-slate-800 active:bg-slate-100'
 
   return (
     <>
@@ -27,59 +32,63 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >
-        <Menu className={cn('h-5 w-5', isHome ? 'text-white' : 'text-slate-700')} />
+        <Menu className={cn('h-6 w-6', isHome ? 'text-white' : 'text-slate-800')} />
       </button>
 
       {open && (
         <div className="fixed inset-0 z-[60] md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} aria-hidden />
-          <aside
-            className={cn(
-              'absolute right-0 top-0 flex h-full w-72 flex-col shadow-xl',
-              isHome ? 'bg-nexo-ink text-white' : 'bg-white text-slate-900',
-            )}
-          >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
-              <span className="font-semibold">Menu</span>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close menu">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-900/50"
+            onClick={close}
+            aria-label="Close menu"
+          />
+          <aside className="absolute right-0 top-0 flex h-full w-[min(100vw,320px)] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]">
+              <Logo to="/" size="sm" />
+              <button
+                type="button"
+                onClick={close}
+                className="rounded-full p-2 text-slate-500 hover:bg-slate-100"
+                aria-label="Close menu"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="flex flex-1 flex-col gap-1 p-3">
-              <Link to="/services" className={linkClass} onClick={() => setOpen(false)}>
+
+            <nav className="flex flex-1 flex-col overflow-y-auto p-3">
+              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Explore
+              </p>
+              <Link to="/services" className={linkClass} onClick={close}>
                 Services
               </Link>
-              <Link to="/providers" className={linkClass} onClick={() => setOpen(false)}>
+              <Link to="/providers" className={linkClass} onClick={close}>
                 Find providers
               </Link>
+
+              <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Account
+              </p>
               {user ? (
-                <>
-                  <Link
-                    to={getDashboardPath(user.role)}
-                    className={cn(linkClass, 'bg-nexo-700 text-white hover:bg-nexo-800')}
-                    onClick={() => setOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <div className="mt-auto border-t border-white/10 p-2 pt-4">
-                    <LogoutButton
-                      showIcon={false}
-                      className="w-full justify-center"
-                      onLogout={() => setOpen(false)}
-                    />
-                  </div>
-                </>
+                <Link
+                  to={getDashboardPath(user.role)}
+                  className={cn(linkClass, 'bg-nexo-700 text-white active:bg-nexo-800')}
+                  onClick={close}
+                >
+                  Go to dashboard
+                </Link>
               ) : (
                 <>
-                  <Link to="/login" className={linkClass} onClick={() => setOpen(false)}>
+                  <Link to="/login" className={linkClass} onClick={close}>
                     Log in
                   </Link>
                   <Link
                     to="/register"
-                    className={cn(linkClass, 'bg-nexo-700 text-white hover:bg-nexo-800')}
-                    onClick={() => setOpen(false)}
+                    className={cn(linkClass, 'mt-2 bg-nexo-700 text-white active:bg-nexo-800')}
+                    onClick={close}
                   >
-                    Register
+                    Create account
                   </Link>
                 </>
               )}

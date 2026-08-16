@@ -9,7 +9,7 @@ import { useChatRealtimeSync } from '@/features/bookings/hooks/useChatRealtime'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
-import { MobileBottomNav } from '@/shared/components/layout/MobileBottomNav'
+import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
 
 type BadgeKind = 'notifications' | 'messages'
 
@@ -106,6 +106,12 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
     return location.pathname === item.to || location.pathname.startsWith(`${item.to}/`)
   }
 
+  const mobileTitle = (() => {
+    if (role !== 'customer') return `${role} portal`
+    const item = nav.find((n) => isActive(n))
+    return item?.label ?? 'Dashboard'
+  })()
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white md:block">
@@ -160,12 +166,14 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
 
       <div className="flex flex-1 flex-col">
         <header className="flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4 pt-[env(safe-area-inset-top)]">
-          <button className="md:hidden" onClick={toggleSidebar} aria-label="Open menu">
-            <Menu className="h-5 w-5 text-slate-600" />
-          </button>
-          <span className="text-sm capitalize text-slate-500">{role} portal</span>
-          <div className="ml-auto">
-            <LogoutButton />
+          {role !== 'customer' && (
+            <button className="md:hidden" onClick={toggleSidebar} aria-label="Open menu">
+              <Menu className="h-5 w-5 text-slate-600" />
+            </button>
+          )}
+          <span className="text-sm font-medium text-slate-800">{mobileTitle}</span>
+          <div className="ml-auto md:block">
+            <LogoutButton className="hidden md:inline-flex" />
           </div>
         </header>
         <main
@@ -180,7 +188,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
           <SiteFooter compact className={cn('mt-8 border-0', role === 'customer' && 'hidden md:block')} />
         </main>
       </div>
-      {role === 'customer' && <MobileBottomNav unreadMessages={unreadChat} />}
+      {role === 'customer' && <CustomerMobileNav />}
     </div>
   )
 }
