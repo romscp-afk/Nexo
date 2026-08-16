@@ -14,6 +14,7 @@ import { bookingService } from '@/shared/services/bookingService'
 import { providerAvailabilityService } from '@/shared/services/providerAvailabilityService'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function BookProviderPage() {
@@ -158,7 +159,7 @@ export function BookProviderPage() {
               description="Fill in the details below. The provider will confirm your booking."
             />
 
-            <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+            <form id="book-provider-form" onSubmit={handleSubmit} className="grid gap-6 pb-36 lg:grid-cols-3 lg:pb-0">
               <div className="space-y-4 lg:col-span-2">
                 {formError && (
                   <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -339,7 +340,7 @@ export function BookProviderPage() {
                 <button
                   type="submit"
                   disabled={createBooking.isPending || provider.services.length === 0}
-                  className="mt-4 w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50"
+                  className="mt-4 hidden w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50 lg:block"
                 >
                   {createBooking.isPending ? 'Submitting…' : 'Request booking'}
                 </button>
@@ -350,6 +351,13 @@ export function BookProviderPage() {
                 )}
               </aside>
             </form>
+            <StickyFormAction
+              formId="book-provider-form"
+              label="Request booking"
+              total={breakdown ? formatCurrency(breakdown.total) : undefined}
+              loading={createBooking.isPending}
+              disabled={provider.services.length === 0}
+            />
           </>
         )}
       </QueryState>

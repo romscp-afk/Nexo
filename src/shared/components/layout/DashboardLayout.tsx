@@ -9,6 +9,7 @@ import { useChatRealtimeSync } from '@/features/bookings/hooks/useChatRealtime'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
+import { MobileBottomNav } from '@/shared/components/layout/MobileBottomNav'
 
 type BadgeKind = 'notifications' | 'messages'
 
@@ -158,7 +159,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4">
+        <header className="flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4 pt-[env(safe-area-inset-top)]">
           <button className="md:hidden" onClick={toggleSidebar} aria-label="Open menu">
             <Menu className="h-5 w-5 text-slate-600" />
           </button>
@@ -167,13 +168,19 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             <LogoutButton />
           </div>
         </header>
-        <main className="flex flex-1 flex-col p-6">
+        <main
+          className={cn(
+            'flex flex-1 flex-col p-4 sm:p-6',
+            role === 'customer' && 'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
+          )}
+        >
           <div className="flex-1">
             <Outlet />
           </div>
-          <SiteFooter compact className="mt-8 border-0" />
+          <SiteFooter compact className={cn('mt-8 border-0', role === 'customer' && 'hidden md:block')} />
         </main>
       </div>
+      {role === 'customer' && <MobileBottomNav unreadMessages={unreadChat} />}
     </div>
   )
 }

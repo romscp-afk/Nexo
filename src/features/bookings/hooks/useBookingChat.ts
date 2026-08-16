@@ -58,7 +58,7 @@ export function useChatInbox(role: 'customer' | 'provider') {
   })
 }
 
-export function useUnreadChatCount(role: 'customer' | 'provider') {
+export function useUnreadChatCount(role: 'customer' | 'provider', options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['chat-unread', role],
     queryFn: async () => {
@@ -67,5 +67,6 @@ export function useUnreadChatCount(role: 'customer' | 'provider') {
       return data
     },
     refetchInterval: 30000,
+    enabled: options?.enabled ?? true,
   })
 }

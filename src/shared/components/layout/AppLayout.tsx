@@ -4,18 +4,23 @@ import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
+import { MobilePublicNav } from '@/shared/components/layout/MobilePublicNav'
+import { MobileBottomNav } from '@/shared/components/layout/MobileBottomNav'
+import { useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
 import { cn } from '@/shared/lib/utils'
 
 export function AppLayout() {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const isHome = pathname === '/'
+  const showCustomerNav = user?.role === 'customer'
+  const { data: unreadChat = 0 } = useUnreadChatCount('customer', { enabled: showCustomerNav })
 
   return (
     <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-pearl' : 'bg-nexo-50 text-nexo-950')}>
       <header
         className={cn(
-          'sticky top-0 z-50 border-b backdrop-blur-xl',
+          'sticky top-0 z-50 border-b backdrop-blur-xl pt-[env(safe-area-inset-top)]',
           isHome
             ? 'border-white/10 bg-nexo-ink/75 text-white'
             : 'border-nexo-200/80 bg-white/90',
@@ -23,7 +28,7 @@ export function AppLayout() {
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Logo to="/" highlighted={isHome} />
-          <nav className="flex items-center gap-4 text-sm">
+          <nav className="hidden items-center gap-4 text-sm md:flex">
             <Link
               to="/services"
               className={cn(
@@ -89,12 +94,20 @@ export function AppLayout() {
               </>
             )}
           </nav>
+          <MobilePublicNav isHome={isHome} />
         </div>
       </header>
-      <main className={cn('mx-auto w-full flex-1', isHome ? 'max-w-none px-0 py-0' : 'max-w-5xl px-4 py-8')}>
+      <main
+        className={cn(
+          'mx-auto w-full flex-1',
+          isHome ? 'max-w-none px-0 py-0' : 'max-w-5xl px-4 py-6 sm:py-8',
+          showCustomerNav && 'pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0',
+        )}
+      >
         <Outlet />
       </main>
-      <SiteFooter className={isHome ? 'border-t border-nexo-200/80 bg-white/80' : undefined} />
+      <SiteFooter className={cn(isHome ? 'border-t border-nexo-200/80 bg-white/80' : undefined, showCustomerNav && 'hidden md:block')} />
+      {showCustomerNav && <MobileBottomNav unreadMessages={unreadChat} />}
     </div>
   )
 }

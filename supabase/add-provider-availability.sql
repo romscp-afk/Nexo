@@ -27,6 +27,7 @@ CREATE POLICY "provider_weekly_hours_manage_own" ON provider_weekly_hours FOR AL
 DROP POLICY IF EXISTS "provider_weekly_hours_admin" ON provider_weekly_hours;
 CREATE POLICY "provider_weekly_hours_admin" ON provider_weekly_hours FOR ALL USING (is_admin());
 
+DROP TRIGGER IF EXISTS provider_weekly_hours_updated_at ON provider_weekly_hours;
 CREATE TRIGGER provider_weekly_hours_updated_at
   BEFORE UPDATE ON provider_weekly_hours
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

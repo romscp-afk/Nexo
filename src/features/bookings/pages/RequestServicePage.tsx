@@ -11,6 +11,7 @@ import { buildPriceBreakdown, type CeilingHeight } from '@/shared/lib/pricing'
 import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function RequestServicePage() {
@@ -120,7 +121,7 @@ export function RequestServicePage() {
               description={`Your request will be sent to all ${category.name.toLowerCase()} providers in your area.`}
             />
 
-            <form onSubmit={handleSubmit} className="mt-6 grid gap-6 lg:grid-cols-3">
+            <form id="request-service-form" onSubmit={handleSubmit} className="mt-6 grid gap-6 pb-36 lg:grid-cols-3 lg:pb-0">
               <div className="space-y-4 lg:col-span-2">
                 {formError && (
                   <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>
@@ -233,11 +234,17 @@ export function RequestServicePage() {
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <PriceBreakdownPanel breakdown={breakdown} paymentMethod={paymentMethod} compact />
                 </div>
-                <button type="submit" disabled={createBooking.isPending} className="mt-4 w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50">
+                <button type="submit" disabled={createBooking.isPending} className="mt-4 hidden w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50 lg:block">
                   {createBooking.isPending ? 'Sending…' : 'Send request to providers'}
                 </button>
               </aside>
             </form>
+            <StickyFormAction
+              formId="request-service-form"
+              label="Send request"
+              total={breakdown ? formatCurrency(breakdown.total) : undefined}
+              loading={createBooking.isPending}
+            />
           </>
         )}
       </QueryState>
