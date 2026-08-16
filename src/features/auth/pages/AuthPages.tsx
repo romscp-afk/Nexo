@@ -261,7 +261,7 @@ export function RegisterPage() {
       return
     }
 
-    const { error: err, needsEmailConfirmation, role } = await signUp({
+    const { error: err, needsEmailConfirmation, role: signedUpRole } = await signUp({
       email,
       password,
       role,
@@ -286,8 +286,8 @@ export function RegisterPage() {
       setSuccess(`Account created. We sent a confirmation link to ${email}. Check your inbox, then log in.`)
       return
     }
-    if (role) {
-      navigate(getDashboardPath(role))
+    if (signedUpRole) {
+      navigate(getDashboardPath(signedUpRole))
       return
     }
     setSuccess('Account created. You can log in now.')

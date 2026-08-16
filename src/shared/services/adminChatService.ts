@@ -3,6 +3,16 @@ import type { AuthResult } from '@/shared/services/authService'
 import { mapBookingMessage, type BookingMessage, type BookingMessageRow } from '@/shared/types/chat'
 import type { AdminChatThread } from '@/shared/types/admin'
 
+function relationField<T extends Record<string, unknown>>(
+  value: T | T[] | null | undefined,
+  key: keyof T,
+): string | null {
+  const row = Array.isArray(value) ? value[0] : value
+  if (!row) return null
+  const field = row[key]
+  return typeof field === 'string' ? field : null
+}
+
 export const adminChatService = {
   async listThreads(): Promise<AuthResult<AdminChatThread[]>> {
     const { data: messages, error } = await supabase
@@ -54,8 +64,11 @@ export const adminChatService = {
         b.id as string,
         {
           status: b.status as string,
-          serviceName: (b.services as { name: string } | null)?.name ?? null,
-          providerName: (b.providers as { business_name: string } | null)?.business_name ?? null,
+          serviceName: relationField(b.services as { name: string } | { name: string }[] | null, 'name'),
+          providerName: relationField(
+            b.providers as { business_name: string } | { business_name: string }[] | null,
+            'business_name',
+          ),
           customerName: profileMap.get(b.customer_id as string)?.name ?? 'Customer',
           customerEmail: profileMap.get(b.customer_id as string)?.email ?? null,
         },

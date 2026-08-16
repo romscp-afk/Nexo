@@ -24,10 +24,10 @@ function isMissingProfilesTable(error: string | null | undefined): boolean {
 const ADMIN_EMAILS = new Set([DEMO_ADMIN_EMAIL.toLowerCase()])
 
 function resolveRole(user: User, profile: UserProfile | null): UserRole {
+  if (user.email && ADMIN_EMAILS.has(user.email.toLowerCase())) return 'admin'
   if (profile?.role) return profile.role
   const fromMeta = parseRole(user.user_metadata?.role)
   if (fromMeta !== 'customer') return fromMeta
-  if (user.email && ADMIN_EMAILS.has(user.email.toLowerCase())) return 'admin'
   return 'customer'
 }
 

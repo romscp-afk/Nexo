@@ -41,3 +41,19 @@ export const entryTheme = {
   divider: 'border-slate-200',
   errorBox: 'rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700',
 } as const
+
+/** Dark form card on the white entry page */
+export const entryFormTheme = {
+  card: 'rounded-2xl border border-legacy-silver/20 bg-gradient-to-b from-legacy-900/95 via-legacy-950 to-legacy-900 shadow-xl shadow-black/40 backdrop-blur-sm',
+  input:
+    'mt-1.5 w-full rounded-xl border border-legacy-silver/30 bg-white px-3.5 py-2.5 text-sm text-legacy-900 outline-none transition placeholder:text-slate-400 focus:border-legacy-gold focus:ring-2 focus:ring-legacy-gold/30',
+  label: 'block text-sm font-medium text-legacy-silver-light',
+  btnPrimary:
+    'rounded-xl bg-gradient-to-r from-legacy-gold to-legacy-gold-dark px-8 py-3 text-sm font-bold uppercase tracking-wide text-legacy-950 shadow-md shadow-legacy-gold/20 transition hover:brightness-110',
+  tagline: 'text-base italic text-legacy-gold',
+  subheading: 'text-sm uppercase tracking-[0.2em] text-legacy-gold',
+  accentRed: 'text-legacy-red',
+  muted: 'text-legacy-silver',
+  divider: 'border-legacy-silver/15',
+  errorBox: 'rounded-xl border border-legacy-red/40 bg-legacy-red/10 px-3 py-2 text-sm text-red-300',
+} as const

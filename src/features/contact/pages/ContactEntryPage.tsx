@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { contactService } from '@/shared/services/contactService'
 import { validateContactForm } from '@/shared/lib/contactValidation'
+import { PhoneNumberField } from '@/features/contact/components/PhoneNumberField'
 import { EVENT, GALLE_SCHOOLS } from '@/features/gathering/lib/eventConfig'
-import { entryTheme } from '@/features/gathering/lib/legacyTheme'
+import { entryFormTheme, entryTheme } from '@/features/gathering/lib/legacyTheme'
+import { combinePhoneNumber, DEFAULT_PHONE_COUNTRY_CODE } from '@/features/gathering/lib/phoneCodes'
 import { SCHOOL_LOGOS } from '@/features/gathering/lib/schoolLogos'
 import { cn } from '@/shared/lib/utils'
 import logoUrl from '@/assets/silver-legacy-logo.png'
@@ -11,9 +13,11 @@ import logoUrl from '@/assets/silver-legacy-logo.png'
 const emptyForm = {
   fullName: '',
   school: '',
-  contactNumber: '',
+  contactCountryCode: DEFAULT_PHONE_COUNTRY_CODE,
+  contactLocalNumber: '',
   contactIsWhatsApp: true,
-  whatsAppNumber: '',
+  whatsAppCountryCode: DEFAULT_PHONE_COUNTRY_CODE,
+  whatsAppLocalNumber: '',
   email: '',
   workPlace: '',
   designation: '',
@@ -44,12 +48,17 @@ export function ContactEntryPage() {
     }
 
     setSubmitting(true)
+    const contactNumber = combinePhoneNumber(form.contactCountryCode, form.contactLocalNumber)
+    const whatsAppNumber = form.contactIsWhatsApp
+      ? undefined
+      : combinePhoneNumber(form.whatsAppCountryCode, form.whatsAppLocalNumber) || undefined
+
     const { error: saveError } = await contactService.submit({
       fullName: form.fullName,
       school: form.school,
-      contactNumber: form.contactNumber,
+      contactNumber,
       contactIsWhatsApp: form.contactIsWhatsApp,
-      whatsAppNumber: form.contactIsWhatsApp ? undefined : form.whatsAppNumber,
+      whatsAppNumber,
       email: form.email,
       workPlace: form.workPlace,
       designation: form.designation,
@@ -101,25 +110,25 @@ export function ContactEntryPage() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className={`space-y-4 p-6 sm:p-8 ${entryTheme.card}`}>
-          <div className={`border-b ${entryTheme.divider} pb-4 text-center`}>
-            <p className={entryTheme.subheading}>{EVENT.batch}</p>
-            <p className={`mt-2 ${entryTheme.tagline}`}>&ldquo;{EVENT.tagline}&rdquo;</p>
+        <form onSubmit={handleSubmit} className={`space-y-4 p-6 sm:p-8 ${entryFormTheme.card}`}>
+          <div className={`border-b ${entryFormTheme.divider} pb-4 text-center`}>
+            <p className={entryFormTheme.subheading}>{EVENT.batch}</p>
+            <p className={`mt-2 ${entryFormTheme.tagline}`}>&ldquo;{EVENT.tagline}&rdquo;</p>
           </div>
 
-          {error && <p className={entryTheme.errorBox}>{error}</p>}
+          {error && <p className={entryFormTheme.errorBox}>{error}</p>}
 
-          <label className={entryTheme.label}>
-            Name <span className={entryTheme.accentRed}>*</span>
-            <input value={form.fullName} onChange={handleChange('fullName')} className={entryTheme.input} required />
+          <label className={entryFormTheme.label}>
+            Name <span className={entryFormTheme.accentRed}>*</span>
+            <input value={form.fullName} onChange={handleChange('fullName')} className={entryFormTheme.input} required />
           </label>
 
-          <label className={entryTheme.label}>
-            School <span className={entryTheme.accentRed}>*</span>
+          <label className={entryFormTheme.label}>
+            School <span className={entryFormTheme.accentRed}>*</span>
             <select
               value={form.school}
               onChange={handleChange('school')}
-              className={entryTheme.input}
+              className={entryFormTheme.input}
               required
             >
               <option value="">Select your school</option>
@@ -132,93 +141,95 @@ export function ContactEntryPage() {
           </label>
 
           <div className="space-y-3">
-            <div>
-              <span className={entryTheme.label}>
-                Contact Number <span className={entryTheme.accentRed}>*</span>
-              </span>
-              <div className="mt-1.5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                <input
-                  type="tel"
-                  value={form.contactNumber}
-                  onChange={handleChange('contactNumber')}
-                  className={cn(entryTheme.input, 'mt-0 w-full sm:min-w-[10rem] sm:flex-1')}
-                  placeholder="077 123 4567"
-                  required
-                />
-                <label
-                  htmlFor="contactIsWhatsApp"
-                  className="flex shrink-0 cursor-pointer items-center gap-2"
-                >
-                  <input
-                    type="checkbox"
-                    id="contactIsWhatsApp"
-                    checked={form.contactIsWhatsApp}
-                    onChange={handleChange('contactIsWhatsApp')}
-                    className="h-4 w-4 rounded border-slate-300 accent-[#c9a96e]"
-                  />
-                  <span className={`text-sm ${entryTheme.muted}`}>This is my WhatsApp number too</span>
-                </label>
-              </div>
-            </div>
+            <PhoneNumberField
+              idPrefix="contact"
+              label="Contact Number"
+              required
+              countryCode={form.contactCountryCode}
+              localNumber={form.contactLocalNumber}
+              onCountryCodeChange={(value) => setForm((prev) => ({ ...prev, contactCountryCode: value }))}
+              onLocalNumberChange={(value) => setForm((prev) => ({ ...prev, contactLocalNumber: value }))}
+              labelClassName={entryFormTheme.label}
+              inputClassName={entryFormTheme.input}
+              accentClassName={entryFormTheme.accentRed}
+              mutedClassName={entryFormTheme.muted}
+            />
+
+            <label
+              htmlFor="contactIsWhatsApp"
+              className="flex cursor-pointer items-center gap-2"
+            >
+              <input
+                type="checkbox"
+                id="contactIsWhatsApp"
+                checked={form.contactIsWhatsApp}
+                onChange={handleChange('contactIsWhatsApp')}
+                className="h-4 w-4 rounded border-legacy-silver/40 accent-[#c9a96e]"
+              />
+              <span className={`text-sm ${entryFormTheme.muted}`}>This is my WhatsApp number too</span>
+            </label>
 
             {!form.contactIsWhatsApp && (
-              <label className={entryTheme.label}>
-                WhatsApp Number <span className={entryTheme.muted}>(optional)</span>
-                <input
-                  type="tel"
-                  value={form.whatsAppNumber}
-                  onChange={handleChange('whatsAppNumber')}
-                  className={entryTheme.input}
-                  placeholder="Separate WhatsApp number"
-                />
-              </label>
+              <PhoneNumberField
+                idPrefix="whatsapp"
+                label="WhatsApp Number"
+                optional
+                countryCode={form.whatsAppCountryCode}
+                localNumber={form.whatsAppLocalNumber}
+                onCountryCodeChange={(value) => setForm((prev) => ({ ...prev, whatsAppCountryCode: value }))}
+                onLocalNumberChange={(value) => setForm((prev) => ({ ...prev, whatsAppLocalNumber: value }))}
+                labelClassName={entryFormTheme.label}
+                inputClassName={entryFormTheme.input}
+                accentClassName={entryFormTheme.accentRed}
+                mutedClassName={entryFormTheme.muted}
+              />
             )}
           </div>
 
-          <label className={entryTheme.label}>
-            Email <span className={entryTheme.accentRed}>*</span>
+          <label className={entryFormTheme.label}>
+            Email <span className={entryFormTheme.accentRed}>*</span>
             <input
               type="email"
               value={form.email}
               onChange={handleChange('email')}
-              className={entryTheme.input}
+              className={entryFormTheme.input}
               required
             />
           </label>
 
-          <label className={entryTheme.label}>
-            Work Place <span className={entryTheme.muted}>(optional)</span>
+          <label className={entryFormTheme.label}>
+            Work Place <span className={entryFormTheme.muted}>(optional)</span>
             <input
               value={form.workPlace}
               onChange={handleChange('workPlace')}
-              className={entryTheme.input}
+              className={entryFormTheme.input}
               placeholder="Company or organisation"
             />
           </label>
 
-          <label className={entryTheme.label}>
-            Designation <span className={entryTheme.muted}>(optional)</span>
+          <label className={entryFormTheme.label}>
+            Designation <span className={entryFormTheme.muted}>(optional)</span>
             <input
               value={form.designation}
               onChange={handleChange('designation')}
-              className={entryTheme.input}
+              className={entryFormTheme.input}
               placeholder="Job title or role"
             />
           </label>
 
-          <label className={entryTheme.label}>
-            Feedback or comments <span className={entryTheme.muted}>(optional)</span>
+          <label className={entryFormTheme.label}>
+            Feedback or comments <span className={entryFormTheme.muted}>(optional)</span>
             <textarea
               value={form.feedback}
               onChange={handleChange('feedback')}
               rows={3}
-              className={cn(entryTheme.input, 'resize-none')}
+              className={cn(entryFormTheme.input, 'resize-none')}
               placeholder="Share any thoughts or messages..."
             />
           </label>
 
           <div className="flex justify-center pt-2 sm:justify-start">
-            <button type="submit" disabled={submitting} className={entryTheme.btnPrimary}>
+            <button type="submit" disabled={submitting} className={entryFormTheme.btnPrimary}>
               {submitting ? 'Submitting…' : 'Submit'}
             </button>
           </div>

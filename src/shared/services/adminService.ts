@@ -14,6 +14,16 @@ import {
 } from '@/shared/types/admin'
 import { mapActivityLog, type ActivityLog, type ActivityLogRow } from '@/shared/types/activity'
 
+function relationField<T extends Record<string, unknown>>(
+  value: T | T[] | null | undefined,
+  key: keyof T,
+): string | null {
+  const row = Array.isArray(value) ? value[0] : value
+  if (!row) return null
+  const field = row[key]
+  return typeof field === 'string' ? field : null
+}
+
 export const adminService = {
   async getStats(): Promise<AuthResult<AdminStats>> {
     const [users, providers, bookings, payments] = await Promise.all([
@@ -93,7 +103,8 @@ export const adminService = {
       statusCounts.set(status, (statusCounts.get(status) ?? 0) + 1)
       const method = (b.payment_method as string) ?? 'unknown'
       paymentMethodCounts.set(method, (paymentMethodCounts.get(method) ?? 0) + 1)
-      const serviceName = (b.services as { name: string } | null)?.name ?? 'Unknown'
+      const serviceName =
+        relationField(b.services as { name: string } | { name: string }[] | null, 'name') ?? 'Unknown'
       serviceCounts.set(serviceName, (serviceCounts.get(serviceName) ?? 0) + 1)
       const created = new Date(b.created_at as string).getTime()
       if (created >= thirtyDaysAgo) {

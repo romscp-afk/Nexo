@@ -63,6 +63,10 @@ export function GatheringAdminLoginPage() {
           <p className="text-sm text-legacy-silver">
             Sign in with your administrator account to view survey responses and export the Excel report.
           </p>
+          <p className="rounded-lg border border-legacy-silver/20 bg-legacy-950/40 px-3 py-2 text-xs text-legacy-silver">
+            Username: <strong className="text-legacy-gold">{GATHERING_ADMIN_USERNAME}</strong> · Password:{' '}
+            <strong className="text-legacy-gold">Test@123</strong>
+          </p>
 
           {error && (
             <p className="rounded-xl border border-legacy-red/40 bg-legacy-red/10 px-4 py-3 text-sm text-red-300">

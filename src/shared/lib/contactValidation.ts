@@ -19,6 +19,20 @@ export function validatePhoneRequired(value: string, label = 'contact number'): 
   return validatePhoneOptional(trimmed, label)
 }
 
+export function validatePhoneParts(
+  countryCode: string,
+  localNumber: string,
+  label = 'contact number',
+  required = true,
+): string | null {
+  const local = localNumber.trim()
+  if (!local) {
+    return required ? `${label.charAt(0).toUpperCase()}${label.slice(1)} is required.` : null
+  }
+  if (!countryCode.trim()) return `Select a country code for ${label}.`
+  return validatePhoneOptional(local, label)
+}
+
 export function validateEmail(value: string): string | null {
   const trimmed = value.trim()
   if (!trimmed) return 'Email is required.'
@@ -37,9 +51,11 @@ export function validateDesignationOptional(value: string): string | null {
 export function validateContactForm(input: {
   fullName: string
   school: string
-  contactNumber: string
+  contactCountryCode: string
+  contactLocalNumber: string
   contactIsWhatsApp: boolean
-  whatsAppNumber: string
+  whatsAppCountryCode: string
+  whatsAppLocalNumber: string
   email: string
   designation: string
 }): string | null {
@@ -49,11 +65,21 @@ export function validateContactForm(input: {
     return 'Please select a valid school.'
   }
 
-  const contactErr = validatePhoneRequired(input.contactNumber, 'contact number')
+  const contactErr = validatePhoneParts(
+    input.contactCountryCode,
+    input.contactLocalNumber,
+    'contact number',
+    true,
+  )
   if (contactErr) return contactErr
 
   if (!input.contactIsWhatsApp) {
-    const waErr = validatePhoneOptional(input.whatsAppNumber, 'WhatsApp number')
+    const waErr = validatePhoneParts(
+      input.whatsAppCountryCode,
+      input.whatsAppLocalNumber,
+      'WhatsApp number',
+      false,
+    )
     if (waErr) return waErr
   }
 

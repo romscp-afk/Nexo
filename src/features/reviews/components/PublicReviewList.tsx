@@ -66,8 +66,8 @@ type PublicReviewListProps = {
 
 export function PublicReviewList({
   reviews,
-  isLoading,
-  error,
+  isLoading = false,
+  error = null,
   emptyMessage = 'No reviews yet.',
   showProvider = false,
   layout = 'grid',

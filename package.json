@@ -35,6 +35,7 @@
     "setup:provider-time-off": "node scripts/apply-provider-time-off.mjs",
     "setup:booking-whatsapp": "node scripts/apply-booking-whatsapp-alerts.mjs",
     "deploy:booking-whatsapp": "node scripts/deploy-booking-whatsapp.mjs",
+    "setup:production": "node scripts/setup-production.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
