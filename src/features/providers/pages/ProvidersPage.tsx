@@ -169,10 +169,7 @@ export function ProvidersPage() {
     categoryFilters,
     { enabled: isCategoryView },
   )
-  const { data: unfilteredCategoryProviders } = useProviders(
-    { categorySlug: categorySlug || storeCategorySlug || undefined },
-    { enabled: isCategoryView },
-  )
+  const { data: unfilteredCategoryProviders } = useProviders({}, { enabled: isCategoryView })
 
   const hasFilters = Boolean(
     area.trim() ||

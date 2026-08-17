@@ -2,7 +2,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useProviderReviews } from '@/features/bookings/hooks/useReviews'
 import { useIsProviderSaved, useToggleSavedProvider } from '@/features/customer/hooks/useSavedProviders'
-import { BadgeCheck, Briefcase, Heart, MapPin, Star, User } from 'lucide-react'
+import { ProviderAvatar } from '@/features/providers/components/ProviderAvatar'
+import { BadgeCheck, Briefcase, Heart, MapPin, Star } from 'lucide-react'
 import { useProvider } from '@/features/providers/hooks/useProviders'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PublicReviewList } from '@/features/reviews/components/PublicReviewList'
@@ -44,13 +45,11 @@ export function ProviderDetailPage() {
               <div className="space-y-6 lg:col-span-2">
                 <section className="rounded-xl border border-slate-200 bg-white p-6">
                   <div className="flex flex-wrap items-start gap-4">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-nexo-100 text-nexo-700">
-                      {provider.avatarUrl ? (
-                        <img src={provider.avatarUrl} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <User className="h-8 w-8" />
-                      )}
-                    </div>
+                    <ProviderAvatar
+                      name={provider.businessName}
+                      avatarUrl={provider.avatarUrl}
+                      size="lg"
+                    />
                     <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-1 text-amber-600">

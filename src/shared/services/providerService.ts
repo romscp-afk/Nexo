@@ -1,5 +1,7 @@
 import { supabase } from '@/shared/lib/supabase'
 import { parseUnitPrices } from '@/shared/lib/pricing'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import { CLEANING_CATALOG_HOURLY_RATE } from '@/shared/lib/cleaningContent'
 import {
   mapProviderListing,
   type ProviderFilters,
@@ -48,6 +50,21 @@ function mapProviderServices(rows: ProviderServiceJoin[] | null): ProviderServic
     }))
 }
 
+function providerDisplayPrice(provider: ProviderListing): number {
+  if (provider.services.length) {
+    return Math.min(...provider.services.map((s) => s.priceFrom))
+  }
+  return provider.hourlyRate > 0 ? provider.hourlyRate : CLEANING_CATALOG_HOURLY_RATE
+}
+
+function matchesCategoryFilter(provider: ProviderListing, categorySlug: string): boolean {
+  if (categorySlug === PRIMARY_CATEGORY_SLUG) {
+    // Phase 1: every active provider is a home-cleaning professional.
+    return true
+  }
+  return provider.services.some((s) => s.categorySlug === categorySlug)
+}
+
 function applyFilters(providers: ProviderListing[], filters: ProviderFilters): ProviderListing[] {
   return providers.filter((provider) => {
     if (filters.verifiedOnly && !provider.isVerified) return false
@@ -60,13 +77,10 @@ function applyFilters(providers: ProviderListing[], filters: ProviderFilters): P
       })
       if (!matches) return false
     }
-    if (filters.categorySlug) {
-      const matches = provider.services.some((s) => s.categorySlug === filters.categorySlug)
-      if (!matches) return false
+    if (filters.categorySlug && !matchesCategoryFilter(provider, filters.categorySlug)) {
+      return false
     }
-    const minPrice = provider.services.length
-      ? Math.min(...provider.services.map((s) => s.priceFrom))
-      : provider.hourlyRate
+    const minPrice = providerDisplayPrice(provider)
     if (filters.minPrice != null && minPrice < filters.minPrice) return false
     if (filters.maxPrice != null && minPrice > filters.maxPrice) return false
     return true
