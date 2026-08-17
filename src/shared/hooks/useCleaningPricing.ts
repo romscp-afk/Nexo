@@ -5,6 +5,7 @@ import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import {
   CLEANING_CATALOG_HOURLY_RATE,
   CLEANING_DURATION_HOURLY_RATES,
+  CLEANING_EXTRA_HOUR_RATE_SGD,
   MIN_BOOKING_HOURS,
 } from '@/shared/lib/cleaningContent'
 import { formatCurrency } from '@/shared/lib/utils'
@@ -63,8 +64,8 @@ export function useCleaningPricing(): CleaningPricingDisplay {
     const headline = `From ${formatCurrency(catalogBasePrice)}/hr`
 
     const detail = variesByCleaner
-      ? `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr by duration · Some cleaners may quote differently · ${MIN_BOOKING_HOURS} hr minimum`
-      : `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr depending on booking length · ${MIN_BOOKING_HOURS} hr minimum`
+      ? `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr by duration · Extra hours ${formatCurrency(CLEANING_EXTRA_HOUR_RATE_SGD)}/hr · ${MIN_BOOKING_HOURS} hr minimum`
+      : `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr by duration · Extra hours ${formatCurrency(CLEANING_EXTRA_HOUR_RATE_SGD)}/hr · ${MIN_BOOKING_HOURS} hr minimum`
 
     return {
       loading,

@@ -7,6 +7,7 @@ import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { CleaningPriceLabel } from '@/shared/components/CleaningPriceLabel'
+import { CleaningExtraHoursNote } from '@/shared/components/CleaningExtraHoursNote'
 import { formatCurrency } from '@/shared/lib/utils'
 import { getCleaningHourlyRateForDuration } from '@/shared/lib/cleaningContent'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
@@ -528,6 +529,7 @@ export function CleaningRequestPage() {
                           </label>
                         ))}
                       </div>
+                      <CleaningExtraHoursNote className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600" />
                     </fieldset>
 
                     <label className="block text-sm">
@@ -669,6 +671,9 @@ export function CleaningRequestPage() {
                         <dd className="text-slate-900">
                           {formatCleaningScheduleSummary(scheduledAt, duration)}
                         </dd>
+                        <dd className="mt-1">
+                          <CleaningExtraHoursNote />
+                        </dd>
                       </div>
                       <div>
                         <dt className="text-slate-500">Location</dt>
@@ -775,6 +780,7 @@ export function CleaningRequestPage() {
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <PriceBreakdownPanel breakdown={breakdown} paymentMethod={paymentMethod} compact />
                 </div>
+                <CleaningExtraHoursNote className="mt-3" />
                 {paymentMethod === 'cash' && (
                   <p className="mt-2 text-xs text-amber-800">
                     Cash bookings: pay {formatCurrency(PLATFORM_FEE_SGD)} platform fee via PayNow before the job.
