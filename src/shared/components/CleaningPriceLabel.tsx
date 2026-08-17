@@ -21,7 +21,7 @@ export function CleaningPriceLabel({
       {pricing.variesByCleaner ? 'Rates vary by cleaner' : pricing.headline}
       {showDetail && (
         <span className="mt-0.5 block text-xs font-normal opacity-80">
-          {pricing.detail} · {pricing.minDurationHours} hr minimum
+          {pricing.detail}
         </span>
       )}
     </span>
