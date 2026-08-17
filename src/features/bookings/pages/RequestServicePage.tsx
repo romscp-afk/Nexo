@@ -9,7 +9,7 @@ import { AirconBookingFields } from '@/shared/components/AirconBookingFields'
 import { formatCurrency } from '@/shared/lib/utils'
 import { buildPriceBreakdown, type CeilingHeight } from '@/shared/lib/pricing'
 import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
-import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
@@ -175,7 +175,9 @@ export function RequestServicePage() {
                         className="mr-2"
                       />
                       <span className="font-bold text-amber-900">Cash on completion</span>
-                      <p className="mt-1 text-xs text-amber-800">Provider pays {formatCurrency(ADMIN_FEE_SGD)} platform fee via PayNow.</p>
+                      <p className="mt-1 text-xs text-amber-800">
+                        Pay {formatCurrency(PLATFORM_FEE_SGD)} platform fee via PayNow before the job. Pay the provider in cash on completion.
+                      </p>
                     </label>
                   </div>
                 </fieldset>

@@ -32,10 +32,12 @@ export function useCleaningPricing(): CleaningPricingDisplay {
   const { data: providers, isLoading: provLoading } = useProviders({
     categorySlug: PRIMARY_CATEGORY_SLUG,
   })
-  const { data: allProviders, isLoading: allProvLoading } = useProviders({})
+  const { data: onboardedProviders, isLoading: onboardedLoading } = useProviders({
+    publicOnly: false,
+  })
 
   return useMemo(() => {
-    const loading = catLoading || svcLoading || provLoading || allProvLoading
+    const loading = catLoading || svcLoading || provLoading || onboardedLoading
     const standard =
       services?.find((s) => s.slug === 'cleaning-standard') ?? services?.[0] ?? null
     const catalogBasePrice = getCleaningCatalogHourlyRate(standard?.basePrice)
@@ -53,7 +55,7 @@ export function useCleaningPricing(): CleaningPricingDisplay {
     const variesByCleaner =
       uniqueProviderRates.length > 1 &&
       uniqueProviderRates.some((r) => r !== catalogBasePrice)
-    const cleanerCount = allProviders?.length ?? 0
+    const cleanerCount = onboardedProviders?.length ?? 0
     const hasActiveCleaners = cleanerCount > 0
 
     const headline = `From ${formatCurrency(catalogBasePrice)}/hr`
@@ -74,5 +76,5 @@ export function useCleaningPricing(): CleaningPricingDisplay {
       headline,
       detail,
     }
-  }, [catLoading, svcLoading, provLoading, allProvLoading, services, providers, allProviders])
+  }, [catLoading, svcLoading, provLoading, onboardedLoading, services, providers, onboardedProviders])
 }

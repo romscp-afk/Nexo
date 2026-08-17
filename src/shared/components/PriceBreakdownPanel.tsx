@@ -35,12 +35,13 @@ export function PriceBreakdownPanel({ breakdown, paymentMethod, compact }: Props
       {paymentMethod === 'cash' && (
         <p className="text-xs text-slate-500">
           Service amount paid in cash to the provider. Platform fee of{' '}
-          {formatCurrency(breakdown.platformFee)} applies on cash jobs.
+          {formatCurrency(breakdown.platformFee)} is paid via PayNow before the job starts.
         </p>
       )}
       {paymentMethod === 'paynow' && (
         <p className="text-xs text-slate-500">
-          Pay via PayNow after the provider confirms. Total includes platform fee.
+          Pay via PayNow after the provider confirms. Total includes a{' '}
+          {formatCurrency(breakdown.platformFee)} platform fee.
         </p>
       )}
     </div>

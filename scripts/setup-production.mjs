@@ -14,6 +14,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 const steps = [
   ['setup:pricing', 'Pricing units + platform fee'],
+  ['setup:customer-platform-fee', 'Customer PayNow includes platform fee'],
   ['setup:customer-flow', 'Customer flow + chat messages'],
   ['setup:booking-chat', 'Chat access rules'],
   ['setup:booking-chat-inbox', 'Chat inbox + read receipts'],

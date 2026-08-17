@@ -12,7 +12,7 @@ import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { uploadBookingPhotos } from '@/shared/lib/bookingPhotos'
 import { bookingService } from '@/shared/services/bookingService'
 import { providerAvailabilityService } from '@/shared/services/providerAvailabilityService'
-import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
@@ -348,7 +348,7 @@ export function BookProviderPage() {
                 </div>
                 {paymentMethod === 'cash' && (
                   <p className="mt-3 text-xs text-slate-500">
-                    Provider pays {formatCurrency(ADMIN_FEE_SGD)} platform fee on cash jobs.
+                    Pay {formatCurrency(PLATFORM_FEE_SGD)} platform fee via PayNow on cash jobs. Pay the provider in cash on completion.
                   </p>
                 )}
                 <button

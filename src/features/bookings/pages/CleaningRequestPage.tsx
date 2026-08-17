@@ -12,7 +12,7 @@ import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { buildPriceBreakdown } from '@/shared/lib/pricing'
 import { appendCleaningBookingNotes } from '@/shared/lib/bookingNotes'
-import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import {
   BOOKING_CONFIRMATION,
@@ -672,7 +672,8 @@ export function CleaningRequestPage() {
                 </div>
                 {paymentMethod === 'cash' && (
                   <p className="mt-2 text-xs text-amber-800">
-                    Cash bookings: provider pays {formatCurrency(ADMIN_FEE_SGD)} platform fee via PayNow.
+                    Cash bookings: pay {formatCurrency(PLATFORM_FEE_SGD)} platform fee via PayNow before the job.
+                    Pay the cleaner in cash on completion.
                   </p>
                 )}
                 <Link

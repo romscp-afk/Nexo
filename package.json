@@ -47,6 +47,7 @@
     "deploy:booking-whatsapp": "node scripts/deploy-booking-whatsapp.mjs",
     "setup:production": "node scripts/setup-production.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
+    "setup:customer-platform-fee": "node scripts/apply-customer-platform-fee-payment.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
   "dependencies": {

@@ -165,11 +165,15 @@ export function ProvidersPage() {
   )
 
   const { data: browseProviders, isLoading: browseLoading, error: browseError } = useProviders(browseFilters)
+  const { data: allOnboardedProviders } = useProviders({ publicOnly: false })
   const { data: categoryProviders, isLoading: categoryLoading, error: categoryError } = useProviders(
     categoryFilters,
     { enabled: isCategoryView },
   )
-  const { data: unfilteredCategoryProviders } = useProviders({}, { enabled: isCategoryView })
+  const { data: unfilteredCategoryProviders } = useProviders(
+    { publicOnly: false },
+    { enabled: isCategoryView },
+  )
 
   const hasFilters = Boolean(
     area.trim() ||
@@ -321,6 +325,10 @@ export function ProvidersPage() {
         <ProviderListSkeleton />
       ) : browseError ? (
         <ProviderListState variant="error" onRetry={handleRetry} />
+      ) : !browseProviders?.length && !allOnboardedProviders?.length ? (
+        <ProviderListState variant="empty" />
+      ) : !browseProviders?.length && hasFilters ? (
+        <ProviderListState variant="filtered" onClearFilters={clearFilters} />
       ) : !browseProviders?.length ? (
         <ProviderListState variant="empty" />
       ) : (

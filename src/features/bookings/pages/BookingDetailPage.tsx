@@ -20,6 +20,7 @@ import { useBookingPayments } from '@/features/payments/hooks/usePayments'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
 import { ceilingHeightLabel } from '@/shared/lib/pricing'
+import { resolveBookingPlatformFee } from '@/shared/lib/customerPayment'
 import type { PriceBreakdown } from '@/shared/lib/pricing'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { getBookingChatAccess } from '@/shared/lib/bookingChat'
@@ -47,6 +48,9 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
     if (!booking || booking.status !== 'confirmed') return false
     if (booking.paymentMethod === 'paynow') {
       return payments?.customerAdvance?.status === 'paid'
+    }
+    if (payments?.customerAdvance?.status === 'paid' && booking.customerContactShared) {
+      return true
     }
     return (
       payments?.providerAdminFee?.status === 'paid' && booking.customerContactShared
@@ -129,7 +133,8 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
             {isCash && (
               <p className="rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950">
-                CASH payment — customer pays provider on completion. Provider pays platform admin fee via PayNow.
+                CASH payment — pay the provider in cash on completion. Platform fee of{' '}
+                {formatCurrency(resolveBookingPlatformFee(booking))} is paid via PayNow before the job starts.
               </p>
             )}
 
@@ -277,7 +282,6 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             )}
 
             {role === 'customer' &&
-              booking.paymentMethod === 'paynow' &&
               payments?.customerAdvance &&
               ['confirmed', 'in_progress'].includes(booking.status) && (
                 <PayNowQrPanel payment={payments.customerAdvance} booking={booking} role="customer" />
@@ -286,13 +290,17 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             {role === 'provider' &&
               isCash &&
               payments?.providerAdminFee &&
+              !payments?.customerAdvance &&
               ['confirmed', 'in_progress'].includes(booking.status) && (
                 <PayNowQrPanel payment={payments.providerAdminFee} booking={booking} role="provider" />
               )}
 
-            {isCash && role === 'customer' && booking.status === 'confirmed' && (
+            {isCash &&
+              role === 'customer' &&
+              booking.status === 'confirmed' &&
+              payments?.customerAdvance?.status === 'paid' && (
               <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                Pay the provider in cash when the job is done. No online payment required.
+                Platform fee confirmed. Pay the provider in cash when the job is done.
               </p>
             )}
 
@@ -337,7 +345,9 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     {!canStartJob() && (
                       <p className="w-full text-sm text-amber-800">
                         {isCash
-                          ? 'Pay admin fee via PayNow and wait for admin confirmation to receive customer contact.'
+                          ? payments?.providerAdminFee && !payments?.customerAdvance
+                            ? 'Pay admin fee via PayNow and wait for admin confirmation to receive customer contact.'
+                            : 'Waiting for customer platform fee PayNow confirmation.'
                           : 'Waiting for customer PayNow payment confirmation.'}
                       </p>
                     )}

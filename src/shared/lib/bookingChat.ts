@@ -25,6 +25,10 @@ export function isBookingPaymentConfirmed(
     return payments?.customerAdvance?.status === 'paid'
   }
 
+  if (payments?.customerAdvance?.status === 'paid' && booking.customerContactShared) {
+    return true
+  }
+
   return (
     payments?.providerAdminFee?.status === 'paid' && booking.customerContactShared
   )
@@ -64,7 +68,7 @@ export function getBookingChatAccess(input: {
       state: 'locked',
       reason:
         booking.paymentMethod === 'cash'
-          ? 'Chat opens after the provider admin fee is confirmed and contact details are shared.'
+          ? 'Chat opens after your platform fee PayNow is confirmed.'
           : 'Chat opens after your PayNow payment is confirmed.',
     }
   }
