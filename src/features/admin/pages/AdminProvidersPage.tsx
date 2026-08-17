@@ -18,10 +18,17 @@ export function AdminProvidersPage() {
   const deleteProvider = useDeleteProvider()
   const [actionError, setActionError] = useState('')
 
-  const toggleVerified = async (providerId: string, isVerified: boolean, hasPhoto: boolean) => {
+  const toggleVerified = async (
+    providerId: string,
+    businessName: string,
+    isVerified: boolean,
+    hasPhoto: boolean,
+  ) => {
     if (!isVerified && !hasPhoto) {
-      setActionError('Provider must upload a profile photo before you can verify them.')
-      return
+      const proceed = window.confirm(
+        `${businessName} has not uploaded a profile photo yet. Verify this provider anyway?`,
+      )
+      if (!proceed) return
     }
 
     setActionError('')
@@ -55,7 +62,8 @@ export function AdminProvidersPage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Providers</h1>
       <p className="mt-1 text-slate-600">
-        Review profile photos, contact details, payments, and verification status.
+        Review profile photos, contact details, payments, and verification status. A profile photo
+        is recommended before verification, but not required.
       </p>
 
       {actionError && (
@@ -81,7 +89,6 @@ export function AdminProvidersPage() {
             <tbody className="divide-y divide-slate-100">
               {providers?.map((p) => {
                 const hasPhoto = Boolean(p.avatarUrl)
-                const canVerify = p.isVerified || hasPhoto
 
                 return (
                   <tr key={p.id}>
@@ -122,11 +129,11 @@ export function AdminProvidersPage() {
                       <div className="flex flex-wrap items-center gap-3">
                         <button
                           type="button"
-                          onClick={() => toggleVerified(p.id, p.isVerified, hasPhoto)}
-                          disabled={actionPending || (!p.isVerified && !canVerify)}
+                          onClick={() => toggleVerified(p.id, p.businessName, p.isVerified, hasPhoto)}
+                          disabled={actionPending}
                           title={
                             !p.isVerified && !hasPhoto
-                              ? 'Provider must upload a profile photo first'
+                              ? 'No profile photo yet — you can still verify'
                               : undefined
                           }
                           className="text-nexo-700 hover:underline disabled:cursor-not-allowed disabled:opacity-50"

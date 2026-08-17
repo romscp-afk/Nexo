@@ -247,6 +247,14 @@ export const adminService = {
   },
 
   async listProviders(): Promise<AuthResult<AdminProvider[]>> {
+    const sync = await supabase.rpc('admin_sync_provider_listings')
+    if (
+      sync.error &&
+      !/admin_sync_provider_listings|42883|PGRST202/i.test(sync.error.message)
+    ) {
+      return { data: [], error: sync.error.message }
+    }
+
     const { data, error } = await supabase
       .from('providers')
       .select('*')
@@ -317,58 +325,17 @@ export const adminService = {
   },
 
   async setProviderVerified(providerId: string, isVerified: boolean): Promise<AuthResult<AdminProvider>> {
-    if (isVerified) {
-      const { data: providerRow, error: providerError } = await supabase
-        .from('providers')
-        .select('user_id')
-        .eq('id', providerId)
-        .maybeSingle()
-
-      if (providerError || !providerRow) {
-        return {
-          data: null as unknown as AdminProvider,
-          error: providerError?.message ?? 'Provider not found',
-        }
-      }
-
-      const { data: profileRow, error: profileError } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .eq('user_id', providerRow.user_id)
-        .maybeSingle()
-
-      if (profileError) {
-        return { data: null as unknown as AdminProvider, error: profileError.message }
-      }
-
-      if (!profileRow?.avatar_url) {
-        return {
-          data: null as unknown as AdminProvider,
-          error: 'Provider must upload a profile photo before verification.',
-        }
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('providers')
-      .update({ is_verified: isVerified })
-      .eq('id', providerId)
-      .select('*')
-      .single()
+    const { data, error } = await supabase.rpc('admin_set_provider_verified', {
+      p_provider_id: providerId,
+      p_is_verified: isVerified,
+    })
 
     if (error) return { data: null as unknown as AdminProvider, error: error.message }
-
-    await supabase.rpc('log_audit_action', {
-      p_action: isVerified ? 'verify_provider' : 'unverify_provider',
-      p_entity_type: 'provider',
-      p_entity_id: providerId,
-      p_details: {},
-    })
 
     const listing = mapAdminProvider(data as ProviderRow)
     const { data: profile } = await supabase
       .from('profiles')
-      .select('avatar_url')
+      .select('avatar_url, phone, whatsapp')
       .eq('user_id', listing.userId)
       .maybeSingle()
 
@@ -376,6 +343,9 @@ export const adminService = {
       data: {
         ...listing,
         avatarUrl: (profile?.avatar_url as string | null) ?? listing.avatarUrl,
+        phone: (profile?.phone as string | null) ?? null,
+        whatsApp: (profile?.whatsapp as string | null) ?? null,
+        paymentSummary: emptyAdminProviderPaymentSummary(),
       },
       error: null,
     }

@@ -58,8 +58,8 @@ export function ProviderVerificationPhoto({
           </p>
 
           {!avatarUrl && (
-            <p className="mt-2 text-sm font-medium text-amber-800" role="status">
-              Required before admin verification
+            <p className="mt-2 text-sm text-amber-800" role="status">
+              Recommended before admin verification
             </p>
           )}
 
