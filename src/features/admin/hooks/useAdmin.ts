@@ -60,6 +60,21 @@ export function useSetUserActive() {
   })
 }
 
+export function useSetUserRole() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: 'customer' | 'provider' | 'admin' }) => {
+      const { data, error } = await adminService.setUserRole(userId, role)
+      if (error) throw new Error(error)
+      return data
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
+      void queryClient.invalidateQueries({ queryKey: ['providers'] })
+    },
+  })
+}
+
 export function useDeleteUser() {
   const queryClient = useQueryClient()
   return useMutation({

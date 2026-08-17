@@ -1,18 +1,22 @@
 import { supabase } from '@/shared/lib/supabase'
 import type { AuthResult } from '@/shared/services/authService'
+import type { UserRole } from '@/shared/lib/constants'
 import type { ProfileRow } from '@/shared/types/database'
 import type { ProviderRow } from '@/shared/types/catalog'
 import {
   mapAdminBooking,
   mapAdminProvider,
   mapAdminUser,
+  emptyAdminProviderPaymentSummary,
   type AdminBooking,
   type AdminProvider,
+  type AdminProviderPaymentSummary,
   type AdminStats,
   type AdminReports,
   type AdminUser,
 } from '@/shared/types/admin'
 import { mapActivityLog, type ActivityLog, type ActivityLogRow } from '@/shared/types/activity'
+import type { PaymentKind, PaymentStatus } from '@/shared/types/payment'
 
 function relationField<T extends Record<string, unknown>>(
   value: T | T[] | null | undefined,
@@ -22,6 +26,44 @@ function relationField<T extends Record<string, unknown>>(
   if (!row) return null
   const field = row[key]
   return typeof field === 'string' ? field : null
+}
+
+type ProviderBookingPaymentRow = {
+  provider_id: string
+  payments:
+    | { status: PaymentStatus; payment_kind: PaymentKind | null }[]
+    | { status: PaymentStatus; payment_kind: PaymentKind | null }
+    | null
+}
+
+function paymentRowsFromBooking(row: ProviderBookingPaymentRow) {
+  if (!row.payments) return []
+  return Array.isArray(row.payments) ? row.payments : [row.payments]
+}
+
+function accumulateProviderPayments(
+  summaries: Map<string, AdminProviderPaymentSummary>,
+  rows: ProviderBookingPaymentRow[],
+) {
+  for (const row of rows) {
+    const summary = summaries.get(row.provider_id) ?? emptyAdminProviderPaymentSummary()
+    for (const payment of paymentRowsFromBooking(row)) {
+      const status = payment.status
+      if (status === 'pending') summary.pending += 1
+      else if (status === 'submitted') summary.submitted += 1
+      else if (status === 'paid') summary.paid += 1
+      else if (status === 'failed') summary.failed += 1
+      else if (status === 'refunded') summary.refunded += 1
+
+      if (
+        payment.payment_kind === 'provider_admin_fee' &&
+        (status === 'pending' || status === 'submitted')
+      ) {
+        summary.adminFeeDue += 1
+      }
+    }
+    summaries.set(row.provider_id, summary)
+  }
 }
 
 export const adminService = {
@@ -194,6 +236,16 @@ export const adminService = {
     return { data: mapAdminUser(data as ProfileRow), error: null }
   },
 
+  async setUserRole(userId: string, role: UserRole): Promise<AuthResult<AdminUser>> {
+    const { data, error } = await supabase.rpc('admin_set_user_role', {
+      p_user_id: userId,
+      p_role: role,
+    })
+
+    if (error) return { data: null as unknown as AdminUser, error: error.message }
+    return { data: mapAdminUser(data as ProfileRow), error: null }
+  },
+
   async listProviders(): Promise<AuthResult<AdminProvider[]>> {
     const { data, error } = await supabase
       .from('providers')
@@ -205,21 +257,49 @@ export const adminService = {
     const listings = (data as ProviderRow[]).map(mapAdminProvider)
     if (!listings.length) return { data: listings, error: null }
 
+    const providerIds = listings.map((p) => p.id)
     const userIds = listings.map((p) => p.userId)
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, avatar_url')
-      .in('user_id', userIds)
 
-    const avatarByUser = new Map(
-      (profiles ?? []).map((p) => [p.user_id as string, (p.avatar_url as string | null) ?? null]),
+    const [{ data: profiles }, { data: bookingPayments }] = await Promise.all([
+      supabase.from('profiles').select('user_id, avatar_url, phone, whatsapp').in('user_id', userIds),
+      supabase
+        .from('bookings')
+        .select('provider_id, payments ( status, payment_kind )')
+        .in('provider_id', providerIds),
+    ])
+
+    const profileByUser = new Map(
+      (profiles ?? []).map((p) => [
+        p.user_id as string,
+        {
+          avatarUrl: (p.avatar_url as string | null) ?? null,
+          phone: (p.phone as string | null) ?? null,
+          whatsApp: (p.whatsapp as string | null) ?? null,
+        },
+      ]),
+    )
+
+    const paymentSummaryByProvider = new Map<string, AdminProviderPaymentSummary>()
+    for (const providerId of providerIds) {
+      paymentSummaryByProvider.set(providerId, emptyAdminProviderPaymentSummary())
+    }
+    accumulateProviderPayments(
+      paymentSummaryByProvider,
+      (bookingPayments ?? []) as ProviderBookingPaymentRow[],
     )
 
     return {
-      data: listings.map((provider) => ({
-        ...provider,
-        avatarUrl: avatarByUser.get(provider.userId) ?? provider.avatarUrl,
-      })),
+      data: listings.map((provider) => {
+        const profile = profileByUser.get(provider.userId)
+        return {
+          ...provider,
+          avatarUrl: profile?.avatarUrl ?? provider.avatarUrl,
+          phone: profile?.phone ?? null,
+          whatsApp: profile?.whatsApp ?? null,
+          paymentSummary:
+            paymentSummaryByProvider.get(provider.id) ?? emptyAdminProviderPaymentSummary(),
+        }
+      }),
       error: null,
     }
   },

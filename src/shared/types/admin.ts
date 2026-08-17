@@ -30,7 +30,31 @@ export type AdminReports = {
 
 export type AdminUser = UserProfile
 
-export type AdminProvider = ProviderListing
+export type AdminProviderPaymentSummary = {
+  pending: number
+  submitted: number
+  paid: number
+  failed: number
+  refunded: number
+  adminFeeDue: number
+}
+
+export type AdminProvider = ProviderListing & {
+  phone: string | null
+  whatsApp: string | null
+  paymentSummary: AdminProviderPaymentSummary
+}
+
+export function emptyAdminProviderPaymentSummary(): AdminProviderPaymentSummary {
+  return {
+    pending: 0,
+    submitted: 0,
+    paid: 0,
+    failed: 0,
+    refunded: 0,
+    adminFeeDue: 0,
+  }
+}
 
 export type AdminBooking = Booking & {
   customerEmail?: string
@@ -70,5 +94,10 @@ export function mapAdminUser(row: ProfileRow): AdminUser {
 }
 
 export function mapAdminProvider(row: ProviderRow): AdminProvider {
-  return mapProviderListing(row)
+  return {
+    ...mapProviderListing(row),
+    phone: null,
+    whatsApp: null,
+    paymentSummary: emptyAdminProviderPaymentSummary(),
+  }
 }

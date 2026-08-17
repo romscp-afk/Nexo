@@ -31,6 +31,7 @@
     "setup:booking-chat-realtime": "node scripts/apply-booking-chat-realtime.mjs",
     "setup:admin-chat-email": "node scripts/apply-admin-chat-email.mjs",
     "setup:admin-delete": "node scripts/apply-admin-delete.mjs",
+    "setup:admin-set-user-role": "node scripts/apply-admin-set-user-role.mjs",
     "setup:cleaning-price": "node scripts/apply-cleaning-price.mjs",
     "setup:contact-messages": "node scripts/apply-contact-messages.mjs",
     "setup:provider-avatars": "node scripts/apply-provider-avatars.mjs",

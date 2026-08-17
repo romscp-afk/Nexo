@@ -4,6 +4,10 @@ import {
   useDeleteProvider,
   useSetProviderVerified,
 } from '@/features/admin/hooks/useAdmin'
+import {
+  AdminContactCell,
+  AdminProviderPaymentStatus,
+} from '@/features/admin/components/AdminProviderGridCells'
 import { ProviderAvatar } from '@/features/providers/components/ProviderAvatar'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
@@ -51,20 +55,23 @@ export function AdminProvidersPage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Providers</h1>
       <p className="mt-1 text-slate-600">
-        Review profile photos, verify providers, remove listings, and monitor activity.
+        Review profile photos, contact details, payments, and verification status.
       </p>
 
       {actionError && (
         <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{actionError}</p>
       )}
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <QueryState loading={isLoading} error={error} empty={!providers?.length}>
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Photo</th>
                 <th className="px-4 py-3 font-medium">Business</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">WhatsApp</th>
+                <th className="px-4 py-3 font-medium">Payment status</th>
                 <th className="px-4 py-3 font-medium">Rating</th>
                 <th className="px-4 py-3 font-medium">Hourly rate</th>
                 <th className="px-4 py-3 font-medium">Verified</th>
@@ -97,6 +104,15 @@ export function AdminProvidersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 font-medium">{p.businessName}</td>
+                    <td className="px-4 py-3">
+                      <AdminContactCell value={p.phone} kind="phone" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <AdminContactCell value={p.whatsApp} kind="whatsapp" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <AdminProviderPaymentStatus summary={p.paymentSummary} />
+                    </td>
                     <td className="px-4 py-3">
                       {p.ratingAvg.toFixed(1)} ({p.ratingCount})
                     </td>
