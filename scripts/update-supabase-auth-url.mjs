@@ -11,7 +11,7 @@ const token = requireAccessToken(fileEnv)
 const siteUrl =
   process.env.VITE_SITE_URL?.replace(/\/$/, '') ||
   fileEnv.VITE_SITE_URL?.replace(/\/$/, '') ||
-  'https://nexo-service-sepia.vercel.app'
+  'https://nexoservice.online'
 
 const uriAllowList = [
   siteUrl,

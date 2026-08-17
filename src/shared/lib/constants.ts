@@ -1,11 +1,12 @@
 export const APP_NAME = 'Nexo'
 export const APP_TAGLINE = 'Connecting Trust. Simplifying Life'
-export const DEVELOPER_NAME = 'Roms'
+export const DEVELOPER_NAME = 'Uxguard'
+export const DEVELOPER_URL = 'https://uxguard.studio'
 
-/** Production site URL (Vercel). Override with VITE_SITE_URL in .env */
+/** Production site URL. Override with VITE_SITE_URL in .env */
 export const SITE_URL =
   (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') ||
-  'https://nexo-service-sepia.vercel.app'
+  'https://nexoservice.online'
 
 export function getSiteUrl(): string {
   if (typeof window !== 'undefined' && window.location.origin) {
