@@ -3,6 +3,7 @@ import { parseUnitPrices } from '@/shared/lib/pricing'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { CLEANING_CATALOG_HOURLY_RATE } from '@/shared/lib/cleaningContent'
 import { isPublicProviderListing } from '@/shared/lib/providerListing'
+import { normalizeServiceAreas } from '@/shared/lib/serviceArea'
 import {
   mapProviderListing,
   type ProviderFilters,
@@ -279,7 +280,7 @@ export const providerService = {
         bio: input.bio ?? null,
         years_experience: input.yearsExperience,
         hourly_rate: input.hourlyRate,
-        service_areas: input.serviceAreas,
+        service_areas: normalizeServiceAreas(input.serviceAreas),
       })
       .eq('user_id', userId)
       .select('*')

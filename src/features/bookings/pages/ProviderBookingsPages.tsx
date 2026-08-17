@@ -129,7 +129,7 @@ export function ProviderBookingsPage() {
     <div className="space-y-10">
       <section>
         <h1 className="text-2xl font-bold text-slate-900">Open requests</h1>
-        <p className="mt-1 text-slate-600">Jobs broadcast to all providers in your service categories.</p>
+        <p className="mt-1 text-slate-600">Open requests go to all providers — first to accept gets the job.</p>
         <div className="mt-6">
           <QueryState loading={openLoading} error={openError} empty={!openRequests?.length} emptyMessage="No open requests in your categories right now.">
             <BookingList bookings={openRequests ?? []} detailPathPrefix="/provider/bookings" emptyMessage="No open requests." showPaymentMethod />

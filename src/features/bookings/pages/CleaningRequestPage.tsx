@@ -337,6 +337,7 @@ export function CleaningRequestPage() {
           serviceArea,
           notes: notes || undefined,
         }),
+        serviceArea,
         totalPrice: breakdown.total,
         serviceSubtotal: breakdown.serviceSubtotal,
         platformFee: breakdown.platformFee,

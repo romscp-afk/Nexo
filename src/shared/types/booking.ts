@@ -34,6 +34,7 @@ export type BookingRow = {
   pricing_snapshot: Record<string, unknown> | null
   photo_urls?: string[] | null
   payment_method: BookingPaymentMethod
+  service_area: string | null
   admin_fee: number | null
   customer_contact_shared: boolean
   created_at: string
@@ -59,6 +60,7 @@ export type Booking = {
   pricingSnapshot: Record<string, unknown> | null
   photoUrls: string[]
   paymentMethod: BookingPaymentMethod
+  serviceArea: string | null
   adminFee: number | null
   customerContactShared: boolean
   createdAt: string
@@ -97,6 +99,7 @@ export type CreateBookingInput = {
   pricingSnapshot?: Record<string, unknown>
   photoUrls?: string[]
   paymentMethod: BookingPaymentMethod
+  serviceArea?: string
 }
 
 export function mapBooking(
@@ -129,6 +132,7 @@ export function mapBooking(
     pricingSnapshot: row.pricing_snapshot ?? null,
     photoUrls: row.photo_urls ?? [],
     paymentMethod: row.payment_method ?? 'paynow',
+    serviceArea: row.service_area ?? null,
     adminFee: row.admin_fee != null ? Number(row.admin_fee) : null,
     customerContactShared: row.customer_contact_shared ?? false,
     createdAt: row.created_at,

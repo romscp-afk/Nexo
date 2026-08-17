@@ -96,6 +96,7 @@ export function RequestServicePage() {
           quantity: isPerUnit ? unitCount : undefined,
           ceilingHeight: isPerUnit ? ceilingHeight : undefined,
         }),
+        serviceArea: serviceArea || undefined,
         totalPrice: breakdown.total,
         serviceSubtotal: breakdown.serviceSubtotal,
         platformFee: breakdown.platformFee,

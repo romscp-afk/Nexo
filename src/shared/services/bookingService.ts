@@ -1,5 +1,6 @@
 import { supabase } from '@/shared/lib/supabase'
 import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import type { AuthResult } from '@/shared/services/authService'
 import {
   mapBooking,
@@ -67,6 +68,7 @@ export const bookingService = {
       address_line2: input.addressLine2 ?? null,
       postal_code: input.postalCode,
       notes: notesWithPayment,
+      service_area: input.serviceArea?.trim() || null,
       total_price: input.totalPrice,
       service_subtotal: input.serviceSubtotal,
       platform_fee: input.platformFee ?? PLATFORM_FEE_SGD,
@@ -89,6 +91,16 @@ export const bookingService = {
         .single())
     }
 
+    if (error?.message && error.message.includes('service_area')) {
+      const withoutArea = { ...payload }
+      delete (withoutArea as { service_area?: string | null }).service_area
+      ;({ data, error } = await supabase
+        .from('bookings')
+        .insert({ ...withoutArea, payment_method: input.paymentMethod })
+        .select(BOOKING_SELECT)
+        .single())
+    }
+
     if (error?.message && (error.message.includes('quantity') || error.message.includes('pricing_snapshot') || error.message.includes('service_subtotal') || error.message.includes('platform_fee'))) {
       const legacyPayload = {
         customer_id: userId,
@@ -100,6 +112,7 @@ export const bookingService = {
         address_line2: input.addressLine2 ?? null,
         postal_code: input.postalCode,
         notes: notesWithPayment,
+        service_area: input.serviceArea?.trim() || null,
         total_price: input.totalPrice,
         status: 'pending' as const,
       }
@@ -174,7 +187,19 @@ export const bookingService = {
       .eq('provider_id', provider.id)
 
     if (servicesError) return { data: [], error: servicesError.message }
-    const serviceIds = services?.map((s) => s.service_id) ?? []
+
+    let serviceIds = services?.map((s) => s.service_id as string) ?? []
+
+    if (!serviceIds.length) {
+      const { data: cleaningServices, error: cleaningError } = await supabase
+        .from('services')
+        .select('id, service_categories!inner ( slug )')
+        .eq('service_categories.slug', PRIMARY_CATEGORY_SLUG)
+
+      if (cleaningError) return { data: [], error: cleaningError.message }
+      serviceIds = cleaningServices?.map((s) => s.id as string) ?? []
+    }
+
     if (!serviceIds.length) return { data: [], error: null }
 
     const { data, error } = await supabase
