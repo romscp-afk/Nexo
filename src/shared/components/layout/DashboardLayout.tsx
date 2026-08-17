@@ -42,6 +42,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { to: '/admin/payments', label: 'PayNow payments' },
     { to: '/admin/reports', label: 'Analytics' },
     { to: '/admin/chats', label: 'Booking chats' },
+    { to: '/admin/contact', label: 'Contact messages' },
     { to: '/admin/activity', label: 'Activity log' },
     { to: '/admin/bookings', label: 'Bookings' },
     { to: '/admin/users', label: 'Users' },

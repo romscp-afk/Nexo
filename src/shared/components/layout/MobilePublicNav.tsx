@@ -78,6 +78,9 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                 <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
                   Find a Cleaner
                 </Link>
+                <Link to="/support" className={linkClass} onClick={close}>
+                  Contact
+                </Link>
 
                 <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Account

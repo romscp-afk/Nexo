@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminService } from '@/shared/services/adminService'
+import { supportContactService } from '@/shared/services/supportContactService'
 
 export function useAdminStats() {
   return useQuery({
@@ -117,6 +118,17 @@ export function useAdminReports() {
     queryKey: ['admin', 'reports'],
     queryFn: async () => {
       const { data, error } = await adminService.getReports()
+      if (error) throw new Error(error)
+      return data
+    },
+  })
+}
+
+export function useAdminContactMessages() {
+  return useQuery({
+    queryKey: ['admin', 'contact-messages'],
+    queryFn: async () => {
+      const { data, error } = await supportContactService.listForAdmin()
       if (error) throw new Error(error)
       return data
     },

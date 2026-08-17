@@ -32,6 +32,8 @@
     "setup:admin-chat-email": "node scripts/apply-admin-chat-email.mjs",
     "setup:admin-delete": "node scripts/apply-admin-delete.mjs",
     "setup:cleaning-price": "node scripts/apply-cleaning-price.mjs",
+    "setup:contact-messages": "node scripts/apply-contact-messages.mjs",
+    "deploy:submit-contact": "node scripts/deploy-submit-contact.mjs",
     "deploy:chat-email": "node scripts/deploy-chat-email.mjs",
     "setup:chat-email-resend": "node scripts/setup-chat-email-resend.mjs",
     "setup:provider-availability": "node scripts/apply-provider-availability.mjs",

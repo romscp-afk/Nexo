@@ -35,6 +35,8 @@ import { AdminPaymentsPage } from '@/features/admin/pages/AdminPaymentsPage'
 import { AdminActivityPage } from '@/features/admin/pages/AdminActivityPage'
 import { AdminChatsPage, AdminChatDetailPage } from '@/features/admin/pages/AdminChatsPage'
 import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage'
+import { AdminContactPage } from '@/features/admin/pages/AdminContactPage'
+import { SupportContactPage } from '@/features/support/pages/SupportContactPage'
 import { ContactEntryPage } from '@/features/contact/pages/ContactEntryPage'
 import { ContactReportPage } from '@/features/contact/pages/ContactReportPage'
 import { GatheringLayout } from '@/features/gathering/components/GatheringLayout'
@@ -52,6 +54,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/how-it-works', element: <HowNexoWorksPage /> },
+      { path: '/support', element: <SupportContactPage /> },
       { path: '/terms', element: <TermsPage /> },
       { path: '/privacy', element: <PrivacyPage /> },
       { path: '/cancellation-policy', element: <CancellationPolicyPage /> },
@@ -145,6 +148,7 @@ export const router = createBrowserRouter([
               { path: '/admin/reports', element: <AdminReportsPage /> },
               { path: '/admin/chats', element: <AdminChatsPage /> },
               { path: '/admin/chats/:bookingId', element: <AdminChatDetailPage /> },
+              { path: '/admin/contact', element: <AdminContactPage /> },
               { path: '/admin/activity', element: <AdminActivityPage /> },
             ],
           },

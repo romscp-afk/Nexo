@@ -12,7 +12,6 @@ const footerLinks = [
   { label: 'How Nexo Works', to: '/how-it-works' },
   { label: 'Cleaning Services', to: `/services/${PRIMARY_CATEGORY_SLUG}` },
   { label: 'Become a Provider', to: '/register?role=provider' },
-  { label: 'Contact / Support', to: '/contact' },
   { label: 'Terms of Service', to: '/terms' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Cancellation Policy', to: '/cancellation-policy' },

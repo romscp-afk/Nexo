@@ -18,8 +18,8 @@ export function LegalPlaceholderPage({ title }: LegalPlaceholderPageProps) {
       </div>
       <p className="mt-6 text-sm text-slate-600">
         For urgent questions, visit{' '}
-        <Link to="/contact" className="font-medium text-nexo-700 hover:underline">
-          Contact / Support
+        <Link to="/support" className="font-medium text-nexo-700 hover:underline">
+          Contact
         </Link>
         .
       </p>

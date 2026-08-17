@@ -52,6 +52,15 @@ export function AppLayout() {
             >
               Find a Cleaner
             </Link>
+            <Link
+              to="/support"
+              className={cn(
+                'transition',
+                isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
+              )}
+            >
+              Contact
+            </Link>
             {user ? (
               <>
                 <Link
