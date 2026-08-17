@@ -1,7 +1,23 @@
 /** Phase 1 cleaning copy — TODO: confirm legal/policy text with business before production. */
 
-/** Customer-facing catalog hourly rate for standard home cleaning (SGD). */
-export const CLEANING_CATALOG_HOURLY_RATE = 15
+/** Duration-based hourly rates for standard home cleaning (SGD). Longer bookings = lower hourly rate. */
+export const CLEANING_DURATION_HOURLY_RATES: Record<
+  (typeof CLEANING_BOOKING_DURATION_HOURS)[number],
+  number
+> = {
+  2: 23,
+  3: 20,
+  4: 17.5,
+}
+
+/** Lowest tier — used for marketing "from" price. */
+export const CLEANING_CATALOG_HOURLY_RATE = CLEANING_DURATION_HOURLY_RATES[4]
+
+export function getCleaningHourlyRateForDuration(durationHours: number): number {
+  if (durationHours === 4) return CLEANING_DURATION_HOURLY_RATES[4]
+  if (durationHours === 3) return CLEANING_DURATION_HOURLY_RATES[3]
+  return CLEANING_DURATION_HOURLY_RATES[2]
+}
 
 export const MIN_BOOKING_HOURS = 2
 
@@ -67,7 +83,7 @@ export const CLEANING_SERVICE_CONTENT = {
   ],
   propertyTypes: ['HDB', 'Condo', 'Landed home'],
   pricingNote:
-    'Prices are quoted per hour per booking. Final cost depends on duration and the cleaner you select. A platform fee may apply at checkout.',
+    'Hourly rate depends on booking length: $23/hr for 2 hours, $20/hr for 3 hours, $17.50/hr for 4 hours. A platform fee may apply at checkout.',
   minDuration: `${MIN_BOOKING_HOURS} hours minimum per booking`,
   supplies:
     'You can bring your own supplies at no extra charge, or add a supplies fee for the cleaner to bring them.',
@@ -84,7 +100,7 @@ export const CLEANING_SERVICE_CONTENT = {
     },
     {
       q: 'How is pricing calculated?',
-      a: 'Hourly rates are set by each cleaner. Your estimate includes duration and any platform fee shown at checkout.',
+      a: 'Rates vary by duration: $23/hr (2 hours), $20/hr (3 hours), $17.50/hr (4 hours), plus any supplies fee and platform fee shown at checkout.',
     },
     {
       q: 'Do I need an account?',

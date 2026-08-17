@@ -8,7 +8,7 @@ import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { CleaningPriceLabel } from '@/shared/components/CleaningPriceLabel'
 import { formatCurrency } from '@/shared/lib/utils'
-import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
+import { getCleaningHourlyRateForDuration } from '@/shared/lib/cleaningContent'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { buildPriceBreakdown } from '@/shared/lib/pricing'
 import { appendCleaningBookingNotes } from '@/shared/lib/bookingNotes'
@@ -128,7 +128,7 @@ export function CleaningRequestPage() {
 
   const breakdown = useMemo(() => {
     if (!selectedService) return null
-    const hourlyRate = getCleaningCatalogHourlyRate(selectedService.basePrice)
+    const hourlyRate = getCleaningHourlyRateForDuration(duration)
     const extraLines =
       suppliesSurcharge > 0
         ? [{ label: 'Cleaning supplies (cleaner brings)', amount: suppliesSurcharge }]
@@ -522,6 +522,9 @@ export function CleaningRequestPage() {
                             />
                             <span className="text-2xl font-bold text-nexo-800">{hours}</span>
                             <span className="text-sm text-slate-600">hours</span>
+                            <span className="mt-1 text-xs font-medium text-nexo-700">
+                              {formatCurrency(getCleaningHourlyRateForDuration(hours))}/hr
+                            </span>
                           </label>
                         ))}
                       </div>

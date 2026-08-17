@@ -16,7 +16,7 @@ import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
-import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
+import { getCleaningHourlyRateForDuration } from '@/shared/lib/cleaningContent'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function BookProviderPage() {
@@ -69,10 +69,10 @@ export function BookProviderPage() {
     if (!selectedService || !provider) return null
     const isCleaning = selectedService.categorySlug === PRIMARY_CATEGORY_SLUG
     const hourlyRate = isCleaning
-      ? getCleaningCatalogHourlyRate(selectedService.priceFrom)
+      ? getCleaningHourlyRateForDuration(duration)
       : provider.hourlyRate
     const priceFrom = isCleaning
-      ? getCleaningCatalogHourlyRate(selectedService.priceFrom)
+      ? getCleaningHourlyRateForDuration(duration)
       : selectedService.priceFrom
     return buildPriceBreakdown({
       pricingModel: selectedService.pricingModel,

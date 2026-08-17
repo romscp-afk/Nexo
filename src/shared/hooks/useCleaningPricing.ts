@@ -4,6 +4,7 @@ import { useProviders } from '@/features/providers/hooks/useProviders'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import {
   CLEANING_CATALOG_HOURLY_RATE,
+  CLEANING_DURATION_HOURLY_RATES,
   MIN_BOOKING_HOURS,
 } from '@/shared/lib/cleaningContent'
 import { formatCurrency } from '@/shared/lib/utils'
@@ -41,6 +42,7 @@ export function useCleaningPricing(): CleaningPricingDisplay {
     const standard =
       services?.find((s) => s.slug === 'cleaning-standard') ?? services?.[0] ?? null
     const catalogBasePrice = getCleaningCatalogHourlyRate(standard?.basePrice)
+    const maxTierRate = Math.max(...Object.values(CLEANING_DURATION_HOURLY_RATES))
 
     const providerRates = (providers ?? [])
       .flatMap((p) => [
@@ -61,14 +63,14 @@ export function useCleaningPricing(): CleaningPricingDisplay {
     const headline = `From ${formatCurrency(catalogBasePrice)}/hr`
 
     const detail = variesByCleaner
-      ? `Catalog from ${formatCurrency(catalogBasePrice)}/hr · Some cleaners may quote differently · ${MIN_BOOKING_HOURS} hr minimum`
-      : `Per hour · ${MIN_BOOKING_HOURS} hr minimum · Subject to cleaner availability`
+      ? `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr by duration · Some cleaners may quote differently · ${MIN_BOOKING_HOURS} hr minimum`
+      : `${formatCurrency(catalogBasePrice)}–${formatCurrency(maxTierRate)}/hr depending on booking length · ${MIN_BOOKING_HOURS} hr minimum`
 
     return {
       loading,
       catalogBasePrice,
       minHourly: catalogBasePrice,
-      maxHourly: catalogBasePrice,
+      maxHourly: maxTierRate,
       variesByCleaner,
       hasActiveCleaners,
       cleanerCount,
