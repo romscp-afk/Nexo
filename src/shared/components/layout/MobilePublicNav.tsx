@@ -73,10 +73,10 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                   Explore
                 </p>
                 <Link to={`/services/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                  Home cleaning
+                  Cleaning Services
                 </Link>
                 <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                  Find cleaners
+                  Find a Cleaner
                 </Link>
 
                 <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -100,7 +100,7 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                       className={cn(linkClass, 'mt-2 bg-nexo-700 text-white active:bg-nexo-800')}
                       onClick={close}
                     >
-                      Create account
+                      Get Started
                     </Link>
                   </>
                 )}

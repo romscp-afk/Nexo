@@ -29,7 +29,7 @@ function HomeCategoryCard({
   if (featured && launched) {
     return (
       <Link
-        to={`/services/${category.slug}`}
+        to={`/services/${category.slug}/request`}
         className={cn(
           'group relative col-span-1 flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br p-8 text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl sm:col-span-2 lg:col-span-3',
           gradient,
@@ -49,7 +49,7 @@ function HomeCategoryCard({
           )}
         </div>
         <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-nexo-400">
-          Book now <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          Request cleaning <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
         </span>
       </Link>
     )
@@ -99,11 +99,11 @@ export function HomeServicesGrid() {
               Home cleaning
             </h2>
             <p className="mt-2 max-w-lg text-nexo-800/70">
-              Book verified cleaners across Singapore.
+              Request home cleaning across Singapore with clear pricing.
             </p>
           </div>
           <Link
-            to={`/services/${PRIMARY_CATEGORY_SLUG}`}
+            to={`/services/${PRIMARY_CATEGORY_SLUG}/request`}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-nexo-600 transition hover:text-nexo-800"
           >
             Book cleaning

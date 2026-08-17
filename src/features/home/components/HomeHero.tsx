@@ -1,13 +1,8 @@
 import { Link } from 'react-router-dom'
-import {
-  ArrowRight,
-  MapPin,
-  ShieldCheck,
-  Sparkles,
-  Star,
-} from 'lucide-react'
-import { APP_NAME, APP_TAGLINE } from '@/shared/lib/constants'
-import { PRIMARY_CATEGORY_SLUG, PHASE1_TAGLINE } from '@/shared/lib/catalogConfig'
+import { ArrowRight } from 'lucide-react'
+import { BOOKING_CONFIRMATION } from '@/shared/lib/cleaningContent'
+import { CleaningPriceInline, CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { trackEvent } from '@/shared/lib/analytics'
 
 export function HomeHero() {
   return (
@@ -25,52 +20,36 @@ export function HomeHero() {
       <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
           <div className="relative z-10">
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-nexo-champagne backdrop-blur-sm">
-              <Sparkles className="h-4 w-4 text-nexo-400" />
-              Singapore home cleaning — book in minutes
-            </div>
-
-            <h1 className="animate-fade-up-delay-1 mt-6 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-              A cleaner home,
-              <span className="mt-1 block bg-gradient-to-r from-nexo-400 via-nexo-accent to-white bg-clip-text text-transparent">
-                without the hassle.
-              </span>
-            </h1>
-
-            <p className="animate-fade-up-delay-2 mt-5 max-w-lg text-lg leading-relaxed text-nexo-mint/80">
-              {PHASE1_TAGLINE}. {APP_TAGLINE}. Verified cleaners, transparent pricing, PayNow or cash.
+            <p className="hero-enter inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-nexo-champagne backdrop-blur-sm">
+              Home cleaning services in Singapore
             </p>
 
-            <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
-              <Link
-                to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
-                className="group inline-flex items-center gap-2 rounded-full bg-nexo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800"
+            <h1 className="hero-enter mt-6 text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+              Reliable home cleaning, booked around your schedule.
+            </h1>
+
+            <p className="hero-enter mt-5 max-w-lg text-lg leading-relaxed text-nexo-mint/80">
+              Request trusted home-cleaning services with clear pricing and a simple booking
+              experience.
+            </p>
+
+            <div className="hero-enter mt-8 flex flex-wrap gap-3">
+              <CleaningRequestLink
+                onClick={() => trackEvent('request_cleaning_clicked', { source: 'hero' })}
+                className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-nexo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Book a cleaner
+                Request a cleaning
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </Link>
+              </CleaningRequestLink>
               <Link
-                to={`/services/${PRIMARY_CATEGORY_SLUG}`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+                to="/how-it-works"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                View cleaning services
+                How Nexo works
               </Link>
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-nexo-mint/75">
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-nexo-400" />
-                Verified cleaners
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                Rated & reviewed
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-nexo-400" />
-                Island-wide
-              </span>
-            </div>
+            <p className="mt-8 max-w-lg text-sm text-nexo-mint/70">{BOOKING_CONFIRMATION}</p>
           </div>
 
           <div className="relative mx-auto h-[300px] w-full max-w-md sm:h-[360px] lg:mx-0 lg:max-w-none">
@@ -81,43 +60,16 @@ export function HomeHero() {
                 </span>
               </div>
               <p className="mt-4 text-center text-lg font-bold text-nexo-950">Standard Home Cleaning</p>
-              <p className="mt-1 text-center text-xs text-nexo-800/70">{APP_NAME} · {APP_TAGLINE}</p>
-              <p className="mt-4 text-center text-xs font-medium text-nexo-600">from $15/hr · PayNow accepted</p>
+              <p className="mt-1 text-center text-xs text-nexo-800/70">Singapore · Phase 1</p>
+              <div className="mt-4 text-center text-xs font-medium text-nexo-600">
+                <CleaningPriceInline />
+              </div>
             </div>
 
             <div
               aria-hidden
               className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-nexo-400/30 sm:h-72 sm:w-72"
             />
-          </div>
-        </div>
-      </div>
-
-      <div className="relative border-t border-white/10 bg-nexo-ink/50 py-3">
-        <div className="flex overflow-hidden">
-          <div className="animate-marquee flex shrink-0 items-center gap-8 whitespace-nowrap px-4 text-sm text-nexo-mint/70">
-            {[...Array(2)].map((_, copy) => (
-              <span key={copy} className="flex items-center gap-8">
-                {[
-                  'Deep cleaning',
-                  'Move-out cleaning',
-                  'Weekly cleaning',
-                  'Tampines',
-                  'Jurong',
-                  'Woodlands',
-                  'Bedok',
-                  'PayNow',
-                  'Verified pros',
-                ].map((label) => (
-                  <span key={`${copy}-${label}`} className="inline-flex items-center gap-1.5">
-                    {label.startsWith('T') || label.startsWith('J') || label.startsWith('W') || label.startsWith('B') ? (
-                      <MapPin className="h-3 w-3" />
-                    ) : null}
-                    {label}
-                  </span>
-                ))}
-              </span>
-            ))}
           </div>
         </div>
       </div>

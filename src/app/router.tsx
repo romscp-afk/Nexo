@@ -9,7 +9,7 @@ import { CategoryPage } from '@/features/catalog/pages/CategoryPage'
 import { ProvidersPage } from '@/features/providers/pages/ProvidersPage'
 import { ProviderDetailPage } from '@/features/providers/pages/ProviderDetailPage'
 import { ProviderProfilePage } from '@/features/providers/pages/ProviderProfilePage'
-import { RequestServicePage } from '@/features/bookings/pages/RequestServicePage'
+import { CleaningRequestPage } from '@/features/bookings/pages/CleaningRequestPage'
 import { BookProviderPage } from '@/features/bookings/pages/BookProviderPage'
 import {
   CustomerDashboardPage,
@@ -42,6 +42,8 @@ import { GatheringAdminRoute } from '@/features/gathering/guards/GatheringAdminR
 import { GatheringAdminLoginPage } from '@/features/gathering/pages/GatheringAdminLoginPage'
 import { GatheringIntroPage } from '@/features/gathering/pages/GatheringIntroPage'
 import { GatheringThankYouPage } from '@/features/gathering/pages/GatheringThankYouPage'
+import { HowNexoWorksPage } from '@/features/home/pages/HowNexoWorksPage'
+import { TermsPage, PrivacyPage, CancellationPolicyPage } from '@/shared/pages/LegalPages'
 import { NotFoundPage } from '@/shared/pages/PlaceholderPages'
 
 export const router = createBrowserRouter([
@@ -49,8 +51,14 @@ export const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { path: '/', element: <HomePage /> },
+      { path: '/how-it-works', element: <HowNexoWorksPage /> },
+      { path: '/terms', element: <TermsPage /> },
+      { path: '/privacy', element: <PrivacyPage /> },
+      { path: '/cancellation-policy', element: <CancellationPolicyPage /> },
       { path: '/services', element: <Navigate to="/services/cleaning" replace /> },
       { path: '/services/:slug', element: <CategoryPage /> },
+      { path: '/services/cleaning/request', element: <CleaningRequestPage /> },
+      { path: '/services/:slug/request', element: <Navigate to="/services/cleaning/request" replace /> },
       { path: '/providers', element: <Navigate to="/providers/category/cleaning" replace /> },
       { path: '/providers/category/:slug', element: <ProvidersPage /> },
       { path: '/providers/:id', element: <ProviderDetailPage /> },
@@ -59,10 +67,7 @@ export const router = createBrowserRouter([
         children: [
           {
             element: <RoleRoute roles={['customer']} />,
-            children: [
-              { path: '/services/:slug/request', element: <RequestServicePage /> },
-              { path: '/providers/:id/book', element: <BookProviderPage /> },
-            ],
+            children: [{ path: '/providers/:id/book', element: <BookProviderPage /> }],
           },
         ],
       },

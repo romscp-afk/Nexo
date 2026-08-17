@@ -26,12 +26,14 @@ export function ProviderCard({ provider }: { provider: ProviderListing }) {
           )}
         </div>
         <div className="shrink-0 text-right text-sm">
-          <div className="flex items-center justify-end gap-1 text-amber-600">
-            <Star className="h-4 w-4 fill-current" />
-            <span className="font-medium">{provider.ratingAvg.toFixed(1)}</span>
-            <span className="text-slate-400">({provider.ratingCount})</span>
-          </div>
-          <p className="mt-1 text-slate-500">from {formatCurrency(minPrice)}</p>
+          {provider.ratingCount > 0 && (
+            <div className="flex items-center justify-end gap-1 text-amber-600">
+              <Star className="h-4 w-4 fill-current" />
+              <span className="font-medium">{provider.ratingAvg.toFixed(1)}</span>
+              <span className="text-slate-400">({provider.ratingCount})</span>
+            </div>
+          )}
+          <p className="mt-1 text-slate-500">from {formatCurrency(minPrice)}/hr</p>
         </div>
       </div>
 

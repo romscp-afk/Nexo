@@ -1,39 +1,56 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Users, CalendarCheck, BadgeCheck, Wallet } from 'lucide-react'
-import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { ArrowRight, CalendarCheck, Wallet } from 'lucide-react'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
-import { useProviders } from '@/features/providers/hooks/useProviders'
+import { BOOKING_CONFIRMATION } from '@/shared/lib/cleaningContent'
+import { useCleaningPricing } from '@/shared/hooks/useCleaningPricing'
+import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 
 export function HomeTrustBar() {
-  const { data: providers } = useProviders({ categorySlug: PRIMARY_CATEGORY_SLUG })
-  const providerCount = providers?.length ?? 0
+  const pricing = useCleaningPricing()
+  const verifiedCount = pricing.hasActiveCleaners
+    ? pricing.variesByCleaner
+      ? 'Multiple'
+      : 'Available'
+    : '—'
 
   const stats = [
     {
-      value: providerCount > 0 ? String(providerCount) : '—',
-      label: providerCount === 1 ? 'Verified cleaner' : 'Verified cleaners',
-      icon: Users,
+      value: verifiedCount,
+      label: pricing.hasActiveCleaners ? 'Cleaners listed' : 'Cleaners onboarding',
     },
-    { value: String(SINGAPORE_AREAS.length), label: 'Service areas', icon: BadgeCheck },
-    { value: '24h', label: 'Fast booking', icon: CalendarCheck },
-    { value: 'PayNow', label: 'Flexible payment', icon: Wallet },
+    {
+      value: 'PayNow',
+      label: 'Flexible payment',
+      icon: Wallet,
+    },
+    {
+      value: 'Request',
+      label: 'Subject to acceptance',
+      icon: CalendarCheck,
+    },
   ]
+
   return (
     <section className="border-y border-nexo-200 bg-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-nexo-200 sm:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px bg-nexo-200 sm:grid-cols-3">
         {stats.map(({ value, label, icon: Icon }) => (
           <div
             key={label}
             className="flex flex-col items-center gap-2 bg-white px-4 py-8 text-center sm:py-10"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-nexo-100">
-              <Icon className="h-5 w-5 text-nexo-600" strokeWidth={1.75} />
-            </div>
+            {Icon && (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-nexo-100">
+                <Icon className="h-5 w-5 text-nexo-600" strokeWidth={1.75} />
+              </div>
+            )}
             <p className="text-2xl font-bold tracking-tight text-nexo-900">{value}</p>
             <p className="text-xs font-medium uppercase tracking-wider text-nexo-700/60">{label}</p>
           </div>
         ))}
       </div>
+      <p className="mx-auto max-w-3xl px-4 py-4 text-center text-xs text-slate-500">
+        {BOOKING_CONFIRMATION}
+      </p>
     </section>
   )
 }
@@ -41,18 +58,18 @@ export function HomeTrustBar() {
 const steps = [
   {
     step: '01',
-    title: 'Choose a cleaner',
-    description: 'Browse verified home cleaning providers by area, rating, and hourly rate.',
+    title: 'Request a cleaning',
+    description: 'Share your property, schedule and location. No account needed to start.',
   },
   {
     step: '02',
-    title: 'Book a slot',
-    description: 'Pick date, time, and address. See pricing upfront before you confirm.',
+    title: 'Review your estimate',
+    description: 'See hourly pricing and minimum duration before you sign in to submit.',
   },
   {
     step: '03',
-    title: 'Relax',
-    description: 'Pay via PayNow or cash. Chat with your cleaner and track the job in your dashboard.',
+    title: 'Cleaner confirms',
+    description: BOOKING_CONFIRMATION,
   },
 ]
 
@@ -65,7 +82,7 @@ export function HomeHowItWorks() {
             Simple process
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-nexo-900 sm:text-4xl">
-            Three steps to a happier home
+            Home cleaning in three steps
           </h2>
         </div>
 
@@ -73,12 +90,12 @@ export function HomeHowItWorks() {
           {steps.map(({ step, title, description }) => (
             <div
               key={step}
-              className="group relative overflow-hidden rounded-2xl border border-nexo-200 bg-nexo-50 p-8 transition hover:-translate-y-1 hover:border-nexo-400 hover:shadow-md"
+              className="group relative overflow-hidden rounded-2xl border border-nexo-200 bg-nexo-50 p-8 transition hover:-translate-y-1 hover:border-nexo-400 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               <span className="text-4xl font-black text-nexo-200">{step}</span>
               <h3 className="mt-4 text-xl font-bold text-nexo-900">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-nexo-800/70">{description}</p>
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-nexo-400 transition-all group-hover:w-full" />
+              <div className="absolute bottom-0 left-0 h-1 w-0 bg-nexo-400 transition-all group-hover:w-full motion-reduce:transition-none" />
             </div>
           ))}
         </div>
@@ -92,32 +109,21 @@ export function HomeCta() {
     <section className="bg-nexo-50 py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-ink via-nexo-deep to-nexo-800 px-8 py-16 text-center text-white shadow-xl sm:px-16">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 20% 80%, #4f46e5 0%, transparent 40%), radial-gradient(circle at 80% 20%, #2563eb 0%, transparent 35%)',
-            }}
-          />
           <div className="relative">
             <h2 className="text-3xl font-bold sm:text-4xl">Ready for a cleaner home?</h2>
             <p className="mx-auto mt-4 max-w-lg text-nexo-mint/80">
-              Join Singapore homeowners booking trusted cleaners through Nexo.
+              Request home cleaning across Singapore with clear pricing and a simple flow.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 rounded-full bg-nexo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800"
-              >
-                Create free account
+              <CleaningRequestLink className="inline-flex min-h-11 items-center gap-2 rounded-full bg-nexo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800">
+                Request a cleaning
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </CleaningRequestLink>
               <Link
-                to="/providers/category/cleaning"
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Browse cleaners
+                Find a cleaner
               </Link>
             </div>
           </div>

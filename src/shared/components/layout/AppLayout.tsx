@@ -1,4 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
@@ -8,12 +9,17 @@ import { MobilePublicNav } from '@/shared/components/layout/MobilePublicNav'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
 import { cn } from '@/shared/lib/utils'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import { recordSiteVisit } from '@/shared/lib/pwaEngagement'
 
 export function AppLayout() {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const isHome = pathname === '/'
   const showCustomerNav = user?.role === 'customer'
+
+  useEffect(() => {
+    recordSiteVisit()
+  }, [])
 
   return (
     <div className={cn('flex min-h-screen flex-col', isHome ? 'bg-nexo-pearl' : 'bg-nexo-50 text-nexo-950')}>
@@ -35,7 +41,7 @@ export function AppLayout() {
                 isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
-              Cleaning
+              Cleaning Services
             </Link>
             <Link
               to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
@@ -44,7 +50,7 @@ export function AppLayout() {
                 isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
-              Cleaners
+              Find a Cleaner
             </Link>
             {user ? (
               <>
@@ -88,7 +94,7 @@ export function AppLayout() {
                       : 'bg-nexo-700 text-white hover:bg-nexo-800',
                   )}
                 >
-                  Register
+                  Get Started
                 </Link>
               </>
             )}

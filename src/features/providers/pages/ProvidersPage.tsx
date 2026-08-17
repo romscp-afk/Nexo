@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
-import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
+import { ProviderListSkeleton, ProviderListState } from '@/features/providers/components/ProviderListStates'
+import { PageHeader } from '@/features/catalog/components/CatalogUi'
 import { useProviderFilterStore } from '@/shared/stores/filterStore'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import {
   isCategoryLaunched,
   PRIMARY_CATEGORY_SLUG,
 } from '@/shared/lib/catalogConfig'
+import { trackEvent } from '@/shared/lib/analytics'
 
 function ProviderFiltersBar({
   area,
@@ -110,6 +113,8 @@ export function ProvidersPage() {
   const { slug: routeCategorySlug } = useParams<{ slug?: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const emptyTrackedRef = useRef(false)
 
   const legacyCategory = searchParams.get('category') ?? ''
   const areaFromUrl = searchParams.get('area') ?? ''
@@ -166,17 +171,55 @@ export function ProvidersPage() {
   )
   const { data: unfilteredCategoryProviders } = useProviders(
     { categorySlug: categorySlug || storeCategorySlug || undefined },
-    { enabled: isCategoryView && Boolean(area.trim()) },
+    { enabled: isCategoryView },
   )
 
-  const hasAreaFilter = Boolean(area.trim())
-  const areaFilteredEmpty = isCategoryView && hasAreaFilter && !categoryProviders?.length && Boolean(unfilteredCategoryProviders?.length)
+  const hasFilters = Boolean(
+    area.trim() ||
+      verifiedOnly ||
+      minRating > 0 ||
+      minPrice ||
+      maxPrice,
+  )
 
   const activeCategory = categories?.find((category) => category.slug === categorySlug)
 
   const handleAreaChange = (nextArea: string) => {
     setArea(nextArea)
+    trackEvent('cleaner_filters_used', { filter: 'area' })
   }
+
+  const clearFilters = () => {
+    setArea('')
+    setVerifiedOnly(false)
+    setMinRating(0)
+    setMinPrice('')
+    setMaxPrice('')
+  }
+
+  const handleRetry = () => {
+    void queryClient.invalidateQueries({ queryKey: ['providers'] })
+  }
+
+  useEffect(() => {
+    if (categoryLoading || categoryError) return
+    if (categoryProviders?.length === 0 && !emptyTrackedRef.current) {
+      emptyTrackedRef.current = true
+      trackEvent('cleaner_empty_result', {
+        variant: !unfilteredCategoryProviders?.length
+          ? 'empty'
+          : hasFilters
+            ? 'filtered'
+            : 'empty',
+      })
+    }
+  }, [
+    categoryLoading,
+    categoryError,
+    categoryProviders?.length,
+    unfilteredCategoryProviders?.length,
+    hasFilters,
+  ])
 
   useEffect(() => {
     if (legacyCategory && !routeCategorySlug) {
@@ -202,7 +245,7 @@ export function ProvidersPage() {
           title={activeCategory ? `${activeCategory.icon ?? ''} ${activeCategory.name}`.trim() : 'Cleaners'}
           description={
             activeCategory?.description ??
-            'Compare verified home cleaning professionals.'
+            'Browse home cleaning professionals available on Nexo.'
           }
         />
 
@@ -213,39 +256,39 @@ export function ProvidersPage() {
           minPrice={minPrice}
           maxPrice={maxPrice}
           onAreaChange={handleAreaChange}
-          onVerifiedChange={setVerifiedOnly}
-          onMinRatingChange={setMinRating}
-          onMinPriceChange={setMinPrice}
-          onMaxPriceChange={setMaxPrice}
+          onVerifiedChange={(v) => {
+            setVerifiedOnly(v)
+            trackEvent('cleaner_filters_used', { filter: 'verified' })
+          }}
+          onMinRatingChange={(v) => {
+            setMinRating(v)
+            trackEvent('cleaner_filters_used', { filter: 'rating' })
+          }}
+          onMinPriceChange={(v) => {
+            setMinPrice(v)
+            trackEvent('cleaner_filters_used', { filter: 'min_price' })
+          }}
+          onMaxPriceChange={(v) => {
+            setMaxPrice(v)
+            trackEvent('cleaner_filters_used', { filter: 'max_price' })
+          }}
         />
 
-        {areaFilteredEmpty && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            No providers in <strong>{area}</strong> for this category, but{' '}
-            {unfilteredCategoryProviders?.length} provider
-            {unfilteredCategoryProviders?.length === 1 ? '' : 's'} cover other areas.{' '}
-            <button
-              type="button"
-              onClick={() => setArea('')}
-              className="font-medium text-nexo-700 underline hover:text-nexo-800"
-            >
-              Show all areas
-            </button>
-          </div>
-        )}
-
-        <QueryState
-          loading={categoryLoading || categoriesLoading}
-          error={categoryError ?? categoriesError}
-          empty={!categoryProviders?.length}
-          emptyMessage="No cleaners match your filters yet. Try a different area."
-        >
+        {categoryLoading || categoriesLoading ? (
+          <ProviderListSkeleton />
+        ) : categoryError ?? categoriesError ? (
+          <ProviderListState variant="error" onRetry={handleRetry} />
+        ) : !unfilteredCategoryProviders?.length ? (
+          <ProviderListState variant="empty" />
+        ) : !categoryProviders?.length && hasFilters ? (
+          <ProviderListState variant="filtered" onClearFilters={clearFilters} />
+        ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             {categoryProviders?.map((provider) => (
               <ProviderCard key={provider.id} provider={provider} />
             ))}
           </div>
-        </QueryState>
+        )}
 
         <p className="mt-8 text-center text-sm text-slate-500">
           Are you a service professional?{' '}
@@ -260,8 +303,8 @@ export function ProvidersPage() {
   return (
     <div>
       <PageHeader
-        title="Find cleaners"
-        description="Browse verified home cleaning professionals across Singapore."
+        title="Find a cleaner"
+        description="Browse home cleaning professionals available on Nexo."
       />
 
       <ProviderFiltersBar
@@ -277,18 +320,19 @@ export function ProvidersPage() {
         onMaxPriceChange={setMaxPrice}
       />
 
-      <QueryState
-        loading={browseLoading}
-        error={browseError}
-        empty={!browseProviders?.length}
-        emptyMessage="No cleaners listed yet. Service professionals appear here after registering and adding services."
-      >
+      {browseLoading ? (
+        <ProviderListSkeleton />
+      ) : browseError ? (
+        <ProviderListState variant="error" onRetry={handleRetry} />
+      ) : !browseProviders?.length ? (
+        <ProviderListState variant="empty" />
+      ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {browseProviders?.map((provider) => (
+          {browseProviders.map((provider) => (
             <ProviderCard key={provider.id} provider={provider} />
           ))}
         </div>
-      </QueryState>
+      )}
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Are you a service professional?{' '}

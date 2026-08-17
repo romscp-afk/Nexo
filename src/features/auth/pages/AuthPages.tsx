@@ -1,9 +1,33 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { getDashboardPath, ROLES, SINGAPORE_AREAS, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, isAdminEmail } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
+import { loadCleaningDraft } from '@/shared/lib/bookingDraft'
+import { trackEvent } from '@/shared/lib/analytics'
+import { recordPwaEngagement } from '@/shared/lib/pwaEngagement'
+
+const ROLE_LABELS = {
+  customer: 'I need a cleaner',
+  provider: 'I provide cleaning services',
+} as const
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+}
+
+function isValidSgMobile(phone: string) {
+  return /^[689]\d{7}$/.test(phone.replace(/\s+/g, ''))
+}
+
+function postAuthPath(from?: string) {
+  const draft = loadCleaningDraft()
+  if (from) return from
+  if (draft) return '/services/cleaning/request'
+  return null
+}
 
 function DatabaseSetupBanner() {
   const [ready, setReady] = useState<boolean | null>(null)
@@ -87,12 +111,16 @@ function AdminLoginHelp({
 export function LoginPage() {
   const { signIn, setupDemoAdmin } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [creatingAdmin, setCreatingAdmin] = useState(false)
+
+  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
 
   const handleCreateAdmin = async () => {
     setError('')
@@ -111,7 +139,8 @@ export function LoginPage() {
         return
       }
       if (role) {
-        navigate(getDashboardPath(role))
+        const next = postAuthPath(fromPath) ?? getDashboardPath(role)
+        navigate(next)
       }
     } finally {
       setCreatingAdmin(false)
@@ -132,7 +161,8 @@ export function LoginPage() {
         setError(err)
         return
       }
-      navigate(getDashboardPath(role ?? 'customer'))
+      const next = postAuthPath(fromPath) ?? getDashboardPath(role ?? 'customer')
+      navigate(next)
     } finally {
       setLoading(false)
     }
@@ -183,16 +213,26 @@ export function LoginPage() {
           <label htmlFor="password" className="block text-sm font-medium text-slate-700">
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            required
-            disabled={loading}
-          />
+          <div className="relative mt-1">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 pr-10 text-sm"
+              required
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-700"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         <button
           type="submit"
@@ -216,15 +256,16 @@ export function LoginPage() {
 export function RegisterPage() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [phone, setPhone] = useState('')
-  const [role, setRole] = useState<'customer' | 'provider'>('customer')
-  const [preferredArea, setPreferredArea] = useState('')
-  const [addressLine1, setAddressLine1] = useState('')
-  const [addressLine2, setAddressLine2] = useState('')
-  const [postalCode, setPostalCode] = useState('')
+  const [role, setRole] = useState<'customer' | 'provider'>(
+    searchParams.get('role') === 'provider' ? 'provider' : 'customer',
+  )
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [businessName, setBusinessName] = useState('')
   const [bio, setBio] = useState('')
   const [yearsExperience, setYearsExperience] = useState('1')
@@ -233,9 +274,20 @@ export function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [startedTracked, setStartedTracked] = useState(false)
 
   const inputClass = 'mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm'
   const formLocked = loading || Boolean(success)
+
+  useEffect(() => {
+    if (searchParams.get('role') === 'provider') setRole('provider')
+  }, [searchParams])
+
+  const trackRegistrationStarted = () => {
+    if (startedTracked) return
+    setStartedTracked(true)
+    trackEvent('registration_started', { role })
+  }
 
   const toggleServiceArea = (area: string) => {
     setServiceAreas((prev) =>
@@ -247,16 +299,29 @@ export function RegisterPage() {
     e.preventDefault()
     setError('')
     setSuccess('')
+    trackRegistrationStarted()
+
+    if (!isValidEmail(email)) {
+      setError('Enter a valid email address.')
+      return
+    }
+    if (!isValidSgMobile(phone)) {
+      setError('Enter a valid Singapore mobile number (8 digits starting with 6, 8 or 9).')
+      return
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.')
+      return
+    }
+    if (!acceptedTerms) {
+      setError('Please accept the Terms of Service and Privacy Policy.')
+      return
+    }
+
     setLoading(true)
 
     if (role === 'provider' && serviceAreas.length === 0) {
       setError('Select at least one service area you cover.')
-      setLoading(false)
-      return
-    }
-
-    if (!phone.trim()) {
-      setError('Enter your mobile number.')
       setLoading(false)
       return
     }
@@ -267,10 +332,6 @@ export function RegisterPage() {
       role,
       fullName,
       phone,
-      addressLine1: role === 'customer' ? addressLine1 : undefined,
-      addressLine2: role === 'customer' ? addressLine2 : undefined,
-      postalCode: role === 'customer' ? postalCode : undefined,
-      preferredArea: role === 'customer' ? preferredArea : undefined,
       businessName: role === 'provider' ? businessName || fullName : undefined,
       bio: role === 'provider' ? bio : undefined,
       yearsExperience: role === 'provider' ? Number(yearsExperience) || 0 : undefined,
@@ -282,12 +343,15 @@ export function RegisterPage() {
       setError(err)
       return
     }
+    trackEvent('registration_completed', { role })
+    recordPwaEngagement()
     if (needsEmailConfirmation) {
       setSuccess(`Account created. We sent a confirmation link to ${email}. Check your inbox, then log in.`)
       return
     }
     if (signedUpRole) {
-      navigate(getDashboardPath(signedUpRole))
+      const draft = loadCleaningDraft()
+      navigate(draft ? '/services/cleaning/request' : getDashboardPath(signedUpRole))
       return
     }
     setSuccess('Account created. You can log in now.')
@@ -295,9 +359,9 @@ export function RegisterPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900">Create account</h2>
+      <h2 className="text-xl font-semibold text-slate-900">Get started</h2>
       <p className="mt-1 text-sm text-slate-500">
-        Join Nexo as a customer or service provider. We&apos;ll verify your email before you can log in.
+        Create a Nexo account to request cleaning or join as a cleaning professional.
       </p>
 
       <ConfigBanner />
@@ -315,21 +379,24 @@ export function RegisterPage() {
           </p>
         )}
         <div>
-          <label className="block text-sm font-medium text-slate-700">I am a</label>
-          <div className="mt-2 flex gap-2">
+          <span className="block text-sm font-medium text-slate-700">I am</span>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {([ROLES.CUSTOMER, ROLES.PROVIDER] as const).map((r) => (
               <button
                 key={r}
                 type="button"
-                onClick={() => setRole(r)}
+                onClick={() => {
+                  setRole(r)
+                  trackRegistrationStarted()
+                }}
                 disabled={loading}
-                className={`flex-1 rounded-lg border py-2 text-sm capitalize ${
+                className={`min-h-11 rounded-lg border px-3 py-2.5 text-sm ${
                   role === r
                     ? 'border-nexo-700 bg-nexo-50 text-nexo-700'
                     : 'border-slate-200 text-slate-600'
                 }`}
               >
-                {r}
+                {ROLE_LABELS[r]}
               </button>
             ))}
           </div>
@@ -344,7 +411,10 @@ export function RegisterPage() {
             type="text"
             autoComplete="name"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              setFullName(e.target.value)
+              trackRegistrationStarted()
+            }}
             className={inputClass}
             required
             disabled={loading}
@@ -399,74 +469,9 @@ export function RegisterPage() {
           </div>
         )}
         {role === 'customer' && (
-          <>
-            <div>
-              <label htmlFor="preferred-area" className="block text-sm font-medium text-slate-700">
-                Preferred area
-              </label>
-              <select
-                id="preferred-area"
-                value={preferredArea}
-                onChange={(e) => setPreferredArea(e.target.value)}
-                className={inputClass}
-                required
-                disabled={loading}
-              >
-                <option value="">Select your area</option>
-                {SINGAPORE_AREAS.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="address-line1" className="block text-sm font-medium text-slate-700">
-                Block / street address
-              </label>
-              <input
-                id="address-line1"
-                type="text"
-                value={addressLine1}
-                onChange={(e) => setAddressLine1(e.target.value)}
-                placeholder="Blk 123 Tampines Street 11"
-                className={inputClass}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <label htmlFor="address-line2" className="block text-sm font-medium text-slate-700">
-                Unit number
-              </label>
-              <input
-                id="address-line2"
-                type="text"
-                value={addressLine2}
-                onChange={(e) => setAddressLine2(e.target.value)}
-                placeholder="#08-456"
-                className={inputClass}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div>
-              <label htmlFor="postal-code" className="block text-sm font-medium text-slate-700">
-                Postal code
-              </label>
-              <input
-                id="postal-code"
-                type="text"
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                placeholder="521123"
-                pattern="\d{6}"
-                className={inputClass}
-                required
-                disabled={loading}
-              />
-            </div>
-          </>
+          <p className="text-sm text-slate-500">
+            Your address is collected when you submit a cleaning request — not during registration.
+          </p>
         )}
         {role === 'provider' && (
           <>
@@ -539,18 +544,53 @@ export function RegisterPage() {
           <label htmlFor="reg-password" className="block text-sm font-medium text-slate-700">
             Password
           </label>
+          <div className="relative mt-1">
+            <input
+              id="reg-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 pr-10 text-sm"
+              minLength={6}
+              required
+              disabled={loading}
+              aria-describedby="password-hint"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-700"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          <p id="password-hint" className="mt-1 text-xs text-slate-500">
+            At least 6 characters
+          </p>
+        </div>
+        <label className="flex items-start gap-2 text-sm text-slate-600">
           <input
-            id="reg-password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-            minLength={6}
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
             required
             disabled={loading}
+            className="mt-1 rounded border-slate-300"
           />
-        </div>
+          <span>
+            I agree to the{' '}
+            <Link to="/terms" className="font-medium text-nexo-700 hover:underline" target="_blank">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy" className="font-medium text-nexo-700 hover:underline" target="_blank">
+              Privacy Policy
+            </Link>
+            .
+          </span>
+        </label>
         <button
           type="submit"
           disabled={formLocked}
