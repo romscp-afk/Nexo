@@ -35,6 +35,7 @@
     "setup:admin-chat-email": "node scripts/apply-admin-chat-email.mjs",
     "setup:admin-delete": "node scripts/apply-admin-delete.mjs",
     "setup:admin-delete-booking": "node scripts/apply-admin-delete-booking.mjs",
+    "setup:provider-open-booking-select": "node scripts/apply-provider-open-booking-select.mjs",
     "setup:admin-set-user-role": "node scripts/apply-admin-set-user-role.mjs",
     "setup:admin-set-provider-verified": "node scripts/apply-admin-set-provider-verified.mjs",
     "setup:admin-provider-messages": "node scripts/apply-admin-provider-messages.mjs",

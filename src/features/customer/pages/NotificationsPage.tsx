@@ -21,11 +21,30 @@ export function NotificationsPage({ role }: Props) {
   const bookingDetailPrefix = role === 'customer' ? '/dashboard/bookings' : '/provider/bookings'
   const unread = notifications?.filter((n) => !n.readAt).length ?? 0
 
-  const handleOpen = (id: string, readAt: string | null, bookingId?: string, isChat?: boolean) => {
-    if (!readAt) void markRead.mutate(id)
-    if (bookingId) {
-      navigate(isChat ? `${bookingDetailPrefix}/${bookingId}#chat` : `${bookingDetailPrefix}/${bookingId}`)
+  const resolveBookingLink = (notification: {
+    title: string
+    metadata: Record<string, unknown>
+  }) => {
+    const bookingId =
+      typeof notification.metadata.booking_id === 'string'
+        ? notification.metadata.booking_id
+        : undefined
+    if (!bookingId) return null
+
+    const taken =
+      notification.metadata.taken_by_provider_id != null ||
+      notification.title === 'Open request taken'
+    if (role === 'provider' && taken) {
+      return '/provider/bookings'
     }
+
+    const isChat = notification.metadata.kind === 'chat_message'
+    return isChat ? `${bookingDetailPrefix}/${bookingId}#chat` : `${bookingDetailPrefix}/${bookingId}`
+  }
+
+  const handleNavigate = (id: string, readAt: string | null, target: string | null) => {
+    if (!readAt) void markRead.mutate(id)
+    if (target) navigate(target)
   }
 
   return (
@@ -56,19 +75,15 @@ export function NotificationsPage({ role }: Props) {
         >
           <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
             {notifications?.map((notification) => {
-              const bookingId =
-                typeof notification.metadata.booking_id === 'string'
-                  ? notification.metadata.booking_id
-                  : undefined
               const isChat = notification.metadata.kind === 'chat_message'
+              const target = resolveBookingLink(notification)
+              const isTakenLink = target === '/provider/bookings'
 
               return (
                 <li key={notification.id}>
                   <button
                     type="button"
-                    onClick={() =>
-                      handleOpen(notification.id, notification.readAt, bookingId, isChat)
-                    }
+                    onClick={() => handleNavigate(notification.id, notification.readAt, target)}
                     className={`w-full px-5 py-4 text-left transition hover:bg-slate-50 ${
                       notification.readAt ? '' : 'bg-nexo-50/40'
                     }`}
@@ -98,9 +113,9 @@ export function NotificationsPage({ role }: Props) {
                             <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-nexo-600" />
                           )}
                         </div>
-                        {bookingId && (
+                        {target && (
                           <span className="mt-2 inline-block text-xs font-medium text-nexo-700">
-                            {isChat ? 'Open chat →' : 'View booking →'}
+                            {isChat ? 'Open chat →' : isTakenLink ? 'View open requests →' : 'View booking →'}
                           </span>
                         )}
                       </div>
