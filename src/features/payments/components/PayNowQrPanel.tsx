@@ -177,8 +177,32 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
       </dl>
 
       {canShowQr && qrDataUrl && (
-        <div className="mt-4 flex flex-col items-center gap-3 rounded-lg bg-white p-4">
-          <img src={qrDataUrl} alt="PayNow QR code" className="h-56 w-56 rounded-lg border border-slate-200" />
+        <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-white p-4">
+          <img
+            src={qrDataUrl}
+            alt={`PayNow QR code for ${payment.reference}`}
+            className="h-64 w-64 rounded-lg border border-slate-200"
+          />
+          <div className="w-full max-w-sm space-y-2 rounded-lg bg-nexo-50 px-4 py-3 text-center text-sm">
+            <p className="font-medium text-slate-900">Scan with any Singapore banking app</p>
+            <dl className="space-y-1 text-left">
+              <div className="flex justify-between gap-3">
+                <dt className="text-slate-600">PayNow</dt>
+                <dd className="font-semibold text-slate-900">{payment.paynowMobile}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-slate-600">Amount</dt>
+                <dd className="font-semibold text-nexo-800">{formatCurrency(payment.amount)}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-slate-600">Reference</dt>
+                <dd className="font-mono text-xs font-semibold text-slate-900">{payment.reference}</dd>
+              </div>
+            </dl>
+            <p className="text-xs text-slate-600">
+              Use the exact amount and reference so we can match your payment.
+            </p>
+          </div>
         </div>
       )}
 

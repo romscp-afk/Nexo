@@ -56,7 +56,7 @@ export const CLEANING_RECURRING_PLANS_NOTE =
   'One-time bookings can be requested online. Weekly and monthly plans are also available — contact us for pricing and your preferred schedule.'
 
 export const BOOKING_CONFIRMATION =
-  'Requests are sent to available cleaners. A booking is confirmed only after a cleaner accepts your request.'
+  'After you submit, you will get a unique PayNow QR code with the amount and booking reference. Requests are sent to available cleaners — a booking is confirmed once a cleaner accepts.'
 
 export const CLEANING_TYPES = [
   {

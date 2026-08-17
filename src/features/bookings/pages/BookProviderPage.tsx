@@ -156,7 +156,7 @@ export function BookProviderPage() {
           // Photos optional — booking still created
         }
       }
-      navigate(`/dashboard/bookings/${booking.id}`)
+      navigate(`/dashboard/bookings/${booking.id}?pay=1`)
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Booking failed')
     }

@@ -347,7 +347,7 @@ export function CleaningRequestPage() {
       clearCleaningDraft()
       recordPwaEngagement()
       trackEvent('cleaning_request_confirmed')
-      navigate(`/dashboard/bookings/${booking.id}`)
+      navigate(`/dashboard/bookings/${booking.id}?pay=1`)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Request failed')
     }
@@ -702,7 +702,7 @@ export function CleaningRequestPage() {
                             onChange={() => setPaymentMethod('paynow')}
                             className="mr-2"
                           />
-                          PayNow (after acceptance)
+                          PayNow (scan QR after submit)
                         </label>
                         <label
                           className={`cursor-pointer rounded-lg border p-3 text-sm ${

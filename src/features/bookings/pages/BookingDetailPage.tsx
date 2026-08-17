@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Phone, User } from 'lucide-react'
 import { BookingStatusTimeline } from '@/features/bookings/components/BookingStatusTimeline'
 import { BookingChatPanel } from '@/features/bookings/components/BookingChatPanel'
@@ -33,8 +33,9 @@ type BookingDetailPageProps = {
 
 export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
   const { id = '' } = useParams()
+  const [searchParams] = useSearchParams()
   const { data: booking, isLoading, error } = useBooking(id)
-  const { data: payments } = useBookingPayments(id)
+  const { data: payments, refetch: refetchPayments } = useBookingPayments(id)
   const { data: statusHistory } = useBookingStatusHistory(id)
   const cancelBooking = useCancelBooking()
   const updateStatus = useUpdateBookingStatus()
@@ -105,6 +106,32 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
       document.getElementById('chat')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [booking?.id, chatAccess.state])
+
+  const showCustomerPayment =
+    role === 'customer' &&
+    payments?.customerAdvance &&
+    ['pending', 'confirmed', 'in_progress'].includes(booking?.status ?? '')
+
+  const paymentDue =
+    showCustomerPayment && payments?.customerAdvance?.status === 'pending'
+
+  useEffect(() => {
+    if (!showCustomerPayment) return
+    if (searchParams.get('pay') === '1' || window.location.hash === '#pay') {
+      document.getElementById('pay')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [showCustomerPayment, searchParams])
+
+  useEffect(() => {
+    if (
+      role === 'customer' &&
+      booking &&
+      ['pending', 'confirmed', 'in_progress'].includes(booking.status) &&
+      !payments?.customerAdvance
+    ) {
+      void refetchPayments()
+    }
+  }, [role, booking, payments?.customerAdvance, refetchPayments])
 
   return (
     <div>
@@ -281,11 +308,26 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
               </section>
             )}
 
-            {role === 'customer' &&
-              payments?.customerAdvance &&
-              ['confirmed', 'in_progress'].includes(booking.status) && (
-                <PayNowQrPanel payment={payments.customerAdvance} booking={booking} role="customer" />
-              )}
+            {paymentDue && (
+              <section className="rounded-xl border-2 border-nexo-400 bg-nexo-50 px-4 py-4">
+                <h2 className="font-semibold text-nexo-900">Complete your PayNow payment</h2>
+                <p className="mt-1 text-sm text-nexo-800">
+                  {booking.status === 'pending'
+                    ? 'Pay now to secure your request while we match you with a provider. Each booking has a unique QR code with your amount and reference.'
+                    : 'Scan the QR code below with your banking app. Your payment includes the exact amount and booking reference.'}
+                </p>
+              </section>
+            )}
+
+            {role === 'customer' && showCustomerPayment && payments?.customerAdvance && (
+              <div id="pay">
+                <PayNowQrPanel
+                  payment={payments.customerAdvance}
+                  booking={booking}
+                  role="customer"
+                />
+              </div>
+            )}
 
             {role === 'provider' &&
               isCash &&
