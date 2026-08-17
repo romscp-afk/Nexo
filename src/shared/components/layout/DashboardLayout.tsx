@@ -33,6 +33,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { to: '/provider/bookings', label: 'Bookings' },
     { to: '/provider/schedule', label: 'Schedule' },
     { to: '/provider/messages', label: 'Messages', badge: 'messages' },
+    { to: '/provider/support', label: 'Nexo support' },
     { to: '/provider/earnings', label: 'Earnings' },
     { to: '/provider/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/provider/profile', label: 'Profile' },

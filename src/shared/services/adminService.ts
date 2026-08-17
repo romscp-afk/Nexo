@@ -3,6 +3,8 @@ import type { AuthResult } from '@/shared/services/authService'
 import type { UserRole } from '@/shared/lib/constants'
 import type { ProfileRow } from '@/shared/types/database'
 import type { ProviderRow } from '@/shared/types/catalog'
+import { parseUnitPrices } from '@/shared/lib/pricing'
+import type { PricingModel } from '@/shared/types/catalog'
 import {
   mapAdminBooking,
   mapAdminProvider,
@@ -10,6 +12,7 @@ import {
   emptyAdminProviderPaymentSummary,
   type AdminBooking,
   type AdminProvider,
+  type AdminProviderDetail,
   type AdminProviderPaymentSummary,
   type AdminStats,
   type AdminReports,
@@ -17,6 +20,40 @@ import {
 } from '@/shared/types/admin'
 import { mapActivityLog, type ActivityLog, type ActivityLogRow } from '@/shared/types/activity'
 import type { PaymentKind, PaymentStatus } from '@/shared/types/payment'
+
+type ProviderServiceJoin = {
+  price_from: number
+  unit_prices: Record<string, number> | null
+  services: {
+    id: string
+    name: string
+    slug: string
+    pricing_model: PricingModel | null
+    unit_label: string | null
+    service_categories: { slug: string; name: string } | null
+  } | null
+}
+
+type ProviderDetailRow = ProviderRow & {
+  provider_services: ProviderServiceJoin[] | null
+}
+
+function mapAdminProviderServices(rows: ProviderServiceJoin[] | null) {
+  if (!rows) return []
+  return rows
+    .filter((row) => row.services?.service_categories)
+    .map((row) => ({
+      serviceId: row.services!.id,
+      name: row.services!.name,
+      slug: row.services!.slug,
+      categorySlug: row.services!.service_categories!.slug,
+      categoryName: row.services!.service_categories!.name,
+      priceFrom: Number(row.price_from),
+      pricingModel: row.services!.pricing_model ?? 'hourly',
+      unitLabel: row.services!.unit_label,
+      unitPrices: parseUnitPrices(row.unit_prices),
+    }))
+}
 
 function relationField<T extends Record<string, unknown>>(
   value: T | T[] | null | undefined,
@@ -308,6 +345,96 @@ export const adminService = {
             paymentSummaryByProvider.get(provider.id) ?? emptyAdminProviderPaymentSummary(),
         }
       }),
+      error: null,
+    }
+  },
+
+  async getProviderById(providerId: string): Promise<AuthResult<AdminProviderDetail | null>> {
+    const sync = await supabase.rpc('admin_sync_provider_listings')
+    if (
+      sync.error &&
+      !/admin_sync_provider_listings|42883|PGRST202/i.test(sync.error.message)
+    ) {
+      return { data: null, error: sync.error.message }
+    }
+
+    const { data, error } = await supabase
+      .from('providers')
+      .select(
+        `
+        *,
+        provider_services (
+          price_from,
+          unit_prices,
+          services (
+            id,
+            name,
+            slug,
+            pricing_model,
+            unit_label,
+            service_categories ( slug, name )
+          )
+        )
+      `,
+      )
+      .eq('id', providerId)
+      .maybeSingle()
+
+    if (error) return { data: null, error: error.message }
+    if (!data) return { data: null, error: null }
+
+    const row = data as ProviderDetailRow
+    const { provider_services, ...providerRow } = row
+    const services = mapAdminProviderServices(provider_services)
+    const listing = mapAdminProvider(providerRow as ProviderRow)
+    listing.services = services
+
+    const [{ data: profile }, { data: bookingPayments }, { data: bookings }] = await Promise.all([
+      supabase.from('profiles').select('*').eq('user_id', listing.userId).maybeSingle(),
+      supabase
+        .from('bookings')
+        .select('provider_id, payments ( status, payment_kind )')
+        .eq('provider_id', providerId),
+      supabase.from('bookings').select('status').eq('provider_id', providerId),
+    ])
+
+    const paymentSummaryByProvider = new Map<string, AdminProviderPaymentSummary>()
+    paymentSummaryByProvider.set(providerId, emptyAdminProviderPaymentSummary())
+    accumulateProviderPayments(
+      paymentSummaryByProvider,
+      (bookingPayments ?? []) as ProviderBookingPaymentRow[],
+    )
+    const paymentSummary =
+      paymentSummaryByProvider.get(providerId) ?? emptyAdminProviderPaymentSummary()
+
+    const completedBookings =
+      bookings?.filter((b) => b.status === 'completed').length ?? 0
+    const openBookings =
+      bookings?.filter((b) => !['completed', 'cancelled'].includes(b.status as string)).length ?? 0
+
+    const profileRow = profile as ProfileRow | null
+
+    return {
+      data: {
+        ...listing,
+        services,
+        avatarUrl: profileRow?.avatar_url ?? listing.avatarUrl,
+        phone: profileRow?.phone ?? null,
+        whatsApp: profileRow?.whatsapp ?? null,
+        paymentSummary,
+        email: profileRow?.email ?? '',
+        fullName: profileRow?.full_name ?? listing.businessName,
+        isActive: profileRow?.is_active ?? true,
+        addressLine1: profileRow?.address_line1 ?? null,
+        addressLine2: profileRow?.address_line2 ?? null,
+        postalCode: profileRow?.postal_code ?? null,
+        preferredArea: profileRow?.preferred_area ?? null,
+        createdAt: providerRow.created_at,
+        updatedAt: providerRow.updated_at,
+        completedBookings,
+        openBookings,
+        completedJobs: completedBookings,
+      },
       error: null,
     }
   },

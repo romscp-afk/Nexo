@@ -27,9 +27,11 @@ import { BookingDetailPage } from '@/features/bookings/pages/BookingDetailPage'
 import { BookingChatsPage } from '@/features/bookings/pages/BookingChatsPage'
 import { ProviderEarningsPage } from '@/features/providers/pages/ProviderEarningsPage'
 import { ProviderSchedulePage } from '@/features/providers/pages/ProviderSchedulePage'
+import { ProviderSupportPage } from '@/features/providers/pages/ProviderSupportPage'
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage'
 import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage'
 import { AdminProvidersPage } from '@/features/admin/pages/AdminProvidersPage'
+import { AdminProviderDetailPage } from '@/features/admin/pages/AdminProviderDetailPage'
 import { AdminBookingsPage } from '@/features/admin/pages/AdminBookingsPage'
 import { AdminPaymentsPage } from '@/features/admin/pages/AdminPaymentsPage'
 import { AdminActivityPage } from '@/features/admin/pages/AdminActivityPage'
@@ -122,6 +124,7 @@ export const router = createBrowserRouter([
               { path: '/provider', element: <ProviderDashboardPage /> },
               { path: '/provider/bookings', element: <ProviderBookingsPage /> },
               { path: '/provider/messages', element: <BookingChatsPage role="provider" /> },
+              { path: '/provider/support', element: <ProviderSupportPage /> },
               { path: '/provider/earnings', element: <ProviderEarningsPage /> },
               { path: '/provider/schedule', element: <ProviderSchedulePage /> },
               { path: '/provider/notifications', element: <ProviderNotificationsPage /> },
@@ -143,6 +146,7 @@ export const router = createBrowserRouter([
               { path: '/admin', element: <AdminDashboardPage /> },
               { path: '/admin/users', element: <AdminUsersPage /> },
               { path: '/admin/providers', element: <AdminProvidersPage /> },
+              { path: '/admin/providers/:id', element: <AdminProviderDetailPage /> },
               { path: '/admin/bookings', element: <AdminBookingsPage /> },
               { path: '/admin/payments', element: <AdminPaymentsPage /> },
               { path: '/admin/reports', element: <AdminReportsPage /> },

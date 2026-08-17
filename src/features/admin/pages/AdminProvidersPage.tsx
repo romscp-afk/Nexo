@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   useAdminProviders,
   useDeleteProvider,
@@ -96,23 +97,21 @@ export function AdminProvidersPage() {
                   <tr key={p.id}>
                     <td className="px-4 py-3">
                       {hasPhoto ? (
-                        <a
-                          href={p.avatarUrl!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nexo-600"
-                          title={`View ${p.businessName}'s profile photo`}
-                        >
+                        <Link to={`/admin/providers/${p.id}`}>
                           <ProviderAvatar name={p.businessName} avatarUrl={p.avatarUrl} size="lg" />
-                        </a>
+                        </Link>
                       ) : (
-                        <div className="flex items-center gap-2">
+                        <Link to={`/admin/providers/${p.id}`} className="flex items-center gap-2">
                           <ProviderAvatar name={p.businessName} avatarUrl={null} size="lg" />
                           <span className="text-xs text-amber-700">No photo</span>
-                        </div>
+                        </Link>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-medium">{p.businessName}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link to={`/admin/providers/${p.id}`} className="text-nexo-800 hover:underline">
+                        {p.businessName}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       {PROVIDER_LISTING_TYPE_LABELS[p.listingType]}
                       {p.listingType === 'individual' && (
@@ -135,6 +134,12 @@ export function AdminProvidersPage() {
                     <td className="px-4 py-3">{p.isVerified ? 'Yes' : 'No'}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                          to={`/admin/providers/${p.id}`}
+                          className="text-nexo-700 hover:underline"
+                        >
+                          View profile
+                        </Link>
                         <button
                           type="button"
                           onClick={() => toggleVerified(p.id, p.businessName, p.isVerified, hasPhoto)}

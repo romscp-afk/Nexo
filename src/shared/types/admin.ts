@@ -1,6 +1,6 @@
 import type { UserProfile, ProfileRow } from '@/shared/types/database'
 import { mapProfileRow } from '@/shared/types/database'
-import type { ProviderListing, ProviderRow } from '@/shared/types/catalog'
+import type { ProviderListing, ProviderRow, ProviderServiceSummary } from '@/shared/types/catalog'
 import { mapProviderListing } from '@/shared/types/catalog'
 import type { Booking, BookingRow } from '@/shared/types/booking'
 import { mapBooking } from '@/shared/types/booking'
@@ -43,6 +43,21 @@ export type AdminProvider = ProviderListing & {
   phone: string | null
   whatsApp: string | null
   paymentSummary: AdminProviderPaymentSummary
+}
+
+export type AdminProviderDetail = AdminProvider & {
+  email: string
+  fullName: string
+  isActive: boolean
+  addressLine1: string | null
+  addressLine2: string | null
+  postalCode: string | null
+  preferredArea: string | null
+  createdAt: string
+  updatedAt: string
+  completedBookings: number
+  openBookings: number
+  services: ProviderServiceSummary[]
 }
 
 export function emptyAdminProviderPaymentSummary(): AdminProviderPaymentSummary {
