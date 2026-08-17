@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
@@ -7,6 +7,11 @@ import { ProviderCategoryCard } from '@/features/providers/components/ProviderCa
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { useProviderFilterStore } from '@/shared/stores/filterStore'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import {
+  isCategoryLaunched,
+  PRIMARY_CATEGORY_SLUG,
+  sortCategoriesForDisplay,
+} from '@/shared/lib/catalogConfig'
 
 function ProviderFiltersBar({
   categories,
@@ -52,8 +57,13 @@ function ProviderFiltersBar({
             >
               <option value="">All categories</option>
               {categories?.map((category) => (
-                <option key={category.slug} value={category.slug}>
+                <option
+                  key={category.slug}
+                  value={category.slug}
+                  disabled={!isCategoryLaunched(category.slug)}
+                >
                   {category.name}
+                  {!isCategoryLaunched(category.slug) ? ' (coming soon)' : ''}
                 </option>
               ))}
             </select>
@@ -143,6 +153,10 @@ export function ProvidersPage() {
     useProviderFilterStore()
 
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategories()
+  const sortedCategories = useMemo(
+    () => sortCategoriesForDisplay(categories ?? []),
+    [categories],
+  )
 
   const areaInitRef = useRef(false)
 
@@ -160,6 +174,7 @@ export function ProvidersPage() {
 
   const browseFilters = useMemo(
     () => ({
+      categorySlug: PRIMARY_CATEGORY_SLUG,
       verifiedOnly,
       area: area.trim() || undefined,
       minRating: minRating || undefined,
@@ -233,6 +248,10 @@ export function ProvidersPage() {
     return null
   }
 
+  if (isCategoryView && categorySlug && !isCategoryLaunched(categorySlug)) {
+    return <Navigate to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} replace />
+  }
+
   if (isCategoryView) {
     return (
       <div>
@@ -247,7 +266,7 @@ export function ProvidersPage() {
         />
 
         <ProviderFiltersBar
-          categories={categories}
+          categories={sortedCategories}
           categorySlug={categorySlug}
           area={area}
           verifiedOnly={verifiedOnly}
@@ -304,12 +323,12 @@ export function ProvidersPage() {
   return (
     <div>
       <PageHeader
-        title="Providers by category"
-        description="Browse verified home service professionals by the type of work you need."
+        title="Cleaning providers"
+        description="Browse verified home cleaning professionals. More service categories coming soon."
       />
 
       <ProviderFiltersBar
-        categories={categories}
+        categories={sortedCategories}
         categorySlug=""
         area={area}
         verifiedOnly={verifiedOnly}
@@ -327,11 +346,11 @@ export function ProvidersPage() {
       <QueryState
         loading={categoriesLoading || browseLoading}
         error={categoriesError ?? browseError}
-        empty={!categories?.length}
+        empty={!sortedCategories.length}
         emptyMessage="No service categories yet. Run supabase/seed.sql in your Supabase project."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories?.map((category) => (
+          {sortedCategories.map((category) => (
             <ProviderCategoryCard
               key={category.id}
               category={category}
@@ -344,8 +363,8 @@ export function ProvidersPage() {
       <section className="mt-10">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">All providers</h2>
-            <p className="text-sm text-slate-600">Browse every active provider on Nexo.</p>
+            <h2 className="text-lg font-semibold text-slate-900">Available cleaners</h2>
+            <p className="text-sm text-slate-600">All active cleaning providers on Nexo.</p>
           </div>
         </div>
         <QueryState

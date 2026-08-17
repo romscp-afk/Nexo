@@ -116,7 +116,7 @@ export function NotificationsPage({ role }: Props) {
       {role === 'customer' && (
         <p className="mt-6 text-sm text-slate-500">
           Need a new service?{' '}
-          <Link to="/providers" className="font-medium text-nexo-700 hover:underline">
+          <Link to="/providers/category/cleaning" className="font-medium text-nexo-700 hover:underline">
             Browse providers
           </Link>
         </p>

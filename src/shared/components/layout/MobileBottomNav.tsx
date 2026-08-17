@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { CalendarDays, LayoutGrid, Menu, MessageCircle, Search } from 'lucide-react'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { cn } from '@/shared/lib/utils'
 
 type Tab = {
@@ -12,13 +13,13 @@ type Tab = {
 
 const CUSTOMER_TABS: Tab[] = [
   {
-    to: '/services',
+    to: `/services/${PRIMARY_CATEGORY_SLUG}`,
     label: 'Home',
     icon: LayoutGrid,
     match: (p) => p === '/' || p.startsWith('/services'),
   },
   {
-    to: '/providers',
+    to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`,
     label: 'Book',
     icon: Search,
     match: (p) => p.startsWith('/providers'),

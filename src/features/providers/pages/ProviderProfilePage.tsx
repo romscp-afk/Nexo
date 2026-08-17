@@ -5,6 +5,7 @@ import {
   useUpdateMyProviderServices,
 } from '@/features/providers/hooks/useMyProvider'
 import { useAllServices } from '@/features/catalog/hooks/useAllServices'
+import { isCategoryLaunched } from '@/shared/lib/catalogConfig'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { formatCurrency } from '@/shared/lib/utils'
@@ -37,6 +38,10 @@ function defaultUnitPrices(basePrice: number, existing?: UnitPrices): Record<num
 export function ProviderProfilePage() {
   const { data: provider, isLoading, error } = useMyProvider()
   const { data: catalogServices, isLoading: servicesLoading } = useAllServices()
+  const launchedCatalog = useMemo(
+    () => catalogServices?.filter((s) => s.categorySlug && isCategoryLaunched(s.categorySlug)) ?? [],
+    [catalogServices],
+  )
   const updateProvider = useUpdateMyProvider()
   const updateServices = useUpdateMyProviderServices()
 
@@ -52,10 +57,10 @@ export function ProviderProfilePage() {
   const hasHourlyServices = useMemo(
     () =>
       servicePrices.some((row) => {
-        const catalog = catalogServices?.find((s) => s.id === row.serviceId)
+        const catalog = launchedCatalog.find((s) => s.id === row.serviceId)
         return row.enabled && catalog?.pricingModel !== 'per_unit'
       }),
-    [servicePrices, catalogServices],
+    [servicePrices, launchedCatalog],
   )
 
   useEffect(() => {
@@ -69,9 +74,9 @@ export function ProviderProfilePage() {
   }, [provider])
 
   useEffect(() => {
-    if (!catalogServices) return
+    if (!launchedCatalog.length) return
     setServicePrices(
-      catalogServices.map((service) => {
+      launchedCatalog.map((service) => {
         const existing = provider?.services.find((s) => s.serviceId === service.id)
         return {
           serviceId: service.id,
@@ -81,7 +86,7 @@ export function ProviderProfilePage() {
         }
       }),
     )
-  }, [catalogServices, provider])
+  }, [launchedCatalog, provider])
 
   const toggleArea = (area: string) => {
     setServiceAreas((prev) =>
@@ -131,7 +136,7 @@ export function ProviderProfilePage() {
       })
       await updateServices.mutateAsync(
         enabledServices.map((s) => {
-          const catalog = catalogServices?.find((c) => c.id === s.serviceId)
+          const catalog = launchedCatalog.find((c) => c.id === s.serviceId)
           const unitPrices: UnitPrices = {}
           if (catalog?.pricingModel === 'per_unit') {
             for (const n of UNIT_TIER_COUNTS) {
@@ -247,7 +252,7 @@ export function ProviderProfilePage() {
 
               <ul className="divide-y divide-slate-100">
                 {servicePrices.map((row) => {
-                  const catalog = catalogServices?.find((s) => s.id === row.serviceId)
+                  const catalog = launchedCatalog.find((s) => s.id === row.serviceId)
                   if (!catalog) return null
                   const isPerUnit = catalog.pricingModel === 'per_unit'
                   const unitLabel = catalog.unitLabel ?? 'unit'

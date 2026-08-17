@@ -15,6 +15,7 @@ import { providerAvailabilityService } from '@/shared/services/providerAvailabil
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
+import { isCategoryLaunched } from '@/shared/lib/catalogConfig'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function BookProviderPage() {
@@ -24,6 +25,11 @@ export function BookProviderPage() {
   const navigate = useNavigate()
   const { data: provider, isLoading, error } = useProvider(id)
   const createBooking = useCreateBooking()
+
+  const bookableServices = useMemo(
+    () => provider?.services.filter((s) => isCategoryLaunched(s.categorySlug)) ?? [],
+    [provider],
+  )
 
   const preselectedService = searchParams.get('service') ?? ''
 
@@ -52,7 +58,7 @@ export function BookProviderPage() {
   }, [user, prefilled])
 
   const selectedServiceId = serviceId || preselectedService
-  const selectedService = provider?.services.find((s) => s.serviceId === selectedServiceId)
+  const selectedService = bookableServices.find((s) => s.serviceId === selectedServiceId)
   const isPerUnit = selectedService?.pricingModel === 'per_unit'
 
   const duration = Number(durationHours) || 1
@@ -176,7 +182,7 @@ export function BookProviderPage() {
                     required
                   >
                     <option value="">Select a service</option>
-                    {provider.services.map((s) => (
+                    {bookableServices.map((s) => (
                       <option key={s.serviceId} value={s.serviceId}>
                         {s.name} — from {formatCurrency(s.priceFrom)}
                         {s.pricingModel === 'per_unit' ? '/unit' : ''}
@@ -339,12 +345,12 @@ export function BookProviderPage() {
                 )}
                 <button
                   type="submit"
-                  disabled={createBooking.isPending || provider.services.length === 0}
+                  disabled={createBooking.isPending || bookableServices.length === 0}
                   className="mt-4 hidden w-full rounded-lg bg-nexo-700 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 disabled:opacity-50 lg:block"
                 >
                   {createBooking.isPending ? 'Submitting…' : 'Request booking'}
                 </button>
-                {provider.services.length === 0 && (
+                {bookableServices.length === 0 && (
                   <p className="mt-2 text-xs text-amber-700">
                     This provider has no services listed yet.
                   </p>
@@ -356,7 +362,7 @@ export function BookProviderPage() {
               label="Request booking"
               total={breakdown ? formatCurrency(breakdown.total) : undefined}
               loading={createBooking.isPending}
-              disabled={provider.services.length === 0}
+              disabled={bookableServices.length === 0}
             />
           </>
         )}

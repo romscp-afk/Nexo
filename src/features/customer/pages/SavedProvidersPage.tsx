@@ -26,7 +26,7 @@ export function SavedProvidersPage() {
 
       {!providers?.length && !isLoading && (
         <Link
-          to="/providers"
+          to="/providers/category/cleaning"
           className="mt-4 inline-block text-sm font-medium text-nexo-700 hover:underline"
         >
           Browse providers →

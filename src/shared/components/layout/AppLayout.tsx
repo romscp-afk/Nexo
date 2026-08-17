@@ -7,6 +7,7 @@ import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { MobilePublicNav } from '@/shared/components/layout/MobilePublicNav'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
 import { cn } from '@/shared/lib/utils'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 
 export function AppLayout() {
   const { user } = useAuth()
@@ -28,22 +29,22 @@ export function AppLayout() {
           <Logo to="/" highlighted={isHome} />
           <nav className="hidden items-center gap-4 text-sm md:flex">
             <Link
-              to="/services"
+              to={`/services/${PRIMARY_CATEGORY_SLUG}`}
               className={cn(
                 'transition',
                 isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
-              Services
+              Cleaning
             </Link>
             <Link
-              to="/providers"
+              to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
               className={cn(
                 'transition',
                 isHome ? 'text-nexo-mint/85 hover:text-white' : 'text-nexo-800/70 hover:text-nexo-700',
               )}
             >
-              Providers
+              Cleaners
             </Link>
             {user ? (
               <>

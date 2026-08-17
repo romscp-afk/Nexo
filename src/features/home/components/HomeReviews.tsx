@@ -22,10 +22,10 @@ export function HomeReviews() {
             </p>
           </div>
           <Link
-            to="/providers"
+            to={`/providers/category/cleaning`}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-nexo-600 transition hover:text-nexo-800"
           >
-            Browse providers
+            Browse cleaners
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

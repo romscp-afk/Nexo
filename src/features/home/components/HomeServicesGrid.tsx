@@ -1,18 +1,14 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
-import { QueryState } from '@/features/catalog/components/CatalogUi'
+import { ComingSoonBadge, QueryState } from '@/features/catalog/components/CatalogUi'
 import type { ServiceCategory } from '@/shared/types/catalog'
+import {
+  isCategoryLaunched,
+  PRIMARY_CATEGORY_SLUG,
+  sortCategoriesForDisplay,
+} from '@/shared/lib/catalogConfig'
 import { cn } from '@/shared/lib/utils'
-
-const cardStyles = [
-  'from-nexo-900 to-nexo-deep',
-  'from-nexo-800 to-nexo-950',
-  'from-nexo-deep to-nexo-800',
-  'from-nexo-900 to-nexo-800',
-  'from-nexo-950 to-nexo-700',
-  'from-nexo-800 to-nexo-900',
-]
 
 function HomeCategoryCard({
   category,
@@ -23,9 +19,15 @@ function HomeCategoryCard({
   featured?: boolean
   styleIndex: number
 }) {
+  const launched = isCategoryLaunched(category.slug)
+  const cardStyles = [
+    'from-nexo-900 to-nexo-deep',
+    'from-nexo-800 to-nexo-950',
+    'from-nexo-deep to-nexo-800',
+  ]
   const gradient = cardStyles[styleIndex % cardStyles.length]
 
-  if (featured) {
+  if (featured && launched) {
     return (
       <Link
         to={`/services/${category.slug}`}
@@ -40,7 +42,7 @@ function HomeCategoryCard({
         />
         <div>
           <span className="text-5xl" aria-hidden>
-            {category.icon ?? '🛠️'}
+            {category.icon ?? '🧹'}
           </span>
           <h3 className="mt-4 text-2xl font-bold">{category.name}</h3>
           {category.description && (
@@ -54,21 +56,23 @@ function HomeCategoryCard({
     )
   }
 
+  if (!launched) {
+    return (
+      <div className="relative flex min-h-[120px] flex-col rounded-2xl border border-dashed border-slate-200 bg-slate-50/90 p-5">
+        <ComingSoonBadge className="absolute right-4 top-4" />
+        <span className="text-2xl opacity-60" aria-hidden>
+          {category.icon ?? '🛠️'}
+        </span>
+        <h3 className="mt-2 text-base font-semibold text-slate-600">{category.name}</h3>
+      </div>
+    )
+  }
+
   return (
     <Link
       to={`/services/${category.slug}`}
-      className={cn(
-        'group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl border border-nexo-200 bg-gradient-to-br p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-nexo-400 hover:shadow-md',
-        'from-white to-nexo-50',
-      )}
+      className="group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl border border-nexo-200 bg-gradient-to-br from-white to-nexo-50 p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-nexo-400 hover:shadow-md"
     >
-      <div
-        aria-hidden
-        className={cn(
-          'pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br opacity-30 blur-xl',
-          gradient,
-        )}
-      />
       <span className="relative text-3xl" aria-hidden>
         {category.icon ?? '🛠️'}
       </span>
@@ -85,7 +89,9 @@ function HomeCategoryCard({
 
 export function HomeServicesGrid() {
   const { data: categories, isLoading, error, refetch, isFetching } = useCategories()
-  const items = categories ?? []
+  const items = sortCategoriesForDisplay(categories ?? [])
+  const cleaning = items.find((c) => c.slug === PRIMARY_CATEGORY_SLUG)
+  const comingSoon = items.filter((c) => !isCategoryLaunched(c.slug))
 
   return (
     <section className="bg-nexo-50 py-16 sm:py-20">
@@ -93,20 +99,20 @@ export function HomeServicesGrid() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-nexo-600">
-              What we offer
+              Phase 1 — now live
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-nexo-900 sm:text-4xl">
-              Popular services
+              Home cleaning
             </h2>
             <p className="mt-2 max-w-lg text-nexo-800/70">
-              From spotless homes to cool aircon — find the right pro for every job.
+              Book verified cleaners across Singapore. More services launching soon.
             </p>
           </div>
           <Link
-            to="/services"
+            to={`/services/${PRIMARY_CATEGORY_SLUG}`}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-nexo-600 transition hover:text-nexo-800"
           >
-            View all services
+            Book cleaning
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -119,26 +125,22 @@ export function HomeServicesGrid() {
             emptyMessage="No service categories found. Check your Supabase connection or run supabase/seed.sql."
           >
             <>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {items.slice(0, 1).map((category) => (
-                  <HomeCategoryCard
-                    key={category.id}
-                    category={category}
-                    featured
-                    styleIndex={0}
-                  />
-                ))}
-              </div>
-              {items.length > 1 && (
-                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {items.slice(1, 7).map((category, i) => (
-                    <HomeCategoryCard
-                      key={category.id}
-                      category={category}
-                      styleIndex={i + 1}
-                    />
-                  ))}
+              {cleaning && (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <HomeCategoryCard category={cleaning} featured styleIndex={0} />
                 </div>
+              )}
+              {comingSoon.length > 0 && (
+                <>
+                  <p className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-slate-400">
+                    Coming soon
+                  </p>
+                  <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                    {comingSoon.map((category, i) => (
+                      <HomeCategoryCard key={category.id} category={category} styleIndex={i + 1} />
+                    ))}
+                  </div>
+                </>
               )}
             </>
           </QueryState>

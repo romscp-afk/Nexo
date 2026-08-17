@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCategories'
 import { useCreateBooking } from '@/features/bookings/hooks/useBookings'
@@ -12,6 +12,7 @@ import { appendAirconBookingNotes } from '@/shared/lib/bookingNotes'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
+import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function RequestServicePage() {
@@ -108,6 +109,10 @@ export function RequestServicePage() {
 
   const loading = catLoading || svcLoading
   const error = catError ?? svcError
+
+  if (!isCategoryLaunched(slug)) {
+    return <Navigate to={`/services/${PRIMARY_CATEGORY_SLUG}/request`} replace />
+  }
 
   return (
     <div>

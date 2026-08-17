@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { getDashboardPath } from '@/shared/lib/constants'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { Logo } from '@/shared/components/layout/Logo'
 import { cn } from '@/shared/lib/utils'
@@ -60,11 +61,11 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
               <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
                 Explore
               </p>
-              <Link to="/services" className={linkClass} onClick={close}>
-                Services
+              <Link to={`/services/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
+                Home cleaning
               </Link>
-              <Link to="/providers" className={linkClass} onClick={close}>
-                Find providers
+              <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
+                Find cleaners
               </Link>
 
               <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">

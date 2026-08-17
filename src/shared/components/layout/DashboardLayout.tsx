@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { type UserRole } from '@/shared/lib/constants'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
@@ -18,7 +19,7 @@ type NavItem = { to: string; label: string; exact?: boolean; badge?: BadgeKind }
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   customer: [
     { to: '/dashboard', label: 'Dashboard', exact: true },
-    { to: '/providers', label: 'Browse providers' },
+    { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Browse cleaners' },
     { to: '/dashboard/bookings', label: 'My bookings' },
     { to: '/dashboard/messages', label: 'Messages', badge: 'messages' },
     { to: '/dashboard/reviews', label: 'My reviews' },

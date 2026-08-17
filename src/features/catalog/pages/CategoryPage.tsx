@@ -1,7 +1,8 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCategories'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
+import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 
 export function CategoryPage() {
   const { slug = '' } = useParams()
@@ -11,6 +12,14 @@ export function CategoryPage() {
     isLoading: servicesLoading,
     error: servicesError,
   } = useCategoryServices(category?.id)
+
+  if (!slug) {
+    return <Navigate to={`/services/${PRIMARY_CATEGORY_SLUG}`} replace />
+  }
+
+  if (!isCategoryLaunched(slug)) {
+    return <Navigate to={`/services/${PRIMARY_CATEGORY_SLUG}`} replace />
+  }
 
   if (categoryLoading) {
     return <QueryState loading error={null}>{null}</QueryState>
@@ -41,7 +50,7 @@ export function CategoryPage() {
         loading={servicesLoading}
         error={servicesError}
         empty={!services?.length}
-        emptyMessage="No services listed for this category yet."
+        emptyMessage="No cleaning services listed yet."
       >
         <div className="space-y-3">
           {services?.map((service) => (
@@ -57,7 +66,7 @@ export function CategoryPage() {
               </div>
               <p className="text-sm font-medium text-nexo-700">
                 from {formatCurrency(service.basePrice)}
-                {service.pricingModel === 'per_unit' ? `/${service.unitLabel ?? 'unit'}` : ''}
+                {service.pricingModel === 'per_unit' ? `/${service.unitLabel ?? 'unit'}` : '/hr'}
               </p>
             </div>
           ))}
@@ -66,13 +75,13 @@ export function CategoryPage() {
 
       <div className="mt-8 rounded-xl bg-nexo-50 px-5 py-4">
         <p className="text-sm text-nexo-900">
-          Find a trusted provider for {category.name.toLowerCase()}.
+          Find a trusted cleaner near you.
         </p>
         <Link
           to={`/services/${category.slug}/request`}
           className="mt-2 inline-block rounded-lg bg-nexo-700 px-4 py-2 text-sm font-medium text-white hover:bg-nexo-800"
         >
-          Request {category.name.toLowerCase()} →
+          Request cleaning →
         </Link>
         <Link
           to={`/providers/category/${category.slug}`}

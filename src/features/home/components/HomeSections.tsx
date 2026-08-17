@@ -32,18 +32,18 @@ export function HomeTrustBar() {
 const steps = [
   {
     step: '01',
-    title: 'Discover',
-    description: 'Browse categories from deep cleaning to aircon servicing — all tailored for SG homes.',
+    title: 'Choose a cleaner',
+    description: 'Browse verified home cleaning providers by area, rating, and hourly rate.',
   },
   {
     step: '02',
-    title: 'Compare',
-    description: 'Check ratings, coverage areas, and pricing. Pick the provider that fits your schedule.',
+    title: 'Book a slot',
+    description: 'Pick date, time, and address. See pricing upfront before you confirm.',
   },
   {
     step: '03',
-    title: 'Book & relax',
-    description: 'Request a booking, pay via PayNow or cash, and track everything in your dashboard.',
+    title: 'Relax',
+    description: 'Pay via PayNow or cash. Chat with your cleaner and track the job in your dashboard.',
   },
 ]
 
@@ -92,10 +92,9 @@ export function HomeCta() {
             }}
           />
           <div className="relative">
-            <h2 className="text-3xl font-bold sm:text-4xl">Ready to simplify your home life?</h2>
+            <h2 className="text-3xl font-bold sm:text-4xl">Ready for a cleaner home?</h2>
             <p className="mx-auto mt-4 max-w-lg text-nexo-mint/80">
-              Join thousands of Singapore homeowners who trust Nexo for reliable, verified home
-              services.
+              Join Singapore homeowners booking trusted cleaners through Nexo.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
@@ -106,10 +105,10 @@ export function HomeCta() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/providers"
+                to="/providers/category/cleaning"
                 className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Browse providers
+                Browse cleaners
               </Link>
             </div>
           </div>

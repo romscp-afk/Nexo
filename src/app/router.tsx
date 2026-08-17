@@ -5,7 +5,6 @@ import { DashboardLayout } from '@/shared/components/layout/DashboardLayout'
 import { ProtectedRoute, RoleRoute, GuestRoute } from '@/shared/guards/ProtectedRoute'
 import { HomePage } from '@/features/home/pages/HomePage'
 import { LoginPage, RegisterPage } from '@/features/auth/pages/AuthPages'
-import { ServicesPage } from '@/features/catalog/pages/ServicesPage'
 import { CategoryPage } from '@/features/catalog/pages/CategoryPage'
 import { ProvidersPage } from '@/features/providers/pages/ProvidersPage'
 import { ProviderDetailPage } from '@/features/providers/pages/ProviderDetailPage'
@@ -50,9 +49,9 @@ export const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/services', element: <ServicesPage /> },
+      { path: '/services', element: <Navigate to="/services/cleaning" replace /> },
       { path: '/services/:slug', element: <CategoryPage /> },
-      { path: '/providers', element: <ProvidersPage /> },
+      { path: '/providers', element: <Navigate to="/providers/category/cleaning" replace /> },
       { path: '/providers/category/:slug', element: <ProvidersPage /> },
       { path: '/providers/:id', element: <ProviderDetailPage /> },
       {
