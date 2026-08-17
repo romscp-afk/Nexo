@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { CategoryCard, PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
-import { PRIMARY_CATEGORY_SLUG, sortCategoriesForDisplay } from '@/shared/lib/catalogConfig'
+import { PRIMARY_CATEGORY_SLUG, getLaunchedCategories } from '@/shared/lib/catalogConfig'
 
 export function ServicesPage() {
   const { data: categories, isLoading, error } = useCategories()
-  const sorted = useMemo(
-    () => sortCategoriesForDisplay(categories ?? []),
+  const launched = useMemo(
+    () => getLaunchedCategories(categories ?? []),
     [categories],
   )
 
@@ -15,17 +15,17 @@ export function ServicesPage() {
     <div>
       <PageHeader
         title="Home cleaning"
-        description="Book trusted cleaners across Singapore. More home services coming soon."
+        description="Book trusted cleaners across Singapore."
       />
 
       <QueryState
         loading={isLoading}
         error={error}
-        empty={!sorted.length}
+        empty={!launched.length}
         emptyMessage="No service categories yet. Please try again later."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((category) => (
+          {launched.map((category) => (
             <CategoryCard key={category.id} category={category} />
           ))}
         </div>

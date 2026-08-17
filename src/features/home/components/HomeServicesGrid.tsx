@@ -6,7 +6,6 @@ import type { ServiceCategory } from '@/shared/types/catalog'
 import {
   isCategoryLaunched,
   PRIMARY_CATEGORY_SLUG,
-  sortCategoriesForDisplay,
 } from '@/shared/lib/catalogConfig'
 import { cn } from '@/shared/lib/utils'
 
@@ -89,9 +88,7 @@ function HomeCategoryCard({
 
 export function HomeServicesGrid() {
   const { data: categories, isLoading, error, refetch, isFetching } = useCategories()
-  const items = sortCategoriesForDisplay(categories ?? [])
-  const cleaning = items.find((c) => c.slug === PRIMARY_CATEGORY_SLUG)
-  const comingSoon = items.filter((c) => !isCategoryLaunched(c.slug))
+  const cleaning = categories?.find((c) => c.slug === PRIMARY_CATEGORY_SLUG)
 
   return (
     <section className="bg-nexo-50 py-16 sm:py-20">
@@ -102,7 +99,7 @@ export function HomeServicesGrid() {
               Home cleaning
             </h2>
             <p className="mt-2 max-w-lg text-nexo-800/70">
-              Book verified cleaners across Singapore. More services launching soon.
+              Book verified cleaners across Singapore.
             </p>
           </div>
           <Link
@@ -118,7 +115,7 @@ export function HomeServicesGrid() {
           <QueryState
             loading={isLoading}
             error={error}
-            empty={!isLoading && !isFetching && items.length === 0}
+            empty={!isLoading && !isFetching && !cleaning}
             emptyMessage="No service categories found. Please try again later."
           >
             <>
@@ -126,18 +123,6 @@ export function HomeServicesGrid() {
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <HomeCategoryCard category={cleaning} featured styleIndex={0} />
                 </div>
-              )}
-              {comingSoon.length > 0 && (
-                <>
-                  <p className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-slate-400">
-                    Coming soon
-                  </p>
-                  <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-                    {comingSoon.map((category, i) => (
-                      <HomeCategoryCard key={category.id} category={category} styleIndex={i + 1} />
-                    ))}
-                  </div>
-                </>
               )}
             </>
           </QueryState>

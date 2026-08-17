@@ -21,6 +21,11 @@ export function sortCategoriesForDisplay<T extends { slug: string; sortOrder: nu
   })
 }
 
+/** Public catalog views — cleaning only for phase 1. */
+export function getLaunchedCategories<T extends { slug: string }>(categories: T[]): T[] {
+  return categories.filter((category) => isCategoryLaunched(category.slug))
+}
+
 export const PHASE1_TAGLINE = 'Book trusted home cleaning in Singapore'
 
 export const COMING_SOON_LABEL = 'Coming soon'

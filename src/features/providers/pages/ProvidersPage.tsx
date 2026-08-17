@@ -3,73 +3,40 @@ import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-r
 import { useCategories } from '@/features/catalog/hooks/useCategories'
 import { useProviders } from '@/features/providers/hooks/useProviders'
 import { ProviderCard } from '@/features/providers/components/ProviderCard'
-import { ProviderCategoryCard } from '@/features/providers/components/ProviderCategoryCard'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { useProviderFilterStore } from '@/shared/stores/filterStore'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import {
   isCategoryLaunched,
   PRIMARY_CATEGORY_SLUG,
-  sortCategoriesForDisplay,
 } from '@/shared/lib/catalogConfig'
 
 function ProviderFiltersBar({
-  categories,
-  categorySlug,
   area,
   verifiedOnly,
   minRating,
   minPrice,
   maxPrice,
-  onCategoryChange,
   onAreaChange,
   onVerifiedChange,
   onMinRatingChange,
   onMinPriceChange,
   onMaxPriceChange,
-  showCategoryFilter,
 }: {
-  categories: { slug: string; name: string }[] | undefined
-  categorySlug: string
   area: string
   verifiedOnly: boolean
   minRating: number
   minPrice: string
   maxPrice: string
-  onCategoryChange: (slug: string) => void
   onAreaChange: (area: string) => void
   onVerifiedChange: (value: boolean) => void
   onMinRatingChange: (value: number) => void
   onMinPriceChange: (value: string) => void
   onMaxPriceChange: (value: string) => void
-  showCategoryFilter?: boolean
 }) {
   return (
     <div className="mb-6 space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-      <div className={`grid gap-3 ${showCategoryFilter ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'}`}>
-        {showCategoryFilter ? (
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Category</span>
-            <select
-              value={categorySlug}
-              onChange={(e) => onCategoryChange(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-            >
-              <option value="">All categories</option>
-              {categories?.map((category) => (
-                <option
-                  key={category.slug}
-                  value={category.slug}
-                  disabled={!isCategoryLaunched(category.slug)}
-                >
-                  {category.name}
-                  {!isCategoryLaunched(category.slug) ? ' (coming soon)' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-
+      <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Area</span>
           <select
@@ -153,10 +120,6 @@ export function ProvidersPage() {
     useProviderFilterStore()
 
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategories()
-  const sortedCategories = useMemo(
-    () => sortCategoriesForDisplay(categories ?? []),
-    [categories],
-  )
 
   const areaInitRef = useRef(false)
 
@@ -201,7 +164,6 @@ export function ProvidersPage() {
     categoryFilters,
     { enabled: isCategoryView },
   )
-  const { data: allProvidersForCounts } = useProviders({}, { enabled: !isCategoryView })
   const { data: unfilteredCategoryProviders } = useProviders(
     { categorySlug: categorySlug || storeCategorySlug || undefined },
     { enabled: isCategoryView && Boolean(area.trim()) },
@@ -210,28 +172,7 @@ export function ProvidersPage() {
   const hasAreaFilter = Boolean(area.trim())
   const areaFilteredEmpty = isCategoryView && hasAreaFilter && !categoryProviders?.length && Boolean(unfilteredCategoryProviders?.length)
 
-  const providerCountByCategory = useMemo(() => {
-    const counts = new Map<string, number>()
-    const source = allProvidersForCounts ?? browseProviders ?? []
-    for (const provider of source) {
-      const slugs = new Set(provider.services.map((service) => service.categorySlug))
-      for (const slug of slugs) {
-        counts.set(slug, (counts.get(slug) ?? 0) + 1)
-      }
-    }
-    return counts
-  }, [allProvidersForCounts, browseProviders])
-
   const activeCategory = categories?.find((category) => category.slug === categorySlug)
-
-  const handleCategoryChange = (slug: string) => {
-    setCategorySlug(slug)
-    if (!slug) {
-      navigate('/providers')
-      return
-    }
-    navigate(`/providers/category/${slug}`)
-  }
 
   const handleAreaChange = (nextArea: string) => {
     setArea(nextArea)
@@ -256,30 +197,26 @@ export function ProvidersPage() {
     return (
       <div>
         <PageHeader
-          backTo="/providers"
-          backLabel="All categories"
-          title={activeCategory ? `${activeCategory.icon ?? ''} ${activeCategory.name}`.trim() : 'Providers'}
+          backTo={`/services/${PRIMARY_CATEGORY_SLUG}`}
+          backLabel="Home cleaning"
+          title={activeCategory ? `${activeCategory.icon ?? ''} ${activeCategory.name}`.trim() : 'Cleaners'}
           description={
             activeCategory?.description ??
-            'Compare verified professionals for this service category.'
+            'Compare verified home cleaning professionals.'
           }
         />
 
         <ProviderFiltersBar
-          categories={sortedCategories}
-          categorySlug={categorySlug}
           area={area}
           verifiedOnly={verifiedOnly}
           minRating={minRating}
           minPrice={minPrice}
           maxPrice={maxPrice}
-          onCategoryChange={handleCategoryChange}
           onAreaChange={handleAreaChange}
           onVerifiedChange={setVerifiedOnly}
           onMinRatingChange={setMinRating}
           onMinPriceChange={setMinPrice}
           onMaxPriceChange={setMaxPrice}
-          showCategoryFilter
         />
 
         {areaFilteredEmpty && (
@@ -301,7 +238,7 @@ export function ProvidersPage() {
           loading={categoryLoading || categoriesLoading}
           error={categoryError ?? categoriesError}
           empty={!categoryProviders?.length}
-          emptyMessage="No providers match your filters in this category yet. Try a different area or category."
+          emptyMessage="No cleaners match your filters yet. Try a different area."
         >
           <div className="grid gap-4 lg:grid-cols-2">
             {categoryProviders?.map((provider) => (
@@ -323,19 +260,16 @@ export function ProvidersPage() {
   return (
     <div>
       <PageHeader
-        title="Cleaning providers"
-        description="Browse verified home cleaning professionals. More service categories coming soon."
+        title="Find cleaners"
+        description="Browse verified home cleaning professionals across Singapore."
       />
 
       <ProviderFiltersBar
-        categories={sortedCategories}
-        categorySlug=""
         area={area}
         verifiedOnly={verifiedOnly}
         minRating={minRating}
         minPrice={minPrice}
         maxPrice={maxPrice}
-        onCategoryChange={handleCategoryChange}
         onAreaChange={handleAreaChange}
         onVerifiedChange={setVerifiedOnly}
         onMinRatingChange={setMinRating}
@@ -344,42 +278,17 @@ export function ProvidersPage() {
       />
 
       <QueryState
-        loading={categoriesLoading || browseLoading}
-        error={categoriesError ?? browseError}
-        empty={!sortedCategories.length}
-        emptyMessage="No service categories yet. Please try again later."
+        loading={browseLoading}
+        error={browseError}
+        empty={!browseProviders?.length}
+        emptyMessage="No cleaners listed yet. Service professionals appear here after registering and adding services."
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedCategories.map((category) => (
-            <ProviderCategoryCard
-              key={category.id}
-              category={category}
-              providerCount={providerCountByCategory.get(category.slug) ?? 0}
-            />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {browseProviders?.map((provider) => (
+            <ProviderCard key={provider.id} provider={provider} />
           ))}
         </div>
       </QueryState>
-
-      <section className="mt-10">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Available cleaners</h2>
-            <p className="text-sm text-slate-600">All active cleaning providers on Nexo.</p>
-          </div>
-        </div>
-        <QueryState
-          loading={browseLoading}
-          error={browseError}
-          empty={!browseProviders?.length}
-          emptyMessage="No providers listed yet. Service professionals appear here after registering and adding services."
-        >
-          <div className="grid gap-4 lg:grid-cols-2">
-            {browseProviders?.map((provider) => (
-              <ProviderCard key={provider.id} provider={provider} />
-            ))}
-          </div>
-        </QueryState>
-      </section>
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Are you a service professional?{' '}
