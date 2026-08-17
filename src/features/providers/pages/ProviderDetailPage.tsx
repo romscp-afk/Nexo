@@ -8,6 +8,8 @@ import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PublicReviewList } from '@/features/reviews/components/PublicReviewList'
 import { ProviderWeeklyHoursDisplay } from '@/features/providers/pages/ProviderSchedulePage'
 import { formatCurrency } from '@/shared/lib/utils'
+import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 
 export function ProviderDetailPage() {
   const { id = '' } = useParams()
@@ -26,6 +28,10 @@ export function ProviderDetailPage() {
     if (!user || user.role !== 'customer') return
     await toggleSaved.mutateAsync({ providerId: id, saved: Boolean(isSaved) })
   }
+
+  const cleaningHourlyRate = getCleaningCatalogHourlyRate(
+    provider?.services.find((s) => s.categorySlug === PRIMARY_CATEGORY_SLUG)?.priceFrom,
+  )
 
   return (
     <div>
@@ -98,10 +104,15 @@ export function ProviderDetailPage() {
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-medium text-nexo-700">
-                              from {formatCurrency(service.priceFrom)}
+                              from{' '}
+                              {formatCurrency(
+                                service.categorySlug === PRIMARY_CATEGORY_SLUG
+                                  ? getCleaningCatalogHourlyRate(service.priceFrom)
+                                  : service.priceFrom,
+                              )}
                               {service.pricingModel === 'per_unit'
                                 ? `/${service.unitLabel ?? 'unit'}`
-                                : ''}
+                                : '/hr'}
                             </p>
                             {isCustomer && (
                               <Link
@@ -142,7 +153,7 @@ export function ProviderDetailPage() {
                   <>
                     <p className="text-sm text-slate-500">Hourly rate</p>
                     <p className="mt-1 text-2xl font-bold text-slate-900">
-                      {formatCurrency(provider.hourlyRate)}
+                      {formatCurrency(cleaningHourlyRate)}
                       <span className="text-sm font-normal text-slate-500">/hr</span>
                     </p>
                   </>

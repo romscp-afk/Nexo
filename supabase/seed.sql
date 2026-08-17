@@ -20,7 +20,7 @@ SELECT id,
   slug || '-standard',
   description,
   CASE slug
-    WHEN 'cleaning' THEN 45
+    WHEN 'cleaning' THEN 15
     WHEN 'handyman' THEN 60
     WHEN 'movers' THEN 120
     WHEN 'aircon' THEN 55

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Star, BadgeCheck, MapPin } from 'lucide-react'
 import type { ProviderListing } from '@/shared/types/catalog'
+import { useCleaningPricing } from '@/shared/hooks/useCleaningPricing'
 import { formatCurrency } from '@/shared/lib/utils'
 
 export function ProviderCard({ provider }: { provider: ProviderListing }) {
-  const minPrice = provider.services.length
-    ? Math.min(...provider.services.map((s) => s.priceFrom))
-    : provider.hourlyRate
+  const { catalogBasePrice, loading: pricingLoading } = useCleaningPricing()
+  const displayRate = pricingLoading ? null : catalogBasePrice
 
   return (
     <Link
@@ -33,7 +33,9 @@ export function ProviderCard({ provider }: { provider: ProviderListing }) {
               <span className="text-slate-400">({provider.ratingCount})</span>
             </div>
           )}
-          <p className="mt-1 text-slate-500">from {formatCurrency(minPrice)}/hr</p>
+          <p className="mt-1 text-slate-500">
+            from {displayRate != null ? formatCurrency(displayRate) : '…'}/hr
+          </p>
         </div>
       </div>
 

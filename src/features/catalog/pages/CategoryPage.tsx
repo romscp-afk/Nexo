@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCategories'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { CleaningPriceLabel, CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
 import { formatCurrency } from '@/shared/lib/utils'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { CLEANING_SERVICE_CONTENT } from '@/shared/lib/cleaningContent'
@@ -132,8 +133,7 @@ export function CategoryPage() {
                     )}
                   </div>
                   <p className="text-sm font-medium text-nexo-700">
-                    from {formatCurrency(service.basePrice)}
-                    {service.pricingModel === 'per_unit' ? `/${service.unitLabel ?? 'unit'}` : '/hr'}
+                    from {formatCurrency(getCleaningCatalogHourlyRate(service.basePrice))}/hr
                   </p>
                 </div>
               ))}

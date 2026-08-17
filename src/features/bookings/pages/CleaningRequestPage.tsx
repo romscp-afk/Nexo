@@ -8,11 +8,12 @@ import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { CleaningPriceLabel } from '@/shared/components/CleaningPriceLabel'
 import { formatCurrency } from '@/shared/lib/utils'
+import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { buildPriceBreakdown } from '@/shared/lib/pricing'
 import { appendCleaningBookingNotes } from '@/shared/lib/bookingNotes'
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
-import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import {
   BOOKING_CONFIRMATION,
   CLEANING_TYPES,
@@ -106,10 +107,11 @@ export function CleaningRequestPage() {
 
   const breakdown = useMemo(() => {
     if (!selectedService) return null
+    const hourlyRate = getCleaningCatalogHourlyRate(selectedService.basePrice)
     return buildPriceBreakdown({
       pricingModel: selectedService.pricingModel,
-      priceFrom: selectedService.basePrice,
-      hourlyRate: selectedService.basePrice,
+      priceFrom: hourlyRate,
+      hourlyRate,
       durationHours: duration,
       quantity: 1,
       unitPrices: {},

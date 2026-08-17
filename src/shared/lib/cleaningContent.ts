@@ -1,5 +1,8 @@
 /** Phase 1 cleaning copy — TODO: confirm legal/policy text with business before production. */
 
+/** Customer-facing catalog hourly rate for standard home cleaning (SGD). */
+export const CLEANING_CATALOG_HOURLY_RATE = 15
+
 export const MIN_BOOKING_HOURS = 2
 
 export const BOOKING_CONFIRMATION =

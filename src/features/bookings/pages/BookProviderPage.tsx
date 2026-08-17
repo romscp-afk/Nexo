@@ -15,7 +15,8 @@ import { providerAvailabilityService } from '@/shared/services/providerAvailabil
 import { ADMIN_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
-import { isCategoryLaunched } from '@/shared/lib/catalogConfig'
+import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 
 export function BookProviderPage() {
@@ -66,10 +67,17 @@ export function BookProviderPage() {
 
   const breakdown = useMemo(() => {
     if (!selectedService || !provider) return null
+    const isCleaning = selectedService.categorySlug === PRIMARY_CATEGORY_SLUG
+    const hourlyRate = isCleaning
+      ? getCleaningCatalogHourlyRate(selectedService.priceFrom)
+      : provider.hourlyRate
+    const priceFrom = isCleaning
+      ? getCleaningCatalogHourlyRate(selectedService.priceFrom)
+      : selectedService.priceFrom
     return buildPriceBreakdown({
       pricingModel: selectedService.pricingModel,
-      priceFrom: selectedService.priceFrom,
-      hourlyRate: provider.hourlyRate,
+      priceFrom,
+      hourlyRate,
       durationHours: duration,
       quantity: unitCount,
       unitPrices: selectedService.unitPrices,
