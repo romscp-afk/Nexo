@@ -4,9 +4,19 @@ import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import App from './App'
 
-registerSW({ immediate: true })
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    void updateSW(true)
+  },
+})
 
-createRoot(document.getElementById('root')!).render(
+const rootEl = document.getElementById('root')
+if (!rootEl) {
+  throw new Error('Missing #root element')
+}
+
+createRoot(rootEl).render(
   <StrictMode>
     <App />
   </StrictMode>,

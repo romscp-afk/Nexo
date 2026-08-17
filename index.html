@@ -18,6 +18,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="max-width: 32rem; margin: 2rem auto; font-family: system-ui, sans-serif; color: #334155;">
+        Nexo requires JavaScript. Please enable it and reload this page.
+      </p>
+    </noscript>
+    <script>
+      window.setTimeout(function () {
+        var root = document.getElementById('root')
+        if (root && !root.childElementCount && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            return Promise.all(regs.map(function (r) { return r.unregister() }))
+          }).then(function () { window.location.reload() })
+        }
+      }, 4000)
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
