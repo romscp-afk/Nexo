@@ -102,6 +102,19 @@ export function useDeleteProvider() {
   })
 }
 
+export function useDeleteBooking() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await adminService.deleteBooking(bookingId)
+      if (error) throw new Error(error)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
+    },
+  })
+}
+
 export function useSetProviderVerified() {
   const queryClient = useQueryClient()
   return useMutation({

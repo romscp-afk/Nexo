@@ -451,6 +451,12 @@ export const adminService = {
     return { data: null, error: null }
   },
 
+  async deleteBooking(bookingId: string): Promise<AuthResult<null>> {
+    const { error } = await supabase.rpc('admin_delete_booking', { p_booking_id: bookingId })
+    if (error) return { data: null, error: error.message }
+    return { data: null, error: null }
+  },
+
   async setProviderVerified(providerId: string, isVerified: boolean): Promise<AuthResult<AdminProvider>> {
     const { data, error } = await supabase.rpc('admin_set_provider_verified', {
       p_provider_id: providerId,
