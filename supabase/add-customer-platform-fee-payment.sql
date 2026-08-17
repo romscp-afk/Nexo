@@ -77,7 +77,7 @@ BEGIN
       VALUES (
         NEW.customer_id, 'Pay in advance via PayNow',
         'Pay ' || pay_amount::TEXT || ' SGD (includes platform fee). Ref: ' || payment_ref,
-        'booking',
+        'booking'::notification_type,
         jsonb_build_object('booking_id', NEW.id, 'payment_reference', payment_ref, 'action', 'paynow')
       );
 
@@ -99,7 +99,7 @@ BEGIN
         NEW.customer_id, 'Pay platform fee via PayNow',
         'Pay ' || pay_amount::TEXT || ' SGD platform fee. Ref: ' || payment_ref ||
           '. Pay the provider in cash when the job is done.',
-        'booking',
+        'booking'::notification_type,
         jsonb_build_object('booking_id', NEW.id, 'payment_reference', payment_ref, 'action', 'paynow')
       );
 
