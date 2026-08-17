@@ -98,10 +98,7 @@ export function HomeServicesGrid() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-nexo-600">
-              Phase 1 — now live
-            </p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-nexo-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-nexo-900 sm:text-4xl">
               Home cleaning
             </h2>
             <p className="mt-2 max-w-lg text-nexo-800/70">
