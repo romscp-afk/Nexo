@@ -347,7 +347,7 @@ export function ProvidersPage() {
         loading={categoriesLoading || browseLoading}
         error={categoriesError ?? browseError}
         empty={!sortedCategories.length}
-        emptyMessage="No service categories yet. Run supabase/seed.sql in your Supabase project."
+        emptyMessage="No service categories yet. Please try again later."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {sortedCategories.map((category) => (

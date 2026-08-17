@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import { useAdminProviders, useSetProviderVerified } from '@/features/admin/hooks/useAdmin'
+import {
+  useAdminProviders,
+  useDeleteProvider,
+  useSetProviderVerified,
+} from '@/features/admin/hooks/useAdmin'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
 
 export function AdminProvidersPage() {
   const { data: providers, isLoading, error } = useAdminProviders()
   const setVerified = useSetProviderVerified()
+  const deleteProvider = useDeleteProvider()
   const [actionError, setActionError] = useState('')
 
   const toggleVerified = async (providerId: string, isVerified: boolean) => {
@@ -17,10 +22,29 @@ export function AdminProvidersPage() {
     }
   }
 
+  const removeProvider = async (providerId: string, businessName: string) => {
+    if (
+      !window.confirm(
+        `Remove ${businessName} from Nexo? Their listing and provider bookings will be deleted. Their login account stays active as a customer.`,
+      )
+    ) {
+      return
+    }
+
+    setActionError('')
+    try {
+      await deleteProvider.mutateAsync(providerId)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Remove failed')
+    }
+  }
+
+  const actionPending = setVerified.isPending || deleteProvider.isPending
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Providers</h1>
-      <p className="mt-1 text-slate-600">Verify providers and monitor listings.</p>
+      <p className="mt-1 text-slate-600">Verify providers, remove listings, and monitor activity.</p>
 
       {actionError && (
         <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{actionError}</p>
@@ -48,14 +72,24 @@ export function AdminProvidersPage() {
                   <td className="px-4 py-3">{formatCurrency(p.hourlyRate)}/hr</td>
                   <td className="px-4 py-3">{p.isVerified ? 'Yes' : 'No'}</td>
                   <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => toggleVerified(p.id, p.isVerified)}
-                      disabled={setVerified.isPending}
-                      className="text-nexo-700 hover:underline disabled:opacity-50"
-                    >
-                      {p.isVerified ? 'Remove verification' : 'Verify'}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleVerified(p.id, p.isVerified)}
+                        disabled={actionPending}
+                        className="text-nexo-700 hover:underline disabled:opacity-50"
+                      >
+                        {p.isVerified ? 'Remove verification' : 'Verify'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeProvider(p.id, p.businessName)}
+                        disabled={actionPending}
+                        className="text-red-600 hover:underline disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -6,6 +6,10 @@ import { PublicReviewList } from '@/features/reviews/components/PublicReviewList
 export function HomeReviews() {
   const { data: reviews, isLoading, error } = usePublicReviews(6)
 
+  if (!isLoading && !error && (!reviews || reviews.length === 0)) {
+    return null
+  }
+
   return (
     <section className="bg-nexo-50 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

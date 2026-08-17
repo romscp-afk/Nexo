@@ -204,7 +204,7 @@ export function CustomerDashboardPage() {
           emptyMessage={
             user?.preferredArea
               ? `No providers in ${user.preferredArea} yet. Try All areas on the providers page.`
-              : 'No providers yet. Run supabase/seed-demo.sql in the Supabase SQL Editor.'
+              : 'No cleaners listed yet. Check back soon or browse all providers.'
           }
         >
           <div className="grid gap-4 lg:grid-cols-2">

@@ -22,7 +22,7 @@ export function ServicesPage() {
         loading={isLoading}
         error={error}
         empty={!sorted.length}
-        emptyMessage="No service categories yet. Run supabase/seed.sql in your Supabase project."
+        emptyMessage="No service categories yet. Please try again later."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((category) => (

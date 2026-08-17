@@ -204,6 +204,18 @@ export const adminService = {
     return { data: (data as ProviderRow[]).map(mapAdminProvider), error: null }
   },
 
+  async deleteUser(userId: string): Promise<AuthResult<null>> {
+    const { error } = await supabase.rpc('admin_delete_user', { p_user_id: userId })
+    if (error) return { data: null, error: error.message }
+    return { data: null, error: null }
+  },
+
+  async deleteProvider(providerId: string): Promise<AuthResult<null>> {
+    const { error } = await supabase.rpc('admin_delete_provider', { p_provider_id: providerId })
+    if (error) return { data: null, error: error.message }
+    return { data: null, error: null }
+  },
+
   async setProviderVerified(providerId: string, isVerified: boolean): Promise<AuthResult<AdminProvider>> {
     const { data, error } = await supabase
       .from('providers')

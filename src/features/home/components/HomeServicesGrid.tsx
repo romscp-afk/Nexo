@@ -119,7 +119,7 @@ export function HomeServicesGrid() {
             loading={isLoading}
             error={error}
             empty={!isLoading && !isFetching && items.length === 0}
-            emptyMessage="No service categories found. Check your Supabase connection or run supabase/seed.sql."
+            emptyMessage="No service categories found. Please try again later."
           >
             <>
               {cleaning && (

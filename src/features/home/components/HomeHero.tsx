@@ -80,14 +80,9 @@ export function HomeHero() {
                   🧹
                 </span>
               </div>
-              <p className="mt-4 text-center text-lg font-bold text-nexo-950">Home Cleaning</p>
+              <p className="mt-4 text-center text-lg font-bold text-nexo-950">Standard Home Cleaning</p>
               <p className="mt-1 text-center text-xs text-nexo-800/70">{APP_NAME} · {APP_TAGLINE}</p>
-              <div className="mt-4 flex justify-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="mt-2 text-center text-xs font-medium text-nexo-600">From $25/hr · PayNow accepted</p>
+              <p className="mt-4 text-center text-xs font-medium text-nexo-600">from $15/hr · PayNow accepted</p>
             </div>
 
             <div

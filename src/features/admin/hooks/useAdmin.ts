@@ -59,6 +59,33 @@ export function useSetUserActive() {
   })
 }
 
+export function useDeleteUser() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await adminService.deleteUser(userId)
+      if (error) throw new Error(error)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
+    },
+  })
+}
+
+export function useDeleteProvider() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (providerId: string) => {
+      const { error } = await adminService.deleteProvider(providerId)
+      if (error) throw new Error(error)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin'] })
+      void queryClient.invalidateQueries({ queryKey: ['providers'] })
+    },
+  })
+}
+
 export function useSetProviderVerified() {
   const queryClient = useQueryClient()
   return useMutation({

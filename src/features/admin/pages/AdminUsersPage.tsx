@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useAdminUsers, useSetUserActive } from '@/features/admin/hooks/useAdmin'
+import { useAdminUsers, useDeleteUser, useSetUserActive } from '@/features/admin/hooks/useAdmin'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 
 export function AdminUsersPage() {
   const { data: users, isLoading, error } = useAdminUsers()
   const setActive = useSetUserActive()
+  const deleteUser = useDeleteUser()
   const [actionError, setActionError] = useState('')
 
   const toggleActive = async (userId: string, isActive: boolean) => {
@@ -15,6 +16,25 @@ export function AdminUsersPage() {
       setActionError(err instanceof Error ? err.message : 'Update failed')
     }
   }
+
+  const removeUser = async (userId: string, email: string) => {
+    if (
+      !window.confirm(
+        `Permanently remove ${email}? This deletes their account, profile, and all related data. This cannot be undone.`,
+      )
+    ) {
+      return
+    }
+
+    setActionError('')
+    try {
+      await deleteUser.mutateAsync(userId)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Remove failed')
+    }
+  }
+
+  const actionPending = setActive.isPending || deleteUser.isPending
 
   return (
     <div>
@@ -53,15 +73,27 @@ export function AdminUsersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {user.role !== 'admin' && (
-                      <button
-                        type="button"
-                        onClick={() => toggleActive(user.userId, user.isActive)}
-                        disabled={setActive.isPending}
-                        className="text-nexo-700 hover:underline disabled:opacity-50"
-                      >
-                        {user.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
+                    {user.role !== 'admin' ? (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleActive(user.userId, user.isActive)}
+                          disabled={actionPending}
+                          className="text-nexo-700 hover:underline disabled:opacity-50"
+                        >
+                          {user.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeUser(user.userId, user.email)}
+                          disabled={actionPending}
+                          className="text-red-600 hover:underline disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400">Protected</span>
                     )}
                   </td>
                 </tr>

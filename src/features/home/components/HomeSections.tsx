@@ -1,14 +1,23 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Users, CalendarCheck, BadgeCheck, Headphones } from 'lucide-react'
-
-const stats = [
-  { value: '50+', label: 'Verified providers', icon: Users },
-  { value: '12', label: 'Service areas', icon: BadgeCheck },
-  { value: '24h', label: 'Fast booking', icon: CalendarCheck },
-  { value: 'AI', label: 'Instant support', icon: Headphones },
-]
+import { ArrowRight, Users, CalendarCheck, BadgeCheck, Wallet } from 'lucide-react'
+import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import { useProviders } from '@/features/providers/hooks/useProviders'
 
 export function HomeTrustBar() {
+  const { data: providers } = useProviders({ categorySlug: PRIMARY_CATEGORY_SLUG })
+  const providerCount = providers?.length ?? 0
+
+  const stats = [
+    {
+      value: providerCount > 0 ? String(providerCount) : '—',
+      label: providerCount === 1 ? 'Verified cleaner' : 'Verified cleaners',
+      icon: Users,
+    },
+    { value: String(SINGAPORE_AREAS.length), label: 'Service areas', icon: BadgeCheck },
+    { value: '24h', label: 'Fast booking', icon: CalendarCheck },
+    { value: 'PayNow', label: 'Flexible payment', icon: Wallet },
+  ]
   return (
     <section className="border-y border-nexo-200 bg-white">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-nexo-200 sm:grid-cols-4">
