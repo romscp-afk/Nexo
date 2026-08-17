@@ -28,7 +28,7 @@ export function AdminChatsPage() {
           loading={isLoading}
           error={error}
           empty={!threads?.length}
-          emptyMessage="No chat messages yet. Conversations appear after payment is confirmed on bookings."
+          emptyMessage="No active booking chats yet. Threads appear once a provider is assigned and payment is confirmed."
         >
           <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
             {threads?.map((thread) => (

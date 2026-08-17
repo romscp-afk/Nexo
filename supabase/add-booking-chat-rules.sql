@@ -28,7 +28,7 @@ BEGIN
     IF NOT EXISTS (
       SELECT 1 FROM payments p
       WHERE p.booking_id = b.id
-        AND p.payment_kind = 'provider_admin_fee'
+        AND p.payment_kind IN ('customer_advance', 'provider_admin_fee')
         AND p.status = 'paid'
     ) THEN
       RETURN FALSE;

@@ -27,6 +27,7 @@
     "setup:whatsapp-dev": "node scripts/setup-whatsapp-dev.mjs",
     "setup:customer-flow": "node scripts/apply-customer-flow.mjs",
     "setup:booking-chat": "node scripts/apply-booking-chat-rules.mjs",
+    "setup:booking-lifecycle": "node scripts/apply-booking-lifecycle-notifications.mjs",
     "setup:booking-chat-inbox": "node scripts/apply-booking-chat-inbox.mjs",
     "setup:booking-chat-realtime": "node scripts/apply-booking-chat-realtime.mjs",
     "setup:admin-chat-email": "node scripts/apply-admin-chat-email.mjs",
@@ -49,6 +50,8 @@
     "setup:production": "node scripts/setup-production.mjs",
     "setup:pricing": "node scripts/apply-pricing-units.mjs",
     "setup:customer-platform-fee": "node scripts/apply-customer-platform-fee-payment.mjs",
+    "setup:open-bookings": "node scripts/apply-open-booking-requests.mjs",
+    "setup:notification-type-cast": "node scripts/apply-notification-type-cast.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"
   },
   "dependencies": {

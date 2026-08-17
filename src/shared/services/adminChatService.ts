@@ -13,44 +13,72 @@ function relationField<T extends Record<string, unknown>>(
   return typeof field === 'string' ? field : null
 }
 
+const CHAT_OVERSIGHT_STATUSES = ['confirmed', 'in_progress', 'completed'] as const
+
 export const adminChatService = {
   async listThreads(): Promise<AuthResult<AdminChatThread[]>> {
-    const { data: messages, error } = await supabase
-      .from('booking_messages')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(500)
+    const [{ data: messages, error }, { data: bookings, error: bookingsError }] = await Promise.all([
+      supabase
+        .from('booking_messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(500),
+      supabase
+        .from('bookings')
+        .select(
+          `
+          id,
+          status,
+          customer_id,
+          provider_id,
+          updated_at,
+          services ( name ),
+          providers ( business_name )
+        `,
+        )
+        .not('provider_id', 'is', null)
+        .in('status', [...CHAT_OVERSIGHT_STATUSES])
+        .order('updated_at', { ascending: false })
+        .limit(200),
+    ])
 
     if (error) return { data: [], error: error.message }
-
-    const rows = messages as BookingMessageRow[]
-    const bookingIds = [...new Set(rows.map((r) => r.booking_id))]
-    if (!bookingIds.length) return { data: [], error: null }
-
-    const { data: bookings, error: bookingsError } = await supabase
-      .from('bookings')
-      .select(
-        `
-        id,
-        status,
-        customer_id,
-        provider_id,
-        services ( name ),
-        providers ( business_name )
-      `,
-      )
-      .in('id', bookingIds)
-
     if (bookingsError) return { data: [], error: bookingsError.message }
 
-    const customerIds = [...new Set((bookings ?? []).map((b) => b.customer_id))]
+    const rows = (messages ?? []) as BookingMessageRow[]
+    const messageBookingIds = [...new Set(rows.map((r) => r.booking_id))]
+    const oversightIds = new Set((bookings ?? []).map((b) => b.id as string))
+    const extraBookingIds = messageBookingIds.filter((id) => !oversightIds.has(id))
+
+    let extraBookings: typeof bookings = []
+    if (extraBookingIds.length) {
+      const { data: extra, error: extraError } = await supabase
+        .from('bookings')
+        .select(
+          `
+          id,
+          status,
+          customer_id,
+          provider_id,
+          updated_at,
+          services ( name ),
+          providers ( business_name )
+        `,
+        )
+        .in('id', extraBookingIds)
+
+      if (extraError) return { data: [], error: extraError.message }
+      extraBookings = extra ?? []
+    }
+
+    const allBookings = [...(bookings ?? []), ...extraBookings]
+    const customerIds = [...new Set(allBookings.map((b) => b.customer_id as string))]
+    const senderIds = rows.map((r) => r.sender_id)
+
     const { data: profiles } = await supabase
       .from('profiles')
       .select('user_id, full_name, email, role')
-      .in('user_id', [
-        ...customerIds,
-        ...rows.map((r) => r.sender_id),
-      ])
+      .in('user_id', [...new Set([...customerIds, ...senderIds])])
 
     const profileMap = new Map(
       (profiles ?? []).map((p) => [
@@ -60,10 +88,11 @@ export const adminChatService = {
     )
 
     const bookingMap = new Map(
-      (bookings ?? []).map((b) => [
+      allBookings.map((b) => [
         b.id as string,
         {
           status: b.status as string,
+          updatedAt: b.updated_at as string,
           serviceName: relationField(b.services as { name: string } | { name: string }[] | null, 'name'),
           providerName: relationField(
             b.providers as { business_name: string } | { business_name: string }[] | null,
@@ -76,9 +105,27 @@ export const adminChatService = {
     )
 
     const threadMap = new Map<string, AdminChatThread>()
+
+    for (const [bookingId, booking] of bookingMap) {
+      threadMap.set(bookingId, {
+        bookingId,
+        messageCount: 0,
+        lastMessageBody: 'No messages yet — chat may be open after payment is confirmed.',
+        lastMessageAt: booking.updatedAt,
+        lastSenderName: '—',
+        bookingStatus: booking.status,
+        serviceName: booking.serviceName,
+        providerName: booking.providerName,
+        customerName: booking.customerName,
+        customerEmail: booking.customerEmail,
+      })
+    }
+
     for (const row of rows) {
-      const existing = threadMap.get(row.booking_id)
       const booking = bookingMap.get(row.booking_id)
+      if (!booking) continue
+
+      const existing = threadMap.get(row.booking_id)
       const sender = profileMap.get(row.sender_id)
       if (!existing) {
         threadMap.set(row.booking_id, {
@@ -87,12 +134,17 @@ export const adminChatService = {
           lastMessageBody: row.body,
           lastMessageAt: row.created_at,
           lastSenderName: sender?.name ?? 'User',
-          bookingStatus: booking?.status ?? 'unknown',
-          serviceName: booking?.serviceName ?? null,
-          providerName: booking?.providerName ?? null,
-          customerName: booking?.customerName ?? 'Customer',
-          customerEmail: booking?.customerEmail ?? null,
+          bookingStatus: booking.status,
+          serviceName: booking.serviceName,
+          providerName: booking.providerName,
+          customerName: booking.customerName,
+          customerEmail: booking.customerEmail,
         })
+      } else if (existing.messageCount === 0) {
+        existing.messageCount = 1
+        existing.lastMessageBody = row.body
+        existing.lastMessageAt = row.created_at
+        existing.lastSenderName = sender?.name ?? 'User'
       } else {
         existing.messageCount += 1
       }

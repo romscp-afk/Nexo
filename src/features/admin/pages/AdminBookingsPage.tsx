@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { MessageCircle } from 'lucide-react'
 import { useAdminBookings } from '@/features/admin/hooks/useAdmin'
 import { BookingStatusBadge } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
@@ -23,6 +25,7 @@ export function AdminBookingsPage() {
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Scheduled</th>
                   <th className="px-4 py-3 font-medium">Total</th>
+                  <th className="px-4 py-3 font-medium">Chat</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -37,6 +40,19 @@ export function AdminBookingsPage() {
                     <td className="px-4 py-3 text-slate-600">{formatDateTime(b.scheduledAt)}</td>
                     <td className="px-4 py-3">
                       {b.totalPrice != null ? formatCurrency(b.totalPrice) : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      {b.providerId && b.status !== 'cancelled' ? (
+                        <Link
+                          to={`/admin/chats/${b.id}`}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-nexo-700 hover:underline"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          View chat
+                        </Link>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

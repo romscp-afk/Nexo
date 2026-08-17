@@ -345,9 +345,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     {!canStartJob() && (
                       <p className="w-full text-sm text-amber-800">
                         {isCash
-                          ? payments?.providerAdminFee && !payments?.customerAdvance
-                            ? 'Pay admin fee via PayNow and wait for admin confirmation to receive customer contact.'
-                            : 'Waiting for customer platform fee PayNow confirmation.'
+                          ? 'Waiting for customer platform fee PayNow confirmation.'
                           : 'Waiting for customer PayNow payment confirmation.'}
                       </p>
                     )}

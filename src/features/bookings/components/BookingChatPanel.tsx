@@ -82,7 +82,7 @@ export function BookingChatPanel({
           ? 'This chat is closed. You can still read past messages.'
           : access.closesAt
             ? `Chat closes ${formatDistanceToNow(new Date(access.closesAt), { addSuffix: true })} (6 hours after job completion).`
-            : 'Coordinate job details here. Messages are saved for this booking.'}
+            : 'Coordinate job details here. Messages are saved and visible to Nexo admin for support.'}
       </p>
 
       <div className="mt-4 max-h-64 space-y-3 overflow-y-auto rounded-lg border border-slate-100 bg-slate-50 p-3">
