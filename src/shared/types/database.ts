@@ -6,6 +6,7 @@ export type ProfileRow = {
   email: string
   full_name: string
   phone: string | null
+  whatsapp: string | null
   address_line1: string | null
   address_line2: string | null
   postal_code: string | null
@@ -23,6 +24,7 @@ export type UserProfile = {
   email: string
   fullName: string
   phone: string | null
+  whatsApp: string | null
   addressLine1: string | null
   addressLine2: string | null
   postalCode: string | null
@@ -39,6 +41,7 @@ export function mapProfileRow(row: ProfileRow): UserProfile {
     email: row.email,
     fullName: row.full_name,
     phone: row.phone,
+    whatsApp: row.whatsapp,
     addressLine1: row.address_line1,
     addressLine2: row.address_line2,
     postalCode: row.postal_code,

@@ -23,3 +23,16 @@ export function maskSgPhone(e164: string): string {
 export function isValidSgMobileInput(raw: string): boolean {
   return normalizeSgPhone(raw) !== null
 }
+
+/** E.164 or stored phone → 8-digit local input for SG forms */
+export function sgPhoneToLocalInput(phone: string | null | undefined): string {
+  if (!phone) return ''
+  const normalized = normalizeSgPhone(phone)
+  if (normalized?.startsWith('+65')) return normalized.slice(3)
+  return phone.replace(/\D/g, '').replace(/^65/, '')
+}
+
+export function whatsAppHref(e164: string): string {
+  const digits = e164.replace(/\D/g, '')
+  return `https://wa.me/${digits}`
+}

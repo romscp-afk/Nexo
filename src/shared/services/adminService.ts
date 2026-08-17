@@ -201,7 +201,27 @@ export const adminService = {
       .order('created_at', { ascending: false })
 
     if (error) return { data: [], error: error.message }
-    return { data: (data as ProviderRow[]).map(mapAdminProvider), error: null }
+
+    const listings = (data as ProviderRow[]).map(mapAdminProvider)
+    if (!listings.length) return { data: listings, error: null }
+
+    const userIds = listings.map((p) => p.userId)
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('user_id, avatar_url')
+      .in('user_id', userIds)
+
+    const avatarByUser = new Map(
+      (profiles ?? []).map((p) => [p.user_id as string, (p.avatar_url as string | null) ?? null]),
+    )
+
+    return {
+      data: listings.map((provider) => ({
+        ...provider,
+        avatarUrl: avatarByUser.get(provider.userId) ?? provider.avatarUrl,
+      })),
+      error: null,
+    }
   },
 
   async deleteUser(userId: string): Promise<AuthResult<null>> {
@@ -217,6 +237,38 @@ export const adminService = {
   },
 
   async setProviderVerified(providerId: string, isVerified: boolean): Promise<AuthResult<AdminProvider>> {
+    if (isVerified) {
+      const { data: providerRow, error: providerError } = await supabase
+        .from('providers')
+        .select('user_id')
+        .eq('id', providerId)
+        .maybeSingle()
+
+      if (providerError || !providerRow) {
+        return {
+          data: null as unknown as AdminProvider,
+          error: providerError?.message ?? 'Provider not found',
+        }
+      }
+
+      const { data: profileRow, error: profileError } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('user_id', providerRow.user_id)
+        .maybeSingle()
+
+      if (profileError) {
+        return { data: null as unknown as AdminProvider, error: profileError.message }
+      }
+
+      if (!profileRow?.avatar_url) {
+        return {
+          data: null as unknown as AdminProvider,
+          error: 'Provider must upload a profile photo before verification.',
+        }
+      }
+    }
+
     const { data, error } = await supabase
       .from('providers')
       .update({ is_verified: isVerified })
@@ -233,7 +285,20 @@ export const adminService = {
       p_details: {},
     })
 
-    return { data: mapAdminProvider(data as ProviderRow), error: null }
+    const listing = mapAdminProvider(data as ProviderRow)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('user_id', listing.userId)
+      .maybeSingle()
+
+    return {
+      data: {
+        ...listing,
+        avatarUrl: (profile?.avatar_url as string | null) ?? listing.avatarUrl,
+      },
+      error: null,
+    }
   },
 
   async listBookings(): Promise<AuthResult<AdminBooking[]>> {

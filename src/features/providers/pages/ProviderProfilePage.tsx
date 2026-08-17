@@ -4,10 +4,13 @@ import {
   useUpdateMyProvider,
   useUpdateMyProviderServices,
 } from '@/features/providers/hooks/useMyProvider'
+import { ProviderVerificationPhoto } from '@/features/providers/components/ProviderVerificationPhoto'
+import { useMyProfile, useUpdateMyProfile } from '@/features/customer/hooks/useProfile'
 import { useAllServices } from '@/features/catalog/hooks/useAllServices'
 import { isCategoryLaunched } from '@/shared/lib/catalogConfig'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
+import { isValidSgMobileInput, sgPhoneToLocalInput } from '@/shared/lib/phone'
 import { formatCurrency } from '@/shared/lib/utils'
 import type { UnitPrices } from '@/shared/types/catalog'
 
@@ -37,6 +40,7 @@ function defaultUnitPrices(basePrice: number, existing?: UnitPrices): Record<num
 
 export function ProviderProfilePage() {
   const { data: provider, isLoading, error } = useMyProvider()
+  const { data: profile } = useMyProfile()
   const { data: catalogServices, isLoading: servicesLoading } = useAllServices()
   const launchedCatalog = useMemo(
     () => catalogServices?.filter((s) => s.categorySlug && isCategoryLaunched(s.categorySlug)) ?? [],
@@ -44,9 +48,12 @@ export function ProviderProfilePage() {
   )
   const updateProvider = useUpdateMyProvider()
   const updateServices = useUpdateMyProviderServices()
+  const updateProfile = useUpdateMyProfile()
 
   const [businessName, setBusinessName] = useState('')
   const [bio, setBio] = useState('')
+  const [phone, setPhone] = useState('')
+  const [whatsApp, setWhatsApp] = useState('')
   const [yearsExperience, setYearsExperience] = useState('0')
   const [hourlyRate, setHourlyRate] = useState('0')
   const [serviceAreas, setServiceAreas] = useState<string[]>([])
@@ -72,6 +79,12 @@ export function ProviderProfilePage() {
       setServiceAreas(provider.serviceAreas)
     }
   }, [provider])
+
+  useEffect(() => {
+    if (!profile) return
+    setPhone(sgPhoneToLocalInput(profile.phone))
+    setWhatsApp(sgPhoneToLocalInput(profile.whatsApp))
+  }, [profile])
 
   useEffect(() => {
     if (!launchedCatalog.length) return
@@ -120,6 +133,16 @@ export function ProviderProfilePage() {
       return
     }
 
+    if (!isValidSgMobileInput(phone)) {
+      setFormError('Enter a valid Singapore mobile number.')
+      return
+    }
+
+    if (whatsApp.trim() && !isValidSgMobileInput(whatsApp)) {
+      setFormError('Enter a valid Singapore WhatsApp number.')
+      return
+    }
+
     const enabledServices = servicePrices.filter((s) => s.enabled)
     if (enabledServices.length === 0) {
       setFormError('Enable at least one service with a price.')
@@ -127,6 +150,14 @@ export function ProviderProfilePage() {
     }
 
     try {
+      if (profile) {
+        await updateProfile.mutateAsync({
+          fullName: profile.fullName,
+          phone,
+          whatsApp: whatsApp.trim() || undefined,
+        })
+      }
+
       await updateProvider.mutateAsync({
         businessName,
         bio,
@@ -157,7 +188,7 @@ export function ProviderProfilePage() {
     }
   }
 
-  const saving = updateProvider.isPending || updateServices.isPending
+  const saving = updateProvider.isPending || updateServices.isPending || updateProfile.isPending
 
   return (
     <div>
@@ -166,13 +197,57 @@ export function ProviderProfilePage() {
 
       <QueryState loading={isLoading || servicesLoading} error={error} empty={!provider}>
         {provider && (
-          <form onSubmit={handleSubmit} className="mt-6 max-w-2xl space-y-6">
+          <>
+            <div className="mt-6 max-w-2xl">
+              <ProviderVerificationPhoto
+                businessName={provider.businessName}
+                avatarUrl={profile?.avatarUrl ?? provider.avatarUrl}
+                isVerified={provider.isVerified}
+              />
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-6 max-w-2xl space-y-6">
             {formError && (
               <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>
             )}
             {success && (
               <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{success}</p>
             )}
+
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
+              <h2 className="font-semibold text-slate-900">Contact details</h2>
+              <p className="text-sm text-slate-500">
+                Nexo admins use these numbers to reach you. WhatsApp is optional if it differs from
+                your phone.
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-sm">
+                  <span className="font-medium text-slate-700">Phone (Singapore)</span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="91234567"
+                    pattern="[689]\d{7}"
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                    required
+                  />
+                </label>
+
+                <label className="block text-sm">
+                  <span className="font-medium text-slate-700">WhatsApp (Singapore)</span>
+                  <input
+                    type="tel"
+                    value={whatsApp}
+                    onChange={(e) => setWhatsApp(e.target.value)}
+                    placeholder="91234567"
+                    pattern="[689]\d{7}"
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
+                  />
+                </label>
+              </div>
+            </section>
 
             <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
               <h2 className="font-semibold text-slate-900">Business details</h2>
@@ -335,6 +410,7 @@ export function ProviderProfilePage() {
               {saving ? 'Saving…' : 'Save profile'}
             </button>
           </form>
+          </>
         )}
       </QueryState>
     </div>
