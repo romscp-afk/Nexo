@@ -2,6 +2,7 @@ import { supabase } from '@/shared/lib/supabase'
 import { parseUnitPrices } from '@/shared/lib/pricing'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { CLEANING_CATALOG_HOURLY_RATE } from '@/shared/lib/cleaningContent'
+import { isPublicProviderListing } from '@/shared/lib/providerListing'
 import {
   mapProviderListing,
   type ProviderFilters,
@@ -67,6 +68,7 @@ function matchesCategoryFilter(provider: ProviderListing, categorySlug: string):
 
 function applyFilters(providers: ProviderListing[], filters: ProviderFilters): ProviderListing[] {
   return providers.filter((provider) => {
+    if (filters.publicOnly !== false && !isPublicProviderListing(provider)) return false
     if (filters.verifiedOnly && !provider.isVerified) return false
     if (filters.minRating != null && provider.ratingAvg < filters.minRating) return false
     if (filters.area) {
@@ -120,6 +122,7 @@ async function enrichProviders(providers: ProviderListing[]): Promise<ProviderLi
 
 export type UpdateProviderInput = {
   businessName: string
+  listingType: 'individual' | 'company'
   bio?: string
   yearsExperience: number
   hourlyRate: number
@@ -215,8 +218,12 @@ export const providerService = {
     const { provider_services, ...provider } = row
     const listing = mapProviderListing(provider, mapProviderServices(provider_services))
     const [enriched] = await enrichProviders([listing])
+    const result = enriched ?? listing
+    if (!isPublicProviderListing(result)) {
+      return { data: null, error: null }
+    }
     return {
-      data: enriched ?? listing,
+      data: result,
       error: null,
     }
   },
@@ -268,6 +275,7 @@ export const providerService = {
       .from('providers')
       .update({
         business_name: input.businessName,
+        listing_type: input.listingType,
         bio: input.bio ?? null,
         years_experience: input.yearsExperience,
         hourly_rate: input.hourlyRate,

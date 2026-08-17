@@ -35,6 +35,7 @@ export type ProviderRow = {
   years_experience: number
   hourly_rate: number
   service_areas: string[]
+  listing_type: 'individual' | 'company'
   is_verified: boolean
   is_active: boolean
   rating_avg: number
@@ -82,6 +83,7 @@ export type ProviderListing = {
   id: string
   userId: string
   businessName: string
+  listingType: 'individual' | 'company'
   bio: string | null
   yearsExperience: number
   hourlyRate: number
@@ -101,6 +103,8 @@ export type ProviderFilters = {
   minRating?: number
   minPrice?: number
   maxPrice?: number
+  /** When true (default), hide individual listings from public results. */
+  publicOnly?: boolean
 }
 
 export function mapCategory(row: ServiceCategoryRow): ServiceCategory {
@@ -136,6 +140,7 @@ export function mapProviderListing(
     id: row.id,
     userId: row.user_id,
     businessName: row.business_name,
+    listingType: row.listing_type ?? 'individual',
     bio: row.bio,
     yearsExperience: row.years_experience,
     hourlyRate: Number(row.hourly_rate),

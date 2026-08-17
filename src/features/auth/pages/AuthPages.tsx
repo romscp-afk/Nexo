@@ -7,6 +7,7 @@ import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
 import { loadCleaningDraft } from '@/shared/lib/bookingDraft'
 import { trackEvent } from '@/shared/lib/analytics'
+import { PROVIDER_LISTING_TYPE_LABELS } from '@/shared/lib/providerListing'
 import { recordPwaEngagement } from '@/shared/lib/pwaEngagement'
 
 const ROLE_LABELS = {
@@ -265,6 +266,7 @@ export function RegisterPage() {
   const [role, setRole] = useState<'customer' | 'provider'>(
     searchParams.get('role') === 'provider' ? 'provider' : 'customer',
   )
+  const [listingType, setListingType] = useState<'individual' | 'company'>('individual')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [businessName, setBusinessName] = useState('')
   const [bio, setBio] = useState('')
@@ -318,6 +320,11 @@ export function RegisterPage() {
       return
     }
 
+    if (role === 'provider' && listingType === 'company' && !businessName.trim()) {
+      setError('Enter your company name.')
+      return
+    }
+
     setLoading(true)
 
     if (role === 'provider' && serviceAreas.length === 0) {
@@ -332,7 +339,13 @@ export function RegisterPage() {
       role,
       fullName,
       phone,
-      businessName: role === 'provider' ? businessName || fullName : undefined,
+      businessName:
+        role === 'provider'
+          ? listingType === 'company'
+            ? businessName.trim()
+            : businessName.trim() || fullName
+          : undefined,
+      listingType: role === 'provider' ? listingType : undefined,
       bio: role === 'provider' ? bio : undefined,
       yearsExperience: role === 'provider' ? Number(yearsExperience) || 0 : undefined,
       hourlyRate: role === 'provider' ? Number(hourlyRate) || 0 : undefined,
@@ -454,19 +467,51 @@ export function RegisterPage() {
         </div>
         {role === 'provider' && (
           <div>
+            <span className="block text-sm font-medium text-slate-700">Listing as</span>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {(['individual', 'company'] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setListingType(type)}
+                  disabled={loading}
+                  className={`min-h-11 rounded-lg border px-3 py-2.5 text-left text-sm ${
+                    listingType === type
+                      ? 'border-nexo-700 bg-nexo-50 text-nexo-700'
+                      : 'border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <span className="font-medium">{PROVIDER_LISTING_TYPE_LABELS[type]}</span>
+                  <span className="mt-0.5 block text-xs opacity-80">
+                    {type === 'company' ? 'Public company name' : 'Hidden from public site'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {role === 'provider' && listingType === 'company' && (
+          <div>
             <label htmlFor="business-name" className="block text-sm font-medium text-slate-700">
-              Business name
+              Company name
             </label>
             <input
               id="business-name"
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="e.g. CleanPro SG"
+              placeholder="e.g. CleanPro SG Pte Ltd"
               className={inputClass}
+              required
               disabled={loading}
             />
           </div>
+        )}
+        {role === 'provider' && listingType === 'individual' && (
+          <p className="text-sm text-slate-500">
+            Individual cleaners are not listed by name on the public website. You can switch to a
+            company listing later from your provider profile.
+          </p>
         )}
         {role === 'customer' && (
           <p className="text-sm text-slate-500">

@@ -10,6 +10,7 @@ import {
 } from '@/features/admin/components/AdminProviderGridCells'
 import { ProviderAvatar } from '@/features/providers/components/ProviderAvatar'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
+import { PROVIDER_LISTING_TYPE_LABELS } from '@/shared/lib/providerListing'
 import { formatCurrency } from '@/shared/lib/utils'
 
 export function AdminProvidersPage() {
@@ -77,6 +78,7 @@ export function AdminProvidersPage() {
               <tr>
                 <th className="px-4 py-3 font-medium">Photo</th>
                 <th className="px-4 py-3 font-medium">Business</th>
+                <th className="px-4 py-3 font-medium">Type</th>
                 <th className="px-4 py-3 font-medium">Phone</th>
                 <th className="px-4 py-3 font-medium">WhatsApp</th>
                 <th className="px-4 py-3 font-medium">Payment status</th>
@@ -111,6 +113,12 @@ export function AdminProvidersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 font-medium">{p.businessName}</td>
+                    <td className="px-4 py-3">
+                      {PROVIDER_LISTING_TYPE_LABELS[p.listingType]}
+                      {p.listingType === 'individual' && (
+                        <span className="mt-0.5 block text-xs text-slate-500">Hidden publicly</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <AdminContactCell value={p.phone} kind="phone" />
                     </td>

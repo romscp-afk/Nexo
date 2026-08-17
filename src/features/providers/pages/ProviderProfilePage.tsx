@@ -11,6 +11,7 @@ import { isCategoryLaunched } from '@/shared/lib/catalogConfig'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { isValidSgMobileInput, sgPhoneToLocalInput } from '@/shared/lib/phone'
+import { PROVIDER_LISTING_TYPE_LABELS, type ProviderListingType } from '@/shared/lib/providerListing'
 import { formatCurrency } from '@/shared/lib/utils'
 import type { UnitPrices } from '@/shared/types/catalog'
 
@@ -51,6 +52,7 @@ export function ProviderProfilePage() {
   const updateProfile = useUpdateMyProfile()
 
   const [businessName, setBusinessName] = useState('')
+  const [listingType, setListingType] = useState<ProviderListingType>('individual')
   const [bio, setBio] = useState('')
   const [phone, setPhone] = useState('')
   const [whatsApp, setWhatsApp] = useState('')
@@ -73,6 +75,7 @@ export function ProviderProfilePage() {
   useEffect(() => {
     if (provider) {
       setBusinessName(provider.businessName)
+      setListingType(provider.listingType)
       setBio(provider.bio ?? '')
       setYearsExperience(String(provider.yearsExperience))
       setHourlyRate(String(provider.hourlyRate))
@@ -143,6 +146,11 @@ export function ProviderProfilePage() {
       return
     }
 
+    if (listingType === 'company' && !businessName.trim()) {
+      setFormError('Enter your company name for public listing.')
+      return
+    }
+
     const enabledServices = servicePrices.filter((s) => s.enabled)
     if (enabledServices.length === 0) {
       setFormError('Enable at least one service with a price.')
@@ -159,7 +167,11 @@ export function ProviderProfilePage() {
       }
 
       await updateProvider.mutateAsync({
-        businessName,
+        businessName:
+          listingType === 'company'
+            ? businessName.trim()
+            : businessName.trim() || profile?.fullName || provider?.businessName || 'Individual cleaner',
+        listingType,
         bio,
         yearsExperience: Number(yearsExperience) || 0,
         hourlyRate: Number(hourlyRate) || 0,
@@ -250,15 +262,69 @@ export function ProviderProfilePage() {
             </section>
 
             <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
+              <h2 className="font-semibold text-slate-900">Listing type</h2>
+              <p className="text-sm text-slate-500">
+                Only <strong>company</strong> listings appear on the public Find a Cleaner page.
+                Individual cleaners can still receive bookings but their personal name stays hidden
+                from the public site.
+              </p>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                {(['individual', 'company'] as const).map((type) => (
+                  <label
+                    key={type}
+                    className={`flex cursor-pointer flex-col rounded-lg border px-4 py-3 text-sm ${
+                      listingType === type
+                        ? 'border-nexo-700 bg-nexo-50 text-nexo-800'
+                        : 'border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2 font-medium">
+                      <input
+                        type="radio"
+                        name="listing-type"
+                        value={type}
+                        checked={listingType === type}
+                        onChange={() => setListingType(type)}
+                        className="text-nexo-700"
+                      />
+                      {PROVIDER_LISTING_TYPE_LABELS[type]}
+                    </span>
+                    <span className="mt-1 text-xs text-slate-500">
+                      {type === 'company'
+                        ? 'Show your company name publicly'
+                        : 'Hidden from public listings'}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {listingType === 'individual' && (
+                <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  Your name will not appear on the public website. Switch to Company when you are
+                  ready to list under a business name.
+                </p>
+              )}
+            </section>
+
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
               <h2 className="font-semibold text-slate-900">Business details</h2>
 
               <label className="block text-sm">
-                <span className="font-medium text-slate-700">Business name</span>
+                <span className="font-medium text-slate-700">
+                  {listingType === 'company' ? 'Company name' : 'Display name (internal only)'}
+                </span>
+                {listingType === 'company' && (
+                  <span className="mt-0.5 block text-xs text-slate-500">
+                    Shown to customers on Find a Cleaner
+                  </span>
+                )}
                 <input
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder={listingType === 'company' ? 'e.g. CleanPro SG Pte Ltd' : profile?.fullName}
                   className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
-                  required
+                  required={listingType === 'company'}
                 />
               </label>
 

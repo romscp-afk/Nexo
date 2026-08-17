@@ -36,6 +36,7 @@
     "setup:cleaning-price": "node scripts/apply-cleaning-price.mjs",
     "setup:contact-messages": "node scripts/apply-contact-messages.mjs",
     "setup:provider-avatars": "node scripts/apply-provider-avatars.mjs",
+    "setup:provider-listing-type": "node scripts/apply-provider-listing-type.mjs",
     "setup:profile-whatsapp": "node scripts/apply-profile-whatsapp.mjs",
     "deploy:submit-contact": "node scripts/deploy-submit-contact.mjs",
     "deploy:chat-email": "node scripts/deploy-chat-email.mjs",

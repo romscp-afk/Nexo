@@ -63,6 +63,7 @@ export const authService = {
           postal_code: input.postalCode ?? null,
           preferred_area: input.preferredArea ?? null,
           business_name: input.businessName ?? null,
+          listing_type: input.listingType ?? 'individual',
           bio: input.bio ?? null,
           years_experience: input.yearsExperience != null ? String(input.yearsExperience) : null,
           hourly_rate: input.hourlyRate != null ? String(input.hourlyRate) : null,

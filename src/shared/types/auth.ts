@@ -21,6 +21,7 @@ export type SignUpInput = {
   postalCode?: string
   preferredArea?: string
   businessName?: string
+  listingType?: 'individual' | 'company'
   bio?: string
   yearsExperience?: number
   hourlyRate?: number

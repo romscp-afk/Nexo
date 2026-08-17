@@ -13,7 +13,11 @@ export function HomeTrustBar() {
     {
       value: pricing.loading ? '…' : String(count),
       label:
-        count === 1 ? 'Cleaner onboarded' : count > 0 ? 'Cleaners onboarded' : 'Cleaners onboarding',
+        count === 1
+          ? 'Company onboarded'
+          : count > 0
+            ? 'Companies onboarded'
+            : 'Companies onboarding',
       icon: Users,
     },
     {
