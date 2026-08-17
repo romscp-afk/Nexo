@@ -8,6 +8,7 @@ import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { CleaningPriceLabel } from '@/shared/components/CleaningPriceLabel'
 import { CleaningExtraHoursNote } from '@/shared/components/CleaningExtraHoursNote'
+import { CleaningServicePlansSection } from '@/shared/components/CleaningServicePlansSection'
 import { formatCurrency } from '@/shared/lib/utils'
 import { getCleaningHourlyRateForDuration } from '@/shared/lib/cleaningContent'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
@@ -781,6 +782,7 @@ export function CleaningRequestPage() {
                   <PriceBreakdownPanel breakdown={breakdown} paymentMethod={paymentMethod} compact />
                 </div>
                 <CleaningExtraHoursNote className="mt-3" />
+                <CleaningServicePlansSection compact className="mt-4" />
                 {paymentMethod === 'cash' && (
                   <p className="mt-2 text-xs text-amber-800">
                     Cash bookings: pay {formatCurrency(PLATFORM_FEE_SGD)} platform fee via PayNow before the job.

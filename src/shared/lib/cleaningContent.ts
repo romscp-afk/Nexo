@@ -5,9 +5,9 @@ export const CLEANING_DURATION_HOURLY_RATES: Record<
   (typeof CLEANING_BOOKING_DURATION_HOURS)[number],
   number
 > = {
-  2: 23,
-  3: 20,
-  4: 17.5,
+  2: 25,
+  3: 23,
+  4: 20,
 }
 
 /** Lowest tier — used for marketing "from" price. */
@@ -28,6 +28,32 @@ export const CLEANING_EXTRA_HOUR_RATE_SGD = 15
 export const CLEANING_SUPPLIES_SURCHARGE_SGD = 10
 
 export const CLEANING_BOOKING_DURATION_HOURS = [2, 3, 4] as const
+
+export const CLEANING_SERVICE_PLANS = [
+  {
+    id: 'one-time',
+    label: 'One-time',
+    description: 'Book a single cleaning online — choose your date and duration.',
+    bookOnline: true,
+  },
+  {
+    id: 'weekly',
+    label: 'Weekly',
+    description: 'Same cleaner on a regular weekly schedule with a tailored quote.',
+    bookOnline: false,
+    contactSubject: 'Weekly cleaning plan enquiry',
+  },
+  {
+    id: 'monthly',
+    label: 'Monthly',
+    description: 'Monthly upkeep or scheduled deep cleans — we arrange a plan for you.',
+    bookOnline: false,
+    contactSubject: 'Monthly cleaning plan enquiry',
+  },
+] as const
+
+export const CLEANING_RECURRING_PLANS_NOTE =
+  'One-time bookings can be requested online. Weekly and monthly plans are also available — contact us for pricing and your preferred schedule.'
 
 export const BOOKING_CONFIRMATION =
   'Requests are sent to available cleaners. A booking is confirmed only after a cleaner accepts your request.'
@@ -86,7 +112,7 @@ export const CLEANING_SERVICE_CONTENT = {
   ],
   propertyTypes: ['HDB', 'Condo', 'Landed home'],
   pricingNote:
-    'Hourly rate depends on booking length: $23/hr for 2 hours, $20/hr for 3 hours, $17.50/hr for 4 hours. Extra hours beyond your booking are $15/hr. A platform fee may apply at checkout.',
+    'Hourly rate depends on booking length: $25/hr for 2 hours, $23/hr for 3 hours, $20/hr for 4 hours. Extra hours beyond your booking are $15/hr. A $5 platform fee applies at checkout.',
   minDuration: `${MIN_BOOKING_HOURS} hours minimum per booking`,
   supplies:
     'You can bring your own supplies at no extra charge, or add a supplies fee for the cleaner to bring them.',
@@ -103,7 +129,11 @@ export const CLEANING_SERVICE_CONTENT = {
     },
     {
       q: 'How is pricing calculated?',
-      a: 'Rates vary by duration: $23/hr (2 hours), $20/hr (3 hours), $17.50/hr (4 hours). Extra hours beyond your booking are $15/hr. Supplies and platform fees are shown at checkout.',
+      a: 'Rates vary by duration: $25/hr (2 hours), $23/hr (3 hours), $20/hr (4 hours). Extra hours beyond your booking are $15/hr. Supplies and a $5 platform fee are shown at checkout.',
+    },
+    {
+      q: 'Do you offer weekly or monthly cleaning?',
+      a: 'Yes. One-time cleanings can be booked online. For weekly or monthly plans with a regular cleaner, contact us and we will arrange a schedule and quote for you.',
     },
     {
       q: 'Do I need an account?',

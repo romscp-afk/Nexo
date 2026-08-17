@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, CalendarCheck, Users, Wallet } from 'lucide-react'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
-import { BOOKING_CONFIRMATION } from '@/shared/lib/cleaningContent'
+import { BOOKING_CONFIRMATION, CLEANING_RECURRING_PLANS_NOTE } from '@/shared/lib/cleaningContent'
 import { useCleaningPricing } from '@/shared/hooks/useCleaningPricing'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 
@@ -123,6 +123,12 @@ export function HomeCta() {
             <h2 className="text-3xl font-bold sm:text-4xl">Ready for a cleaner home?</h2>
             <p className="mx-auto mt-4 max-w-lg text-nexo-mint/80">
               Request home cleaning across Singapore with clear pricing and a simple flow.
+            </p>
+            <p className="mx-auto mt-3 max-w-lg text-sm text-nexo-mint/70">
+              {CLEANING_RECURRING_PLANS_NOTE}{' '}
+              <Link to="/support" className="font-medium text-white underline underline-offset-2 hover:text-nexo-mint">
+                Contact us
+              </Link>
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <CleaningRequestLink className="inline-flex min-h-11 items-center gap-2 rounded-full bg-nexo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800">

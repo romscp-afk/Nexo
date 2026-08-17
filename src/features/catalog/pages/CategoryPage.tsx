@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { useCategory, useCategoryServices } from '@/features/catalog/hooks/useCategories'
 import { PageHeader, QueryState } from '@/features/catalog/components/CatalogUi'
 import { CleaningPriceLabel, CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { CleaningServicePlansSection } from '@/shared/components/CleaningServicePlansSection'
 import { getCleaningCatalogHourlyRate } from '@/shared/hooks/useCleaningPricing'
 import { formatCurrency } from '@/shared/lib/utils'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
@@ -75,6 +76,8 @@ export function CategoryPage() {
         <p className="mt-3 text-sm text-slate-600">{content.pricingNote}</p>
         <p className="mt-2 text-sm font-medium text-slate-700">{content.minDuration}</p>
       </section>
+
+      <CleaningServicePlansSection className="mt-8" />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border border-slate-200 bg-white p-6">

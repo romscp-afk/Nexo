@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { supportContactService } from '@/shared/services/supportContactService'
 import { cn } from '@/shared/lib/utils'
 
 export function SupportContactPage() {
+  const [searchParams] = useSearchParams()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -12,6 +13,13 @@ export function SupportContactPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const presetSubject = searchParams.get('subject')
+    if (presetSubject) {
+      setSubject(presetSubject)
+    }
+  }, [searchParams])
 
   const inputClass =
     'mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-nexo-500 focus:outline-none focus:ring-2 focus:ring-nexo-500/20'
