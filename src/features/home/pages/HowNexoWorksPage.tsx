@@ -28,8 +28,7 @@ export function HowNexoWorksPage() {
       <header className="mb-10">
         <h1 className="text-3xl font-bold text-slate-900">How Nexo works</h1>
         <p className="mt-2 max-w-2xl text-slate-600">
-          Nexo connects you with home-cleaning professionals in Singapore. Phase 1 focuses on
-          cleaning services only.
+          Nexo connects you with home-cleaning professionals in Singapore.
         </p>
       </header>
 

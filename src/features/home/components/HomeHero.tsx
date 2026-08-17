@@ -60,7 +60,7 @@ export function HomeHero() {
                 </span>
               </div>
               <p className="mt-4 text-center text-lg font-bold text-nexo-950">Standard Home Cleaning</p>
-              <p className="mt-1 text-center text-xs text-nexo-800/70">Singapore · Phase 1</p>
+              <p className="mt-1 text-center text-xs text-nexo-800/70">Singapore</p>
               <div className="mt-4 text-center text-xs font-medium text-nexo-600">
                 <CleaningPriceInline />
               </div>
