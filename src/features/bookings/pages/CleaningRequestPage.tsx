@@ -16,11 +16,23 @@ import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import {
   BOOKING_CONFIRMATION,
+  CLEANING_SUPPLIES_SURCHARGE_SGD,
   CLEANING_TYPES,
   MIN_BOOKING_HOURS,
   PROPERTY_TYPES,
   SUPPLY_OPTIONS,
 } from '@/shared/lib/cleaningContent'
+import {
+  buildCleaningScheduledAt,
+  CLEANING_BOOKING_DURATIONS,
+  formatCleaningHourLabel,
+  formatCleaningScheduleSummary,
+  formatCleaningTimeRange,
+  getCleaningStartHours,
+  isCleaningBookingDuration,
+  minCleaningScheduleDate,
+  parseCleaningScheduledAt,
+} from '@/shared/lib/cleaningSchedule'
 import {
   clearCleaningDraft,
   loadCleaningDraft,
@@ -86,8 +98,9 @@ export function CleaningRequestPage() {
   const [bedrooms, setBedrooms] = useState('2')
   const [bathrooms, setBathrooms] = useState('1')
   const [supplies, setSupplies] = useState<'customer' | 'cleaner'>('customer')
-  const [scheduledAt, setScheduledAt] = useState('')
-  const [durationHours, setDurationHours] = useState(String(MIN_BOOKING_HOURS))
+  const [scheduleDate, setScheduleDate] = useState('')
+  const [scheduleStartHour, setScheduleStartHour] = useState<number | null>(null)
+  const [durationHours, setDurationHours] = useState<string>('2')
   const [serviceArea, setServiceArea] = useState('')
   const [addressLine1, setAddressLine1] = useState('')
   const [addressLine2, setAddressLine2] = useState('')
@@ -104,10 +117,22 @@ export function CleaningRequestPage() {
   }, [services, selectedType])
 
   const duration = Number(durationHours) || MIN_BOOKING_HOURS
+  const validStartHours = useMemo(() => getCleaningStartHours(duration), [duration])
+
+  const scheduledAt = useMemo(() => {
+    if (!scheduleDate || scheduleStartHour == null) return ''
+    return buildCleaningScheduledAt(scheduleDate, scheduleStartHour)
+  }, [scheduleDate, scheduleStartHour])
+
+  const suppliesSurcharge = supplies === 'cleaner' ? CLEANING_SUPPLIES_SURCHARGE_SGD : 0
 
   const breakdown = useMemo(() => {
     if (!selectedService) return null
     const hourlyRate = getCleaningCatalogHourlyRate(selectedService.basePrice)
+    const extraLines =
+      suppliesSurcharge > 0
+        ? [{ label: 'Cleaning supplies (cleaner brings)', amount: suppliesSurcharge }]
+        : undefined
     return buildPriceBreakdown({
       pricingModel: selectedService.pricingModel,
       priceFrom: hourlyRate,
@@ -115,8 +140,9 @@ export function CleaningRequestPage() {
       durationHours: duration,
       quantity: 1,
       unitPrices: {},
+      extraLines,
     })
-  }, [selectedService, duration])
+  }, [selectedService, duration, suppliesSurcharge])
 
   const restoreDraft = useCallback((draft: CleaningRequestDraft) => {
     setCleaningTypeId(draft.cleaningTypeId)
@@ -124,8 +150,14 @@ export function CleaningRequestPage() {
     setBedrooms(String(draft.bedrooms))
     setBathrooms(String(draft.bathrooms))
     setSupplies(draft.supplies)
-    setScheduledAt(draft.scheduledAt)
-    setDurationHours(String(draft.durationHours))
+    const parsedSchedule = parseCleaningScheduledAt(draft.scheduledAt)
+    setScheduleDate(parsedSchedule.date)
+    setScheduleStartHour(parsedSchedule.startHour)
+    setDurationHours(
+      isCleaningBookingDuration(draft.durationHours)
+        ? String(draft.durationHours)
+        : String(MIN_BOOKING_HOURS),
+    )
     setServiceArea(draft.serviceArea)
     setAddressLine1(draft.addressLine1)
     setAddressLine2(draft.addressLine2)
@@ -222,16 +254,24 @@ export function CleaningRequestPage() {
       return true
     }
     if (s === 3) {
+      if (!scheduleDate) {
+        setFieldError('Choose a preferred date.')
+        return false
+      }
+      if (!isCleaningBookingDuration(duration)) {
+        setFieldError('Select a booking duration (2, 3 or 4 hours).')
+        return false
+      }
+      if (scheduleStartHour == null) {
+        setFieldError('Select a start time.')
+        return false
+      }
       if (!scheduledAt) {
-        setFieldError('Choose a preferred date and time.')
+        setFieldError('Choose a valid date and time.')
         return false
       }
       if (new Date(scheduledAt) <= new Date()) {
         setFieldError('Please pick a future date and time.')
-        return false
-      }
-      if (duration < MIN_BOOKING_HOURS) {
-        setFieldError(`Minimum booking duration is ${MIN_BOOKING_HOURS} hours.`)
         return false
       }
       return true
@@ -438,7 +478,14 @@ export function CleaningRequestPage() {
                             onChange={() => setSupplies(opt.value)}
                             className="mt-0.5"
                           />
-                          {opt.label}
+                          <span>
+                            {opt.label}
+                            {opt.surcharge > 0 && (
+                              <span className="mt-0.5 block text-xs font-medium text-nexo-700">
+                                +{formatCurrency(opt.surcharge)} added to your estimate
+                              </span>
+                            )}
+                          </span>
                         </label>
                       ))}
                     </fieldset>
@@ -446,33 +493,87 @@ export function CleaningRequestPage() {
                 )}
 
                 {step === 3 && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    <fieldset className="space-y-3">
+                      <legend className="text-sm font-medium text-slate-900">How long do you need?</legend>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {CLEANING_BOOKING_DURATIONS.map((hours) => (
+                          <label
+                            key={hours}
+                            className={`flex cursor-pointer flex-col items-center rounded-xl border p-4 text-center ${
+                              durationHours === String(hours)
+                                ? 'border-nexo-500 bg-nexo-50'
+                                : 'border-slate-200 bg-white'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="durationHours"
+                              value={hours}
+                              checked={durationHours === String(hours)}
+                              onChange={() => {
+                                setDurationHours(String(hours))
+                                setScheduleStartHour((current) => {
+                                  if (current == null) return current
+                                  return getCleaningStartHours(hours).includes(current) ? current : null
+                                })
+                              }}
+                              className="sr-only"
+                            />
+                            <span className="text-2xl font-bold text-nexo-800">{hours}</span>
+                            <span className="text-sm text-slate-600">hours</span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+
                     <label className="block text-sm">
-                      <span className="font-medium text-slate-700">Preferred date & start time</span>
+                      <span className="font-medium text-slate-700">Preferred date</span>
                       <input
-                        type="datetime-local"
-                        value={scheduledAt}
-                        onChange={(e) => setScheduledAt(e.target.value)}
+                        type="date"
+                        value={scheduleDate}
+                        min={minCleaningScheduleDate()}
+                        onChange={(e) => setScheduleDate(e.target.value)}
                         className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5"
                         required
                       />
                     </label>
-                    <label className="block text-sm">
-                      <span className="font-medium text-slate-700">Duration (hours)</span>
-                      <input
-                        type="number"
-                        min={MIN_BOOKING_HOURS}
-                        max={12}
-                        step={0.5}
-                        value={durationHours}
-                        onChange={(e) => setDurationHours(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5"
-                        required
-                      />
-                      <span className="mt-1 block text-xs text-slate-500">
-                        Minimum {MIN_BOOKING_HOURS} hours per booking
-                      </span>
-                    </label>
+
+                    {isCleaningBookingDuration(duration) && (
+                      <fieldset className="space-y-3">
+                        <legend className="text-sm font-medium text-slate-900">
+                          Start time <span className="font-normal text-slate-500">(7 AM – 7 PM)</span>
+                        </legend>
+                        <p className="text-xs text-slate-500">
+                          {duration}-hour booking
+                          {scheduleStartHour != null
+                            ? ` · finishes ${formatCleaningTimeRange(scheduleStartHour, duration).split(' – ')[1]}`
+                            : ' · pick a start time below'}
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                          {validStartHours.map((hour) => (
+                            <label
+                              key={hour}
+                              className={`cursor-pointer rounded-lg border px-3 py-2.5 text-center text-sm ${
+                                scheduleStartHour === hour
+                                  ? 'border-nexo-500 bg-nexo-50 font-medium text-nexo-900'
+                                  : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="scheduleStartHour"
+                                value={hour}
+                                checked={scheduleStartHour === hour}
+                                onChange={() => setScheduleStartHour(hour)}
+                                className="sr-only"
+                              />
+                              {formatCleaningHourLabel(hour)}
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                    )}
                   </div>
                 )}
 
@@ -555,14 +656,15 @@ export function CleaningRequestPage() {
                         <dt className="text-slate-500">Property</dt>
                         <dd className="text-slate-900">
                           {propertyType} · {bedrooms} bed · {bathrooms} bath ·{' '}
-                          {supplies === 'customer' ? 'You provide supplies' : 'Cleaner brings supplies'}
+                          {supplies === 'customer'
+                            ? 'You provide supplies'
+                            : `Cleaner brings supplies (+${formatCurrency(CLEANING_SUPPLIES_SURCHARGE_SGD)})`}
                         </dd>
                       </div>
                       <div>
                         <dt className="text-slate-500">Schedule</dt>
                         <dd className="text-slate-900">
-                          {scheduledAt ? new Date(scheduledAt).toLocaleString('en-SG') : '—'} ·{' '}
-                          {duration} hr{duration === 1 ? '' : 's'}
+                          {formatCleaningScheduleSummary(scheduledAt, duration)}
                         </dd>
                       </div>
                       <div>

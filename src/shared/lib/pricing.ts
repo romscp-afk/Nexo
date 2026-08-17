@@ -75,6 +75,7 @@ export function buildPriceBreakdown(input: {
   unitPrices?: UnitPrices
   ceilingHeight?: CeilingHeight
   platformFee?: number
+  extraLines?: PriceLine[]
 }): PriceBreakdown {
   const platformFee = input.platformFee ?? PLATFORM_FEE_SGD
   const lines: PriceLine[] = []
@@ -113,15 +114,20 @@ export function buildPriceBreakdown(input: {
     input.hourlyRate,
   )
   lines.push({ label: lineLabel, amount: subtotal })
+  let serviceSubtotal = subtotal
+  for (const extra of input.extraLines ?? []) {
+    lines.push(extra)
+    serviceSubtotal += extra.amount
+  }
   return {
     pricingModel: 'hourly',
     quantity: null,
     durationHours: input.durationHours,
     ceilingHeight: null,
     lines,
-    serviceSubtotal: subtotal,
+    serviceSubtotal,
     platformFee,
-    total: subtotal + platformFee,
+    total: serviceSubtotal + platformFee,
   }
 }
 
