@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, CalendarCheck, Wallet } from 'lucide-react'
+import { ArrowRight, CalendarCheck, Users, Wallet } from 'lucide-react'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { BOOKING_CONFIRMATION } from '@/shared/lib/cleaningContent'
 import { useCleaningPricing } from '@/shared/hooks/useCleaningPricing'
@@ -7,16 +7,14 @@ import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 
 export function HomeTrustBar() {
   const pricing = useCleaningPricing()
-  const verifiedCount = pricing.hasActiveCleaners
-    ? pricing.variesByCleaner
-      ? 'Multiple'
-      : 'Available'
-    : '—'
+  const count = pricing.cleanerCount
 
   const stats = [
     {
-      value: verifiedCount,
-      label: pricing.hasActiveCleaners ? 'Cleaners listed' : 'Cleaners onboarding',
+      value: pricing.loading ? '…' : String(count),
+      label:
+        count === 1 ? 'Cleaner onboarded' : count > 0 ? 'Cleaners onboarded' : 'Cleaners onboarding',
+      icon: Users,
     },
     {
       value: 'PayNow',
@@ -45,6 +43,14 @@ export function HomeTrustBar() {
             )}
             <p className="text-2xl font-bold tracking-tight text-nexo-900">{value}</p>
             <p className="text-xs font-medium uppercase tracking-wider text-nexo-700/60">{label}</p>
+            {!pricing.loading && count > 0 && (
+              <Link
+                to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
+                className="text-xs font-medium text-nexo-600 hover:text-nexo-800 hover:underline"
+              >
+                View cleaners
+              </Link>
+            )}
           </div>
         ))}
       </div>
