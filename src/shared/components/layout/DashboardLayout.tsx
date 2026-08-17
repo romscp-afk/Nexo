@@ -11,6 +11,7 @@ import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
+import { Portal } from '@/shared/components/layout/Portal'
 
 type BadgeKind = 'notifications' | 'messages'
 
@@ -138,31 +139,33 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       </aside>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-56 bg-white shadow-xl">
-            <div className="flex h-14 items-center justify-between border-b px-4">
-              <Logo to="/" size="sm" />
-              <button onClick={() => setSidebarOpen(false)} aria-label="Close menu">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <nav className="space-y-1 p-3">
-              {nav.map((item) => (
-                <NavLink
-                  key={item.to}
-                  item={item}
-                  isActive={isActive(item)}
-                  badgeCount={badgeForItem(item)}
-                  onNavigate={() => setSidebarOpen(false)}
-                />
-              ))}
-              <div className="mt-4 border-t border-slate-100 pt-2">
-                <LogoutButton variant="sidebar" onLogout={() => setSidebarOpen(false)} />
+        <Portal>
+          <div className="fixed inset-0 z-40 md:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
+            <aside className="absolute left-0 top-0 h-full w-56 bg-white shadow-xl">
+              <div className="flex h-14 items-center justify-between border-b px-4 pt-[env(safe-area-inset-top)]">
+                <Logo to="/" size="sm" />
+                <button onClick={() => setSidebarOpen(false)} aria-label="Close menu">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-            </nav>
-          </aside>
-        </div>
+              <nav className="space-y-1 overflow-y-auto p-3">
+                {nav.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    item={item}
+                    isActive={isActive(item)}
+                    badgeCount={badgeForItem(item)}
+                    onNavigate={() => setSidebarOpen(false)}
+                  />
+                ))}
+                <div className="mt-4 border-t border-slate-100 pt-2">
+                  <LogoutButton variant="sidebar" onLogout={() => setSidebarOpen(false)} />
+                </div>
+              </nav>
+            </aside>
+          </div>
+        </Portal>
       )}
 
       <div className="flex flex-1 flex-col">

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Bell, Bookmark, Home, Star, User, X } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
+import { Portal } from '@/shared/components/layout/Portal'
 import { cn } from '@/shared/lib/utils'
 
 type MobileMoreSheetProps = {
@@ -46,7 +47,8 @@ export function MobileMoreSheet({ open, onClose, unreadNotifications = 0 }: Mobi
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[70] md:hidden">
+    <Portal>
+      <div className="fixed inset-0 z-[70] md:hidden">
       <button
         type="button"
         className="absolute inset-0 bg-slate-900/50"
@@ -112,5 +114,6 @@ export function MobileMoreSheet({ open, onClose, unreadNotifications = 0 }: Mobi
         </nav>
       </div>
     </div>
+    </Portal>
   )
 }

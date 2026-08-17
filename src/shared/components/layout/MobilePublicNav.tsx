@@ -5,6 +5,7 @@ import { getDashboardPath } from '@/shared/lib/constants'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { Logo } from '@/shared/components/layout/Logo'
+import { Portal } from '@/shared/components/layout/Portal'
 import { cn } from '@/shared/lib/utils'
 
 type MobilePublicNavProps = {
@@ -19,6 +20,15 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
   useEffect(() => {
     setOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
 
   const close = () => setOpen(false)
 
@@ -37,65 +47,67 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-slate-900/50"
-            onClick={close}
-            aria-label="Close menu"
-          />
-          <aside className="absolute right-0 top-0 flex h-full w-[min(100vw,320px)] flex-col bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]">
-              <Logo to="/" size="sm" />
-              <button
-                type="button"
-                onClick={close}
-                className="rounded-full p-2 text-slate-500 hover:bg-slate-100"
-                aria-label="Close menu"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <nav className="flex flex-1 flex-col overflow-y-auto p-3">
-              <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Explore
-              </p>
-              <Link to={`/services/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                Home cleaning
-              </Link>
-              <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                Find cleaners
-              </Link>
-
-              <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Account
-              </p>
-              {user ? (
-                <Link
-                  to={getDashboardPath(user.role)}
-                  className={cn(linkClass, 'bg-nexo-700 text-white active:bg-nexo-800')}
+        <Portal>
+          <div className="fixed inset-0 z-[60] md:hidden">
+            <button
+              type="button"
+              className="absolute inset-0 bg-slate-900/50"
+              onClick={close}
+              aria-label="Close menu"
+            />
+            <aside className="absolute right-0 top-0 flex h-full w-[min(100vw,320px)] flex-col bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]">
+                <Logo to="/" size="sm" />
+                <button
+                  type="button"
                   onClick={close}
+                  className="rounded-full p-2 text-slate-500 hover:bg-slate-100"
+                  aria-label="Close menu"
                 >
-                  Go to dashboard
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <nav className="flex flex-1 flex-col overflow-y-auto p-3">
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Explore
+                </p>
+                <Link to={`/services/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
+                  Home cleaning
                 </Link>
-              ) : (
-                <>
-                  <Link to="/login" className={linkClass} onClick={close}>
-                    Log in
-                  </Link>
+                <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
+                  Find cleaners
+                </Link>
+
+                <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Account
+                </p>
+                {user ? (
                   <Link
-                    to="/register"
-                    className={cn(linkClass, 'mt-2 bg-nexo-700 text-white active:bg-nexo-800')}
+                    to={getDashboardPath(user.role)}
+                    className={cn(linkClass, 'bg-nexo-700 text-white active:bg-nexo-800')}
                     onClick={close}
                   >
-                    Create account
+                    Go to dashboard
                   </Link>
-                </>
-              )}
-            </nav>
-          </aside>
-        </div>
+                ) : (
+                  <>
+                    <Link to="/login" className={linkClass} onClick={close}>
+                      Log in
+                    </Link>
+                    <Link
+                      to="/register"
+                      className={cn(linkClass, 'mt-2 bg-nexo-700 text-white active:bg-nexo-800')}
+                      onClick={close}
+                    >
+                      Create account
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </aside>
+          </div>
+        </Portal>
       )}
     </>
   )
