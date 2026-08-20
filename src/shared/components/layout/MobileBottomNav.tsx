@@ -54,7 +54,7 @@ export function MobileBottomNav({
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white shadow-[0_-4px_24px_rgba(15,23,42,0.08)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-brand-surface shadow-[0_-4px_24px_rgba(7,21,58,0.08)] md:hidden"
       aria-label="Main navigation"
     >
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]">
@@ -68,7 +68,7 @@ export function MobileBottomNav({
               <span className="relative flex h-7 w-7 items-center justify-center">
                 <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.5 : 2} />
                 {(messageBadge || moreTabBadge) && (
-                  <span className="absolute -right-1.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-nexo-700 px-1 text-[10px] font-semibold text-white">
+                  <span className="absolute -right-1.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-semibold text-white">
                     {messageBadge
                       ? unreadMessages > 9
                         ? '9+'
@@ -81,14 +81,14 @@ export function MobileBottomNav({
               </span>
               <span className="max-w-full truncate text-[11px] font-semibold leading-none">{label}</span>
               {active && (
-                <span className="absolute inset-x-2 top-0 h-0.5 rounded-full bg-nexo-700" aria-hidden />
+                <span className="absolute inset-x-2 top-0 h-0.5 rounded-full bg-brand-primary" aria-hidden />
               )}
             </>
           )
 
           const className = cn(
             'relative flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 py-1.5 transition-colors',
-            active ? 'text-nexo-700' : 'text-slate-500 active:text-nexo-600',
+            active ? 'text-brand-primary' : 'text-brand-text-muted active:text-brand-primary',
           )
 
           if (action === 'more') {

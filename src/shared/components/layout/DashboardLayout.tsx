@@ -1,7 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { type UserRole } from '@/shared/lib/constants'
-import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { useAppStore } from '@/shared/stores/appStore'
 import { cn } from '@/shared/lib/utils'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
@@ -12,6 +11,7 @@ import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
 import { Portal } from '@/shared/components/layout/Portal'
+import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 
 type BadgeKind = 'notifications' | 'messages'
 
@@ -19,23 +19,22 @@ type NavItem = { to: string; label: string; exact?: boolean; badge?: BadgeKind }
 
 const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   customer: [
-    { to: '/dashboard', label: 'Dashboard', exact: true },
-    { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Browse cleaners' },
-    { to: '/dashboard/bookings', label: 'My bookings' },
+    { to: '/dashboard', label: 'Home', exact: true },
+    { to: '/dashboard/bookings', label: 'Bookings' },
     { to: '/dashboard/messages', label: 'Messages', badge: 'messages' },
-    { to: '/dashboard/reviews', label: 'My reviews' },
-    { to: '/dashboard/saved-providers', label: 'Saved providers' },
+    { to: '/dashboard/saved-providers', label: 'Saved cleaners' },
+    { to: '/dashboard/reviews', label: 'Reviews' },
     { to: '/dashboard/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/dashboard/profile', label: 'Profile' },
   ],
   provider: [
-    { to: '/provider', label: 'Dashboard', exact: true },
-    { to: '/provider/bookings', label: 'Bookings' },
+    { to: '/provider', label: 'Today', exact: true },
+    { to: '/provider/bookings', label: 'Requests' },
     { to: '/provider/schedule', label: 'Schedule' },
     { to: '/provider/messages', label: 'Messages', badge: 'messages' },
-    { to: '/provider/support', label: 'Nexo support' },
     { to: '/provider/earnings', label: 'Earnings' },
     { to: '/provider/notifications', label: 'Notifications', badge: 'notifications' },
+    { to: '/provider/support', label: 'Support' },
     { to: '/provider/profile', label: 'Profile' },
   ],
   admin: [
@@ -71,13 +70,15 @@ function NavLink({
       to={item.to}
       onClick={onNavigate}
       className={cn(
-        'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium',
-        isActive ? 'bg-nexo-50 text-nexo-700' : 'text-slate-600 hover:bg-slate-100',
+        'flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200',
+        isActive
+          ? 'bg-brand-light text-brand-primary'
+          : 'text-brand-text-secondary hover:bg-brand-bg hover:text-brand-text',
       )}
     >
       <span>{item.label}</span>
       {item.badge && badgeCount > 0 && (
-        <span className="rounded-full bg-nexo-700 px-1.5 py-0.5 text-xs text-white">
+        <span className="rounded-full bg-brand-primary px-1.5 py-0.5 text-xs font-semibold text-white">
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}
@@ -111,18 +112,17 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   }
 
   const mobileTitle = (() => {
-    if (role !== 'customer') return `${role} portal`
     const item = nav.find((n) => isActive(n))
     return item?.label ?? 'Dashboard'
   })()
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white md:block">
-        <div className="flex h-14 items-center border-b border-slate-200 px-4">
+    <div className="flex min-h-screen bg-brand-bg">
+      <aside className="hidden w-60 shrink-0 border-r border-brand-border bg-brand-surface md:block">
+        <div className="flex h-16 items-center border-b border-brand-border px-4">
           <Logo to="/" size="sm" />
         </div>
-        <nav className="space-y-1 p-3">
+        <nav className="space-y-1 p-3" aria-label="Dashboard">
           {nav.map((item) => (
             <NavLink
               key={item.to}
@@ -131,10 +131,17 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               badgeCount={badgeForItem(item)}
             />
           ))}
-          <Link to="/" className="mt-4 block px-3 text-xs text-slate-500 hover:text-nexo-700">
+          {role === 'customer' && (
+            <div className="mt-4 px-1">
+              <CleaningRequestLink className="flex min-h-10 w-full items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white transition hover:bg-brand-primary-hover">
+                Request Cleaning
+              </CleaningRequestLink>
+            </div>
+          )}
+          <Link to="/" className="mt-4 block px-3 text-xs text-brand-text-muted hover:text-brand-primary">
             ← Back to site
           </Link>
-          <div className="mt-2 border-t border-slate-100 pt-2">
+          <div className="mt-2 border-t border-brand-border pt-2">
             <LogoutButton variant="sidebar" />
           </div>
         </nav>
@@ -143,12 +150,12 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       {sidebarOpen && (
         <Portal>
           <div className="fixed inset-0 z-40 md:hidden">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-            <aside className="absolute left-0 top-0 h-full w-56 bg-white shadow-xl">
-              <div className="flex h-14 items-center justify-between border-b px-4 pt-[env(safe-area-inset-top)]">
+            <div className="absolute inset-0 bg-brand-navy/40" onClick={() => setSidebarOpen(false)} />
+            <aside className="absolute left-0 top-0 h-full w-64 bg-brand-surface shadow-card-hover">
+              <div className="flex h-16 items-center justify-between border-b border-brand-border px-4 pt-[env(safe-area-inset-top)]">
                 <Logo to="/" size="sm" />
-                <button onClick={() => setSidebarOpen(false)} aria-label="Close menu">
-                  <X className="h-5 w-5" />
+                <button onClick={() => setSidebarOpen(false)} aria-label="Close menu" className="min-h-11 min-w-11">
+                  <X className="h-5 w-5 text-brand-text-secondary" />
                 </button>
               </div>
               <nav className="space-y-1 overflow-y-auto p-3">
@@ -161,7 +168,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
                     onNavigate={() => setSidebarOpen(false)}
                   />
                 ))}
-                <div className="mt-4 border-t border-slate-100 pt-2">
+                <div className="mt-4 border-t border-brand-border pt-2">
                   <LogoutButton variant="sidebar" onLogout={() => setSidebarOpen(false)} />
                 </div>
               </nav>
@@ -171,14 +178,14 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4 pt-[env(safe-area-inset-top)]">
-          {role !== 'customer' && (
-            <button className="md:hidden" onClick={toggleSidebar} aria-label="Open menu">
-              <Menu className="h-5 w-5 text-slate-600" />
+        <header className="flex h-16 items-center gap-3 border-b border-brand-border bg-brand-surface px-4 pt-[env(safe-area-inset-top)]">
+          {(role === 'provider' || role === 'admin') && (
+            <button className="min-h-11 min-w-11 md:hidden" onClick={toggleSidebar} aria-label="Open menu">
+              <Menu className="h-5 w-5 text-brand-text-secondary" />
             </button>
           )}
-          <span className="text-sm font-medium text-slate-800">{mobileTitle}</span>
-          <div className="ml-auto md:block">
+          <span className="text-sm font-semibold text-brand-text">{mobileTitle}</span>
+          <div className="ml-auto">
             <LogoutButton className="hidden md:inline-flex" />
           </div>
         </header>
@@ -188,10 +195,10 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             role === 'customer' && 'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
           )}
         >
-          <div className="flex-1">
+          <div className="mx-auto w-full max-w-5xl flex-1">
             <Outlet />
           </div>
-          <SiteFooter compact className={cn('mt-8 border-0', role === 'customer' && 'hidden md:block')} />
+          <SiteFooter compact className={cn('mt-8', role === 'customer' && 'hidden md:block')} />
         </main>
       </div>
       {role === 'customer' && <CustomerMobileNav />}

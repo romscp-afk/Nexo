@@ -6,9 +6,9 @@ import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
+    <div className="rounded-card-lg border border-brand-border bg-brand-surface p-4 shadow-card">
+      <p className="text-sm text-brand-text-secondary">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-brand-text">{value}</p>
     </div>
   )
 }

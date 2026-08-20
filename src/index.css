@@ -2,33 +2,57 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  /* Nexo brand palette */
+
+  /* ─── Nexo brand palette (premium indigo + blue) ─── */
+  --color-brand-primary: #2563eb;
+  --color-brand-primary-hover: #1d4ed8;
+  --color-brand-electric: #3b82f6;
+  --color-brand-indigo: #172554;
+  --color-brand-navy: #07153a;
+  --color-brand-navy-surface: #0b1f4d;
+  --color-brand-light: #eff6ff;
+  --color-brand-pale: #dbeafe;
+
+  /* Neutrals */
+  --color-brand-text: #0f172a;
+  --color-brand-text-secondary: #475569;
+  --color-brand-text-muted: #64748b;
+  --color-brand-border: #e2e8f0;
+  --color-brand-bg: #f8fafc;
+  --color-brand-surface: #ffffff;
+
+  /* Feedback */
+  --color-brand-success: #16a34a;
+  --color-brand-warning: #f59e0b;
+  --color-brand-error: #dc2626;
+  --color-brand-info: #2563eb;
+
+  /* Legacy nexo-* aliases (backward compatible) */
   --color-nexo-50: #f8fafc;
-  --color-nexo-100: #eef2ff;
+  --color-nexo-100: #eff6ff;
   --color-nexo-200: #e2e8f0;
-  --color-nexo-300: #c7d2fe;
-  --color-nexo-400: #6366f1;
-  --color-nexo-500: #4f46e5;
+  --color-nexo-300: #dbeafe;
+  --color-nexo-400: #3b82f6;
+  --color-nexo-500: #2563eb;
   --color-nexo-600: #2563eb;
   --color-nexo-700: #2563eb;
   --color-nexo-800: #1d4ed8;
-  --color-nexo-900: #1e293b;
-  --color-nexo-950: #0f172a;
-  /* Brand accents */
-  --color-nexo-accent: #818cf8;
-  --color-nexo-glow: #4f46e5;
-  --color-nexo-mint: #e0e7ff;
-  --color-nexo-soft: #f1f5f9;
+  --color-nexo-900: #172554;
+  --color-nexo-950: #07153a;
+  --color-nexo-accent: #3b82f6;
+  --color-nexo-glow: #2563eb;
+  --color-nexo-mint: #dbeafe;
+  --color-nexo-soft: #f8fafc;
   --color-nexo-pearl: #f8fafc;
-  --color-nexo-deep: #312e81;
-  --color-nexo-ink: #0f172a;
-  --color-nexo-champagne: #cbd5e1;
+  --color-nexo-deep: #172554;
+  --color-nexo-ink: #07153a;
+  --color-nexo-champagne: #94a3b8;
   --color-nexo-card: #ffffff;
-  /* Semantic */
-  --color-nexo-success: #10b981;
+  --color-nexo-success: #16a34a;
   --color-nexo-warning: #f59e0b;
-  --color-nexo-error: #ef4444;
-  /* Silver Legacy banner palette */
+  --color-nexo-error: #dc2626;
+
+  /* Silver Legacy (gathering — unchanged) */
   --color-legacy-950: #121212;
   --color-legacy-900: #1a1a1a;
   --color-legacy-800: #2a2a2a;
@@ -39,18 +63,35 @@
   --color-legacy-gold-dark: #d4a017;
   --color-legacy-red: #e1251b;
   --color-legacy-sky: #6fa3bc;
+
+  /* Radius tokens */
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-card-lg: 20px;
+
+  /* Typography scale */
+  --text-display: clamp(2.375rem, 5vw, 4rem);
+  --text-page: clamp(1.875rem, 3.5vw, 3rem);
+  --text-section: clamp(1.625rem, 2.5vw, 2.5rem);
 }
 
 html {
   overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
   font-family: var(--font-sans);
-  color: var(--color-nexo-950);
-  background-color: var(--color-nexo-pearl);
+  color: var(--color-brand-text);
+  background-color: var(--color-brand-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -59,7 +100,7 @@ body {
   min-height: 100%;
 }
 
-/* Mobile: prevent iOS zoom on input focus (needs ≥16px) */
+/* Mobile: prevent iOS zoom on input focus */
 @media (max-width: 767px) {
   input,
   select,
@@ -68,7 +109,6 @@ body {
   }
 }
 
-/* Better touch targets */
 @media (hover: none) {
   button,
   a {
@@ -76,120 +116,95 @@ body {
   }
 }
 
+/* ─── Design utilities ─── */
+.rounded-input {
+  border-radius: var(--radius-input);
+}
+
+.rounded-card {
+  border-radius: var(--radius-card);
+}
+
+.rounded-card-lg {
+  border-radius: var(--radius-card-lg);
+}
+
+.text-display {
+  font-size: var(--text-display);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.text-page {
+  font-size: var(--text-page);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.text-section {
+  font-size: var(--text-section);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.bg-hero-gradient {
+  background: linear-gradient(135deg, #07153a 0%, #172554 45%, #2563eb 100%);
+}
+
+.bg-cta-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+}
+
+.bg-section-light {
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.shadow-brand {
+  box-shadow: 0 4px 24px -4px rgb(37 99 235 / 0.25);
+}
+
+.shadow-card {
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.06), 0 8px 24px -8px rgb(37 99 235 / 0.08);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.08), 0 16px 40px -12px rgb(37 99 235 / 0.15);
+}
+
+/* Skyline decorative pattern */
+.hero-skyline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' fill='none'%3E%3Cpath d='M0 120V80h40v40H0zm60 0V60h30v20h20v40H60zm80 0V70h50v50H140zm70 0V50h35v70H210zm60 0V65h45v55H270zm80 0V40h40v80H350zm70 0V55h55v65H420zm90 0V30h50v90H510zm80 0V45h60v75H590zm100 0V20h70v100H690zm90 0V35h55v85H780zm80 0V50h45v70H860zm70 0V60h50v60H930zm80 0V25h65v95H1010zm90 0V45h50v75H1100zm100 0V55h40v65h60V120H1200V70h-50v50z' fill='white' fill-opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom center;
+  background-size: 1200px 120px;
+}
+
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-12px) rotate(2deg);
-  }
-}
-
-@keyframes float-delayed {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-16px) rotate(-3deg);
-  }
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.hero-enter {
-  opacity: 1;
-  animation: hero-enter 0.45s ease-out both;
-}
-
-@keyframes hero-enter {
-  from {
-    transform: translateY(8px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-enter {
-    animation: none;
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-enter {
+  animation: fade-up 0.45s ease-out both;
 }
 
 .animate-float {
   animation: float 5s ease-in-out infinite;
 }
 
-.animate-float-delayed {
-  animation: float-delayed 6s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 4s ease-in-out infinite;
-}
-
-.animate-marquee {
-  animation: marquee 28s linear infinite;
-}
-
 .animate-fade-up {
-  animation: fade-up 0.7s ease-out both;
-}
-
-.animate-fade-up-delay-1 {
-  animation: fade-up 0.7s ease-out 0.1s both;
-}
-
-.animate-fade-up-delay-2 {
-  animation: fade-up 0.7s ease-out 0.2s both;
-}
-
-.animate-fade-up-delay-3 {
-  animation: fade-up 0.7s ease-out 0.3s both;
+  animation: fade-up 0.6s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-enter,
   .animate-float,
-  .animate-float-delayed,
-  .animate-pulse-glow,
-  .animate-marquee,
-  .animate-fade-up,
-  .animate-fade-up-delay-1,
-  .animate-fade-up-delay-2,
-  .animate-fade-up-delay-3,
-  .hero-enter {
+  .animate-fade-up {
     animation: none;
   }
 }

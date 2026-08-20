@@ -44,6 +44,7 @@ import {
 import { trackEvent } from '@/shared/lib/analytics'
 import { recordPwaEngagement } from '@/shared/lib/pwaEngagement'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
+import { ProgressStepper } from '@/shared/components/ui/ProgressStepper'
 
 const STEPS = [
   'Cleaning type',
@@ -54,35 +55,6 @@ const STEPS = [
 ] as const
 
 const TOTAL_STEPS = STEPS.length
-
-function StepProgress({ step }: { step: number }) {
-  return (
-    <nav aria-label="Booking progress" className="mb-8">
-      <ol className="flex flex-wrap gap-2">
-        {STEPS.map((label, i) => {
-          const n = i + 1
-          const active = n === step
-          const done = n < step
-          return (
-            <li
-              key={label}
-              className={`rounded-full px-3 py-1 text-xs font-medium ${
-                active
-                  ? 'bg-nexo-700 text-white'
-                  : done
-                    ? 'bg-nexo-100 text-nexo-800'
-                    : 'bg-slate-100 text-slate-500'
-              }`}
-              aria-current={active ? 'step' : undefined}
-            >
-              <span className="sr-only">Step {n}:</span> {label}
-            </li>
-          )
-        })}
-      </ol>
-    </nav>
-  )
-}
 
 export function CleaningRequestPage() {
   const { user } = useAuth()
@@ -372,7 +344,7 @@ export function CleaningRequestPage() {
               description="Tell us what you need — sign in only when you are ready to submit."
             />
 
-            <StepProgress step={step} />
+            <ProgressStepper steps={STEPS} currentStep={step} className="mb-8" />
 
             {fieldError && (
               <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">

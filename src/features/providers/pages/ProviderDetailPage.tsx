@@ -43,7 +43,7 @@ export function ProviderDetailPage() {
 
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="space-y-6 lg:col-span-2">
-                <section className="rounded-xl border border-slate-200 bg-white p-6">
+                <section className="rounded-card-lg border border-brand-border bg-brand-surface p-6 shadow-card">
                   <div className="flex flex-wrap items-start gap-4">
                     <ProviderAvatar
                       name={provider.businessName}
@@ -86,7 +86,7 @@ export function ProviderDetailPage() {
 
                 <ProviderWeeklyHoursDisplay providerId={provider.id} />
 
-                <section className="rounded-xl border border-slate-200 bg-white p-6">
+                <section className="rounded-card-lg border border-brand-border bg-brand-surface p-6 shadow-card">
                   <h2 className="font-semibold text-slate-900">Services offered</h2>
                   {provider.services.length === 0 ? (
                     <p className="mt-2 text-sm text-slate-500">No services listed yet.</p>
@@ -128,7 +128,7 @@ export function ProviderDetailPage() {
                   )}
                 </section>
 
-                <section className="rounded-xl border border-slate-200 bg-white p-6">
+                <section className="rounded-card-lg border border-brand-border bg-brand-surface p-6 shadow-card">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h2 className="font-semibold text-slate-900">Customer reviews</h2>
                     <span className="text-sm text-slate-500">

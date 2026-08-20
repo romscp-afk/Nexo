@@ -1,66 +1,51 @@
+import { ShieldCheck, BadgeDollarSign, Lock, HeadphonesIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CalendarCheck, Users, Wallet } from 'lucide-react'
-import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
-import { BOOKING_CONFIRMATION, CLEANING_RECURRING_PLANS_NOTE } from '@/shared/lib/cleaningContent'
-import { useCleaningPricing } from '@/shared/hooks/useCleaningPricing'
+import { ArrowRight } from 'lucide-react'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+
+const items = [
+  {
+    icon: ShieldCheck,
+    title: 'Verified cleaning professionals',
+    description: 'Background-checked providers on the Nexo platform.',
+  },
+  {
+    icon: BadgeDollarSign,
+    title: 'Transparent hourly rates',
+    description: 'See your estimate before you submit a request.',
+  },
+  {
+    icon: Lock,
+    title: 'Secure booking records',
+    description: 'Every booking tracked with clear status updates.',
+  },
+  {
+    icon: HeadphonesIcon,
+    title: 'Responsive customer support',
+    description: 'Help when you need it across Singapore.',
+  },
+]
 
 export function HomeTrustBar() {
-  const pricing = useCleaningPricing()
-  const count = pricing.cleanerCount
-
-  const stats = [
-    {
-      value: pricing.loading ? '…' : String(count),
-      label:
-        count === 1
-          ? 'Cleaner onboarded'
-          : count > 0
-            ? 'Cleaners onboarded'
-            : 'Cleaners onboarding',
-      icon: Users,
-    },
-    {
-      value: 'PayNow',
-      label: 'Flexible payment',
-      icon: Wallet,
-    },
-    {
-      value: 'Request',
-      label: 'Subject to acceptance',
-      icon: CalendarCheck,
-    },
-  ]
-
   return (
-    <section className="border-y border-nexo-200 bg-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px bg-nexo-200 sm:grid-cols-3">
-        {stats.map(({ value, label, icon: Icon }) => (
+    <section className="border-y border-brand-border bg-brand-surface">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px bg-brand-border sm:grid-cols-2 lg:grid-cols-4">
+        {items.map(({ icon: Icon, title, description }) => (
           <div
-            key={label}
-            className="flex flex-col items-center gap-2 bg-white px-4 py-8 text-center sm:py-10"
+            key={title}
+            className="flex flex-col gap-3 bg-brand-surface px-5 py-8 sm:px-6"
           >
-            {Icon && (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-nexo-100">
-                <Icon className="h-5 w-5 text-nexo-600" strokeWidth={1.75} />
-              </div>
-            )}
-            <p className="text-2xl font-bold tracking-tight text-nexo-900">{value}</p>
-            <p className="text-xs font-medium uppercase tracking-wider text-nexo-700/60">{label}</p>
-            {!pricing.loading && count > 0 && (
-              <Link
-                to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
-                className="text-xs font-medium text-nexo-600 hover:text-nexo-800 hover:underline"
-              >
-                View cleaners
-              </Link>
-            )}
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-light">
+              <Icon className="h-5 w-5 text-brand-primary" strokeWidth={1.75} />
+            </div>
+            <div>
+              <p className="font-semibold text-brand-text">{title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-brand-text-secondary">{description}</p>
+            </div>
           </div>
         ))}
       </div>
-      <p className="mx-auto max-w-3xl px-4 py-4 text-center text-xs text-slate-500">
-        {BOOKING_CONFIRMATION}
-      </p>
     </section>
   )
 }
@@ -68,44 +53,47 @@ export function HomeTrustBar() {
 const steps = [
   {
     step: '01',
-    title: 'Request a cleaning',
-    description: 'Share your property, schedule and location. No account needed to start.',
+    title: 'Tell us what you need',
+    description: 'Choose your cleaning type, property details, schedule and location.',
   },
   {
     step: '02',
-    title: 'Review your estimate',
-    description: 'See hourly pricing and minimum duration before you sign in to submit.',
+    title: 'Review pricing and submit',
+    description: 'Review the estimated cost and sign in only when you are ready to submit.',
   },
   {
     step: '03',
-    title: 'Cleaner confirms',
-    description: BOOKING_CONFIRMATION,
+    title: 'Get connected',
+    description: 'An available cleaning professional accepts your request and completes the service.',
   },
 ]
 
 export function HomeHowItWorks() {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-brand-surface py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-nexo-600">
-            Simple process
+          <p className="text-sm font-semibold uppercase tracking-widest text-brand-primary">
+            How Nexo works
           </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-nexo-900 sm:text-4xl">
-            Home cleaning in three steps
+          <h2 className="mt-2 text-section font-bold tracking-tight text-brand-text">
+            Three simple steps
           </h2>
         </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="relative mt-14 grid gap-6 md:grid-cols-3">
+          <div
+            aria-hidden
+            className="absolute left-[16.67%] right-[16.67%] top-12 hidden h-px bg-brand-border md:block"
+          />
           {steps.map(({ step, title, description }) => (
             <div
               key={step}
-              className="group relative overflow-hidden rounded-2xl border border-nexo-200 bg-nexo-50 p-8 transition hover:-translate-y-1 hover:border-nexo-400 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              className="relative rounded-card-lg border border-brand-border bg-brand-bg p-8 transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
-              <span className="text-4xl font-black text-nexo-200">{step}</span>
-              <h3 className="mt-4 text-xl font-bold text-nexo-900">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-nexo-800/70">{description}</p>
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-nexo-400 transition-all group-hover:w-full motion-reduce:transition-none" />
+              <span className="text-4xl font-black text-brand-pale">{step}</span>
+              <h3 className="mt-4 text-xl font-bold text-brand-text">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-brand-text-secondary">{description}</p>
             </div>
           ))}
         </div>
@@ -116,32 +104,24 @@ export function HomeHowItWorks() {
 
 export function HomeCta() {
   return (
-    <section className="bg-nexo-50 py-20">
+    <section className="bg-brand-bg py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-nexo-ink via-nexo-deep to-nexo-800 px-8 py-16 text-center text-white shadow-xl sm:px-16">
-          <div className="relative">
-            <h2 className="text-3xl font-bold sm:text-4xl">Ready for a cleaner home?</h2>
-            <p className="mx-auto mt-4 max-w-lg text-nexo-mint/80">
-              Request home cleaning across Singapore with clear pricing and a simple flow.
-            </p>
-            <p className="mx-auto mt-3 max-w-lg text-sm text-nexo-mint/70">
-              {CLEANING_RECURRING_PLANS_NOTE}{' '}
-              <Link to="/support" className="font-medium text-white underline underline-offset-2 hover:text-nexo-mint">
-                Contact us
-              </Link>
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <CleaningRequestLink className="inline-flex min-h-11 items-center gap-2 rounded-full bg-nexo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-nexo-600/25 transition hover:bg-nexo-800">
-                Request a cleaning
-                <ArrowRight className="h-4 w-4" />
-              </CleaningRequestLink>
-              <Link
-                to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Find a cleaner
-              </Link>
-            </div>
+        <div className="relative overflow-hidden rounded-card-lg bg-hero-gradient px-8 py-16 text-center text-white shadow-brand sm:px-16">
+          <h2 className="text-section font-bold">Ready for a cleaner home?</h2>
+          <p className="mx-auto mt-4 max-w-lg text-brand-pale/90">
+            Request reliable home cleaning across Singapore with clear pricing and a simple booking process.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <CleaningRequestLink className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-brand-navy shadow-brand transition hover:bg-brand-light">
+              Request a Cleaning
+              <ArrowRight className="h-4 w-4" />
+            </CleaningRequestLink>
+            <Link
+              to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Browse Cleaners
+            </Link>
           </div>
         </div>
       </div>

@@ -26,8 +26,8 @@ export function ProviderDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Provider dashboard</h1>
-        <p className="mt-1 text-slate-600">Open category requests and your assigned jobs.</p>
+        <h1 className="text-page font-bold text-brand-text">Provider dashboard</h1>
+        <p className="mt-1 text-brand-text-secondary">Today&apos;s jobs, open requests, and earnings at a glance.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">

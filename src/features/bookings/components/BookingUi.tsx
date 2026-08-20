@@ -5,18 +5,18 @@ import { PaymentMethodBadge } from '@/features/bookings/components/PaymentMethod
 import { cn, formatCurrency, formatDateTime } from '@/shared/lib/utils'
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
-  pending: 'bg-amber-50 text-amber-800',
-  confirmed: 'bg-blue-50 text-blue-800',
-  in_progress: 'bg-indigo-50 text-indigo-800',
-  completed: 'bg-emerald-50 text-emerald-800',
-  cancelled: 'bg-slate-100 text-slate-600',
+  pending: 'bg-amber-50 text-amber-800 ring-amber-100',
+  confirmed: 'bg-brand-light text-brand-primary ring-brand-pale',
+  in_progress: 'bg-indigo-50 text-indigo-800 ring-indigo-100',
+  completed: 'bg-green-50 text-brand-success ring-green-100',
+  cancelled: 'bg-brand-bg text-brand-text-muted ring-brand-border',
 }
 
 export function BookingStatusBadge({ status }: { status: BookingStatus }) {
   return (
     <span
       className={cn(
-        'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize',
+        'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset',
         STATUS_STYLES[status],
       )}
     >
@@ -40,8 +40,8 @@ export function BookingCard({
     <Link
       to={unreadCount > 0 ? `${detailPath}#chat` : detailPath}
       className={cn(
-        'block rounded-xl border bg-white p-5 transition hover:shadow-sm',
-        booking.paymentMethod === 'cash' ? 'border-amber-300 hover:border-amber-400' : 'border-slate-200 hover:border-nexo-200',
+        'block rounded-card-lg border bg-brand-surface p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        booking.paymentMethod === 'cash' ? 'border-amber-200 hover:border-amber-300' : 'border-brand-border hover:border-brand-primary/20',
       )}
     >
       <div className="flex items-start justify-between gap-3">

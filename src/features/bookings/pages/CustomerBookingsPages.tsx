@@ -48,10 +48,10 @@ export function CustomerDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">
+        <h1 className="text-page font-bold text-brand-text">
           Welcome back{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''}
         </h1>
-        <p className="mt-1 text-slate-600">Your home services hub — book, track, and review.</p>
+        <p className="mt-1 text-brand-text-secondary">Your home cleaning hub — book, track, and review.</p>
       </div>
 
       {(user?.preferredArea || user?.addressLine1) && (
@@ -73,11 +73,11 @@ export function CustomerDashboardPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="rounded-card-lg border border-brand-border bg-brand-surface p-4 shadow-card">
           <p className="text-sm text-slate-500">Active bookings</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{upcoming.length}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="rounded-card-lg border border-brand-border bg-brand-surface p-4 shadow-card">
           <p className="text-sm text-slate-500">Total bookings</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{bookings?.length ?? 0}</p>
         </div>
@@ -85,7 +85,7 @@ export function CustomerDashboardPage() {
           <p className="text-sm text-slate-500">Saved providers</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{savedProviders?.length ?? 0}</p>
         </Link>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="rounded-card-lg border border-brand-border bg-brand-surface p-4 shadow-card">
           <p className="text-sm text-slate-500">Reviews left</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{reviews?.length ?? 0}</p>
         </div>
