@@ -1,7 +1,7 @@
 {
   "name": "nexo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -60,9 +60,21 @@
     "setup:provider-platform-fee-10": "node scripts/apply-provider-platform-fee-10.mjs",
     "setup:open-bookings": "node scripts/apply-open-booking-requests.mjs",
     "setup:notification-type-cast": "node scripts/apply-notification-type-cast.mjs",
-    "fix:auth": "node scripts/fix-auth-trigger.mjs"
+    "fix:auth": "node scripts/fix-auth-trigger.mjs",
+    "mobile:build": "npm run build && npx cap sync",
+    "mobile:sync": "npx cap sync",
+    "mobile:ios": "npx cap open ios",
+    "mobile:android": "npx cap open android",
+    "mobile:add": "npx cap add ios && npx cap add android",
+    "mobile:icons": "npx capacitor-assets generate --ios --android"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.4",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "@supabase/supabase-js": "^2.110.0",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-query": "^5.101.2",
@@ -82,6 +94,10 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
     "@types/node": "^24.13.2",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.17",

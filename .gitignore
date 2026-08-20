@@ -31,3 +31,16 @@ dist-ssr
 # Gathering deploy artifacts (built locally / on Vercel)
 deploy/silver-legacy-site/
 deploy/*.zip
+
+# Capacitor / native
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/release/
+ios/App/Pods/
+ios/App/Podfile.lock
+ios/DerivedData/
+*.keystore
+*.jks
+*.mobileprovision
