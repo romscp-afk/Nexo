@@ -4,7 +4,6 @@ import {
   CLEANING_SUPPLIES_SURCHARGE_SGD,
   MIN_BOOKING_HOURS,
 } from '@/shared/lib/cleaningContent'
-import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { formatCurrency } from '@/shared/lib/utils'
 import { SectionHeading } from '@/shared/components/ui/SectionHeading'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
@@ -37,7 +36,7 @@ export function HomePricing() {
               <p className="mt-2 text-3xl font-bold text-brand-primary">{formatCurrency(rate)}</p>
               <p className="text-sm text-brand-text-muted">per hour</p>
               <p className="mt-3 text-xs text-brand-text-secondary">
-                from {formatCurrency(rate * hours + PLATFORM_FEE_SGD)} total
+                from {formatCurrency(rate * hours)} total
               </p>
             </div>
           ))}
@@ -54,16 +53,12 @@ export function HomePricing() {
               <dd className="font-medium text-brand-text">+{formatCurrency(CLEANING_SUPPLIES_SURCHARGE_SGD)}</dd>
             </div>
             <div className="flex justify-between gap-4 border-t border-brand-border pt-3">
-              <dt className="text-brand-text-secondary">Platform fee</dt>
-              <dd className="font-medium text-brand-text">{formatCurrency(PLATFORM_FEE_SGD)}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
               <dt className="text-brand-text-secondary">Minimum booking</dt>
               <dd className="font-medium text-brand-text">{MIN_BOOKING_HOURS} hours</dd>
             </div>
           </dl>
           <p className="mt-4 text-xs text-brand-text-muted">
-            PayNow or cash on completion. Platform fee paid via PayNow before the job starts.
+            Pay via PayNow or cash on completion. You only pay the service amount — no platform fee.
           </p>
         </div>
 

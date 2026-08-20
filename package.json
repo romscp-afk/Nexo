@@ -57,6 +57,7 @@
     "setup:payments-payment-kind": "node scripts/apply-payments-payment-kind.mjs",
     "setup:payment-on-booking-created": "node scripts/apply-payment-on-booking-created.mjs",
     "setup:platform-fee-5": "node scripts/apply-platform-fee-5.mjs",
+    "setup:provider-platform-fee-10": "node scripts/apply-provider-platform-fee-10.mjs",
     "setup:open-bookings": "node scripts/apply-open-booking-requests.mjs",
     "setup:notification-type-cast": "node scripts/apply-notification-type-cast.mjs",
     "fix:auth": "node scripts/fix-auth-trigger.mjs"

@@ -20,7 +20,6 @@ import { useBookingPayments } from '@/features/payments/hooks/usePayments'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency, formatDateTime } from '@/shared/lib/utils'
 import { ceilingHeightLabel } from '@/shared/lib/pricing'
-import { resolveBookingPlatformFee } from '@/shared/lib/customerPayment'
 import type { PriceBreakdown } from '@/shared/lib/pricing'
 import { PriceBreakdownPanel } from '@/shared/components/PriceBreakdownPanel'
 import { getBookingChatAccess } from '@/shared/lib/bookingChat'
@@ -109,6 +108,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
   const showCustomerPayment =
     role === 'customer' &&
+    booking?.paymentMethod === 'paynow' &&
     payments?.customerAdvance &&
     ['pending', 'confirmed', 'in_progress'].includes(booking?.status ?? '')
 
@@ -160,8 +160,9 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
 
             {isCash && (
               <p className="rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950">
-                CASH payment — pay the provider in cash on completion. Platform fee of{' '}
-                {formatCurrency(resolveBookingPlatformFee(booking))} is paid via PayNow before the job starts.
+                {role === 'customer'
+                  ? 'CASH payment — pay the provider in cash when the job is done. No platform fee is charged to you.'
+                  : 'CASH job — customer pays you in cash on completion. Pay the 10% platform fee via PayNow to unlock customer contact.'}
               </p>
             )}
 
@@ -218,14 +219,14 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                       <dd className="font-medium">{formatCurrency(booking.serviceSubtotal)}</dd>
                     </div>
                   )}
-                  {booking.platformFee != null && (
+                  {role === 'provider' && booking.adminFee != null && booking.adminFee > 0 && (
                     <div>
-                      <dt className="text-slate-500">Platform fee</dt>
-                      <dd className="font-medium">{formatCurrency(booking.platformFee)}</dd>
+                      <dt className="text-slate-500">Your platform fee (10%)</dt>
+                      <dd className="font-medium">{formatCurrency(booking.adminFee)}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="text-slate-500">Total</dt>
+                    <dt className="text-slate-500">{role === 'customer' ? 'Total' : 'Customer total'}</dt>
                     <dd className="font-medium text-nexo-700">
                       {booking.totalPrice != null ? formatCurrency(booking.totalPrice) : '—'}
                     </dd>
@@ -330,19 +331,14 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
             )}
 
             {role === 'provider' &&
-              isCash &&
               payments?.providerAdminFee &&
-              !payments?.customerAdvance &&
               ['confirmed', 'in_progress'].includes(booking.status) && (
                 <PayNowQrPanel payment={payments.providerAdminFee} booking={booking} role="provider" />
               )}
 
-            {isCash &&
-              role === 'customer' &&
-              booking.status === 'confirmed' &&
-              payments?.customerAdvance?.status === 'paid' && (
+            {isCash && role === 'customer' && booking.status === 'confirmed' && (
               <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                Platform fee confirmed. Pay the provider in cash when the job is done.
+                Pay the provider in cash when the job is done.
               </p>
             )}
 
@@ -387,7 +383,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     {!canStartJob() && (
                       <p className="w-full text-sm text-amber-800">
                         {isCash
-                          ? 'Waiting for customer platform fee PayNow confirmation.'
+                          ? 'Waiting for your 10% platform fee PayNow confirmation.'
                           : 'Waiting for customer PayNow payment confirmation.'}
                       </p>
                     )}

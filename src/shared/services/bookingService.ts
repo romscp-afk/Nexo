@@ -1,5 +1,4 @@
 import { supabase } from '@/shared/lib/supabase'
-import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import type { AuthResult } from '@/shared/services/authService'
 import {
@@ -71,7 +70,7 @@ export const bookingService = {
       service_area: input.serviceArea?.trim() || null,
       total_price: input.totalPrice,
       service_subtotal: input.serviceSubtotal,
-      platform_fee: input.platformFee ?? PLATFORM_FEE_SGD,
+      platform_fee: input.platformFee ?? 0,
       pricing_snapshot: input.pricingSnapshot ?? {},
       photo_urls: input.photoUrls ?? [],
       status: 'pending' as const,

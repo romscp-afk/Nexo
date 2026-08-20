@@ -96,12 +96,6 @@ export function ReceiptPanel({ bookingId, booking }: { bookingId: string; bookin
                           <span>{formatCurrency(summary.subtotal)}</span>
                         </div>
                       )}
-                  {summary.platformFee != null && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>Platform fee</span>
-                      <span>{formatCurrency(summary.platformFee)}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between pt-1 text-base font-bold text-nexo-800">
                     <span>Amount paid</span>
                     <span>{formatCurrency(receipt.amount)}</span>

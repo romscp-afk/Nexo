@@ -16,6 +16,7 @@ const steps = [
   ['setup:pricing', 'Pricing units + platform fee'],
   ['setup:open-bookings', 'Open booking requests (nullable provider_id)'],
   ['setup:customer-platform-fee', 'Customer PayNow includes platform fee'],
+  ['setup:provider-platform-fee-10', 'Provider 10% platform fee; hide customer fee'],
   ['setup:customer-flow', 'Customer flow + chat messages'],
   ['setup:booking-chat', 'Chat access rules'],
   ['setup:booking-lifecycle', 'Job start/complete notifications + chat cash fix'],

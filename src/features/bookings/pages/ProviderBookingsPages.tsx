@@ -18,7 +18,7 @@ export function ProviderDashboardPage() {
   const totalEarned =
     bookings
       ?.filter((b) => b.status === 'completed')
-      .reduce((sum, b) => sum + (b.serviceSubtotal ?? Math.max(0, (b.totalPrice ?? 0) - (b.platformFee ?? 3))), 0) ?? 0
+      .reduce((sum, b) => sum + (b.serviceSubtotal ?? b.totalPrice ?? 0), 0) ?? 0
   const pending = bookings?.filter((b) => b.status === 'pending') ?? []
   const active = bookings?.filter((b) => ['confirmed', 'in_progress'].includes(b.status)) ?? []
   const cashJobs = bookings?.filter((b) => b.paymentMethod === 'cash' && b.status !== 'cancelled') ?? []

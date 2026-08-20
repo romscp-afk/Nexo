@@ -38,8 +38,6 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
   const [error, setError] = useState('')
 
   const isAdminFee = payment.paymentKind === 'provider_admin_fee'
-  const isCashPlatformFee =
-    !isAdminFee && booking.paymentMethod === 'cash' && role === 'customer'
   const paymentBreakdown = !isAdminFee ? getCustomerPaymentBreakdown(booking) : null
   const canShowQr =
     (role === 'customer' && !isAdminFee && ['pending', 'submitted'].includes(payment.status)) ||
@@ -98,14 +96,14 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
         <div>
           <h2 className="flex items-center gap-2 font-semibold text-slate-900">
             <QrCode className="h-5 w-5 text-nexo-700" />
-            {isCashPlatformFee ? 'Platform fee via PayNow' : PAYMENT_KIND_LABELS[payment.paymentKind]}
+            {PAYMENT_KIND_LABELS[payment.paymentKind]}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
             {isAdminFee
-              ? 'Pay platform admin fee via PayNow to receive customer contact details.'
-              : isCashPlatformFee
-                ? 'Pay the platform fee now via PayNow. Pay the provider in cash when the job is done.'
-                : 'Scan with any Singapore banking app. Total includes the platform fee.'}
+              ? 'Pay the 10% platform fee via PayNow to unlock customer contact details.'
+              : booking.paymentMethod === 'cash'
+                ? 'No PayNow amount is due from you. Pay the provider in cash when the job is done.'
+                : 'Scan with any Singapore banking app to pay the service total.'}
           </p>
         </div>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusTone(payment.status)}`}>
@@ -113,9 +111,9 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
         </span>
       </div>
 
-      {paymentBreakdown && (
+      {paymentBreakdown && paymentBreakdown.paynowAmount > 0 && (
         <dl className="mt-4 space-y-2 rounded-lg bg-white p-4 text-sm">
-          {paymentBreakdown.serviceSubtotal != null && paymentBreakdown.paymentMethod === 'paynow' && (
+          {paymentBreakdown.serviceSubtotal != null && (
             <div className="flex justify-between gap-4">
               <dt className="text-slate-600">Service</dt>
               <dd className="font-medium text-slate-900">
@@ -131,12 +129,6 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
               </dd>
             </div>
           )}
-          <div className="flex justify-between gap-4">
-            <dt className="text-slate-600">Platform fee</dt>
-            <dd className="font-medium text-slate-900">
-              {formatCurrency(paymentBreakdown.platformFee)}
-            </dd>
-          </div>
           <div className="flex justify-between gap-4 border-t border-slate-200 pt-2">
             <dt className="font-semibold text-slate-900">PayNow total</dt>
             <dd className="text-lg font-bold text-nexo-800">{formatCurrency(payment.amount)}</dd>

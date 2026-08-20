@@ -15,6 +15,7 @@ export type PriceBreakdown = {
   ceilingHeight: CeilingHeight | null
   lines: PriceLine[]
   serviceSubtotal: number
+  /** Always 0 for customers — platform fee is charged to providers. */
   platformFee: number
   total: number
 }
@@ -77,6 +78,7 @@ export function buildPriceBreakdown(input: {
   platformFee?: number
   extraLines?: PriceLine[]
 }): PriceBreakdown {
+  // Customer totals never include a platform fee (charged to providers instead).
   const platformFee = input.platformFee ?? PLATFORM_FEE_SGD
   const lines: PriceLine[] = []
   const ceilingHeight = input.pricingModel === 'per_unit' ? (input.ceilingHeight ?? 'normal') : null

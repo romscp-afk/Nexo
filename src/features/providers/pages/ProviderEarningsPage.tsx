@@ -5,17 +5,13 @@ import { useProviderBookings } from '@/features/bookings/hooks/useBookings'
 import { BookingList } from '@/features/bookings/components/BookingUi'
 import { QueryState } from '@/features/catalog/components/CatalogUi'
 import { formatCurrency } from '@/shared/lib/utils'
-import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 
 function providerServiceAmount(booking: {
   serviceSubtotal: number | null
   totalPrice: number | null
-  platformFee: number | null
 }) {
   if (booking.serviceSubtotal != null) return booking.serviceSubtotal
-  if (booking.totalPrice != null) {
-    return Math.max(0, booking.totalPrice - (booking.platformFee ?? PLATFORM_FEE_SGD))
-  }
+  if (booking.totalPrice != null) return booking.totalPrice
   return 0
 }
 

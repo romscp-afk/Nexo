@@ -23,10 +23,6 @@ export function PriceBreakdownPanel({ breakdown, paymentMethod, compact }: Props
             <dd className="font-medium text-slate-900">{formatCurrency(line.amount)}</dd>
           </div>
         ))}
-        <div className="flex justify-between gap-4">
-          <dt className="text-slate-600">Platform fee</dt>
-          <dd className="font-medium text-slate-900">{formatCurrency(breakdown.platformFee)}</dd>
-        </div>
         <div className="flex justify-between gap-4 border-t border-slate-200 pt-2">
           <dt className="font-semibold text-slate-900">Total</dt>
           <dd className="text-lg font-bold text-nexo-700">{formatCurrency(breakdown.total)}</dd>
@@ -34,14 +30,12 @@ export function PriceBreakdownPanel({ breakdown, paymentMethod, compact }: Props
       </dl>
       {paymentMethod === 'cash' && (
         <p className="text-xs text-slate-500">
-          Service amount paid in cash to the provider. Platform fee of{' '}
-          {formatCurrency(breakdown.platformFee)} is paid via PayNow before the job starts.
+          Pay the provider in cash when the job is done. No platform fee is charged to you.
         </p>
       )}
       {paymentMethod === 'paynow' && (
         <p className="text-xs text-slate-500">
-          Pay via PayNow after the provider confirms. Total includes a{' '}
-          {formatCurrency(breakdown.platformFee)} platform fee.
+          Pay the service total via PayNow after the provider confirms.
         </p>
       )}
     </div>

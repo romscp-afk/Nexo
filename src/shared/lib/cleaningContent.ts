@@ -112,7 +112,7 @@ export const CLEANING_SERVICE_CONTENT = {
   ],
   propertyTypes: ['HDB', 'Condo', 'Landed home'],
   pricingNote:
-    'Hourly rate depends on booking length: $25/hr for 2 hours, $23/hr for 3 hours, $20/hr for 4 hours. Extra hours beyond your booking are $15/hr. A $5 platform fee applies at checkout.',
+    'Hourly rate depends on booking length: $25/hr for 2 hours, $23/hr for 3 hours, $20/hr for 4 hours. Extra hours beyond your booking are $15/hr.',
   minDuration: `${MIN_BOOKING_HOURS} hours minimum per booking`,
   supplies:
     'You can bring your own supplies at no extra charge, or add a supplies fee for the cleaner to bring them.',
@@ -129,7 +129,7 @@ export const CLEANING_SERVICE_CONTENT = {
     },
     {
       q: 'How is pricing calculated?',
-      a: 'Rates vary by duration: $25/hr (2 hours), $23/hr (3 hours), $20/hr (4 hours). Extra hours beyond your booking are $15/hr. Supplies and a $5 platform fee are shown at checkout.',
+      a: 'Rates vary by duration: $25/hr (2 hours), $23/hr (3 hours), $20/hr (4 hours). Extra hours beyond your booking are $15/hr. Supplies fees are shown at checkout when applicable.',
     },
     {
       q: 'Do you offer weekly or monthly cleaning?',

@@ -8,6 +8,7 @@ import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
 import { loadCleaningDraft } from '@/shared/lib/bookingDraft'
 import { trackEvent } from '@/shared/lib/analytics'
 import { PROVIDER_LISTING_TYPE_LABELS } from '@/shared/lib/providerListing'
+import { PROVIDER_PLATFORM_FEE_PERCENT } from '@/shared/lib/marketplaceConfig'
 import { recordPwaEngagement } from '@/shared/lib/pwaEngagement'
 
 const ROLE_LABELS = {
@@ -615,6 +616,16 @@ export function RegisterPage() {
             At least 6 characters
           </p>
         </div>
+        {role === 'provider' && (
+          <div className="rounded-lg border border-nexo-200 bg-nexo-50 px-3 py-3 text-sm text-nexo-900">
+            <p className="font-medium">Platform fee</p>
+            <p className="mt-1 text-nexo-800">
+              Nexo charges providers a {PROVIDER_PLATFORM_FEE_PERCENT}% platform fee on every
+              accepted job (based on the service amount), paid via PayNow when you accept a booking.
+              Customers are not charged this fee.
+            </p>
+          </div>
+        )}
         <label className="flex items-start gap-2 text-sm text-slate-600">
           <input
             type="checkbox"
@@ -633,6 +644,11 @@ export function RegisterPage() {
             <Link to="/privacy" className="font-medium text-nexo-700 hover:underline" target="_blank">
               Privacy Policy
             </Link>
+            {role === 'provider' && (
+              <>
+                , and I understand the {PROVIDER_PLATFORM_FEE_PERCENT}% per-job platform fee
+              </>
+            )}
             .
           </span>
         </label>

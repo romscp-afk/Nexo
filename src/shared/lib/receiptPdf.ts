@@ -41,8 +41,9 @@ function receiptDocumentHtml(receipt: Receipt, booking?: Booking | null): string
         ? `<tr><td>Service subtotal</td><td style="text-align:right">${formatCurrency(subtotal)}</td></tr>`
         : ''
   const resolvedPlatformFee = pricingSnapshot?.platformFee ?? platformFee
+  // Customer receipts never show a platform fee line (fee is charged to providers).
   const feeRow =
-    resolvedPlatformFee != null
+    resolvedPlatformFee != null && resolvedPlatformFee > 0
       ? `<tr><td>Platform fee</td><td style="text-align:right">${formatCurrency(resolvedPlatformFee)}</td></tr>`
       : ''
 

@@ -14,7 +14,6 @@ import {
   getCleaningHourlyRateForDuration,
 } from '@/shared/lib/cleaningContent'
 import { buildPriceBreakdown } from '@/shared/lib/pricing'
-import { PLATFORM_FEE_SGD } from '@/shared/lib/marketplaceConfig'
 import { saveCleaningDraft } from '@/shared/lib/bookingDraft'
 import {
   buildCleaningScheduledAt,
@@ -110,7 +109,6 @@ export function HomeHeroEstimateCard() {
         hourlyRate,
         durationHours: duration,
         quantity: 1,
-        platformFee: PLATFORM_FEE_SGD,
       }),
     [duration, hourlyRate],
   )
