@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'logo.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'logo.png', 'pwa-icon-512.png'],
       manifest: {
         name: 'Nexo — Home Services',
         short_name: 'Nexo',
@@ -36,7 +36,7 @@ export default defineConfig({
             purpose: 'maskable',
           },
           {
-            src: '/logo.png',
+            src: '/pwa-icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',

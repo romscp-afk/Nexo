@@ -4,6 +4,7 @@ import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 import { HomeHeroEstimateCard } from '@/features/home/components/HomeHeroEstimateCard'
 import { trackEvent } from '@/shared/lib/analytics'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import mainBannerUrl from '@/assets/main-banner.jpg'
 
 const trustItems = [
   { icon: ShieldCheck, label: 'Trusted professionals' },
@@ -14,24 +15,34 @@ const trustItems = [
 
 export function HomeHero() {
   return (
-    <section className="relative overflow-hidden bg-hero-gradient text-white hero-skyline">
+    <section className="relative min-h-[520px] overflow-hidden text-white sm:min-h-[560px] lg:min-h-[620px]">
+      <img
+        src={mainBannerUrl}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 h-full w-full object-cover object-[center_40%]"
+      />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.15),transparent_55%)]"
+        className="absolute inset-0 bg-gradient-to-r from-brand-navy/95 via-brand-navy/82 to-brand-navy/35 lg:to-transparent"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-brand-navy/30"
       />
 
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pb-24 lg:pt-20">
         <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
           <div className="relative z-10 max-w-xl">
-            <p className="hero-enter inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-medium text-brand-pale backdrop-blur-sm">
+            <p className="hero-enter inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-brand-pale backdrop-blur-sm">
               Home cleaning services in Singapore
             </p>
 
-            <h1 className="hero-enter mt-6 text-display font-bold text-white">
+            <h1 className="hero-enter mt-6 text-display font-bold text-white drop-shadow-sm">
               Reliable home cleaning, booked around your schedule.
             </h1>
 
-            <p className="hero-enter mt-5 text-lg leading-relaxed text-brand-pale/90">
+            <p className="hero-enter mt-5 text-lg leading-relaxed text-brand-pale/95">
               Request trusted home-cleaning services with transparent pricing and a simple booking
               experience.
             </p>
@@ -52,9 +63,9 @@ export function HomeHero() {
               </Link>
             </div>
 
-            <ul className="hero-enter mt-10 grid grid-cols-2 gap-3 sm:grid-cols-2">
+            <ul className="hero-enter mt-10 grid grid-cols-2 gap-3">
               {trustItems.map(({ icon: Icon, label }) => (
-                <li key={label} className="flex items-center gap-2 text-sm text-brand-pale/85">
+                <li key={label} className="flex items-center gap-2 text-sm text-brand-pale/90">
                   <Icon className="h-4 w-4 shrink-0 text-brand-electric" strokeWidth={2} />
                   {label}
                 </li>
