@@ -62,7 +62,7 @@ export function SiteFooter({ className, compact = false }: SiteFooterProps) {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Logo to="/" highlighted showName={false} />
+            <Logo to="/" size="md" className="brightness-0 invert" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-brand-pale/70">
               {APP_TAGLINE}
             </p>

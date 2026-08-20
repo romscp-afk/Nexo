@@ -8,11 +8,7 @@ import { Logo } from '@/shared/components/layout/Logo'
 import { Portal } from '@/shared/components/layout/Portal'
 import { cn } from '@/shared/lib/utils'
 
-type MobilePublicNavProps = {
-  isHome?: boolean
-}
-
-export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
+export function MobilePublicNav() {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
   const { pathname } = useLocation()
@@ -33,17 +29,17 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
   const close = () => setOpen(false)
 
   const linkClass =
-    'flex items-center rounded-xl px-4 py-3.5 text-base font-medium text-slate-800 active:bg-slate-100'
+    'flex items-center rounded-xl px-4 py-3.5 text-base font-medium text-brand-primary active:bg-brand-light'
 
   return (
     <>
       <button
         type="button"
-        className="rounded-lg p-2 md:hidden"
+        className="rounded-lg p-2 text-brand-primary md:hidden"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >
-        <Menu className={cn('h-6 w-6', isHome ? 'text-white' : 'text-slate-800')} />
+        <Menu className="h-6 w-6" />
       </button>
 
       {open && (
@@ -76,7 +72,7 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                   Cleaning Services
                 </Link>
                 <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                  Find a Cleaner
+                  Cleaners
                 </Link>
                 <Link to="/support" className={linkClass} onClick={close}>
                   Contact
@@ -88,7 +84,7 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                 {user ? (
                   <Link
                     to={getDashboardPath(user.role)}
-                    className={cn(linkClass, 'bg-nexo-700 text-white active:bg-nexo-800')}
+                    className={cn(linkClass, 'bg-brand-light font-semibold text-brand-navy')}
                     onClick={close}
                   >
                     Go to dashboard
@@ -99,11 +95,11 @@ export function MobilePublicNav({ isHome = false }: MobilePublicNavProps) {
                       Log in
                     </Link>
                     <Link
-                      to="/register"
-                      className={cn(linkClass, 'mt-2 bg-nexo-700 text-white active:bg-nexo-800')}
+                      to="/services/cleaning/request"
+                      className={cn(linkClass, 'mt-2 bg-brand-primary font-semibold text-white')}
                       onClick={close}
                     >
-                      Get Started
+                      Book Now
                     </Link>
                   </>
                 )}

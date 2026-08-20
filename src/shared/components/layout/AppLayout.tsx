@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { getDashboardPath } from '@/shared/lib/constants'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
@@ -15,7 +15,7 @@ import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
 const NAV_LINKS = [
   { to: `/services/${PRIMARY_CATEGORY_SLUG}`, label: 'Services' },
   { to: '/how-it-works', label: 'How It Works' },
-  { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Find a Cleaner' },
+  { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Cleaners' },
   { to: '/services/cleaning/request', label: 'Pricing' },
   { to: '/support', label: 'Help' },
 ] as const
@@ -25,45 +25,23 @@ export function AppLayout() {
   const { pathname } = useLocation()
   const isHome = pathname === '/'
   const showCustomerNav = user?.role === 'customer'
-  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     recordSiteVisit()
   }, [])
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const navSolid = scrolled || !isHome
-
   return (
-    <div className={cn('flex min-h-screen flex-col', isHome && !scrolled ? 'bg-brand-navy' : 'bg-brand-bg')}>
-      <header
-        className={cn(
-          'sticky top-0 z-50 pt-[env(safe-area-inset-top)] transition duration-300',
-          navSolid
-            ? 'border-b border-brand-border bg-brand-surface/95 shadow-card backdrop-blur-md'
-            : 'border-b border-transparent bg-transparent',
-        )}
-      >
+    <div className="flex min-h-screen flex-col bg-brand-bg">
+      <header className="sticky top-0 z-50 border-b border-brand-border bg-white pt-[env(safe-area-inset-top)] shadow-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Logo to="/" highlighted={!navSolid && isHome} />
+          <Logo to="/" size="md" />
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
             {NAV_LINKS.map((item) => (
               <Link
                 key={item.label}
                 to={item.to}
-                className={cn(
-                  'rounded-lg px-3 py-2 text-sm font-medium transition duration-200',
-                  navSolid
-                    ? 'text-brand-text-secondary hover:bg-brand-bg hover:text-brand-text'
-                    : 'text-white/85 hover:bg-white/10 hover:text-white',
-                )}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-brand-primary transition duration-200 hover:bg-brand-light hover:text-brand-primary-hover"
               >
                 {item.label}
               </Link>
@@ -75,50 +53,28 @@ export function AppLayout() {
               <>
                 <Link
                   to={getDashboardPath(user.role)}
-                  className={cn(
-                    'rounded-full px-4 py-2 text-sm font-semibold transition',
-                    navSolid
-                      ? 'bg-brand-primary text-white hover:bg-brand-primary-hover'
-                      : 'bg-white text-brand-navy hover:bg-brand-light',
-                  )}
+                  className="rounded-full bg-brand-light px-4 py-2 text-sm font-semibold text-brand-navy transition hover:bg-brand-pale"
                 >
                   Dashboard
                 </Link>
-                <LogoutButton
-                  showIcon={false}
-                  className={
-                    navSolid
-                      ? undefined
-                      : 'border-transparent bg-transparent text-white/85 hover:bg-white/10 hover:text-white'
-                  }
-                />
+                <LogoutButton showIcon={false} />
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className={cn(
-                    'rounded-lg px-3 py-2 text-sm font-medium transition',
-                    navSolid ? 'text-brand-text-secondary hover:text-brand-text' : 'text-white/85 hover:text-white',
-                  )}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-brand-primary transition hover:bg-brand-light hover:text-brand-primary-hover"
                 >
                   Log in
                 </Link>
-                <CleaningRequestLink
-                  className={cn(
-                    'inline-flex min-h-10 items-center rounded-full px-5 py-2 text-sm font-semibold transition shadow-brand',
-                    navSolid
-                      ? 'bg-brand-primary text-white hover:bg-brand-primary-hover'
-                      : 'bg-white text-brand-navy hover:bg-brand-light',
-                  )}
-                >
-                  Request a Cleaning
+                <CleaningRequestLink className="inline-flex min-h-10 items-center rounded-lg bg-brand-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-primary-hover">
+                  Book Now
                 </CleaningRequestLink>
               </>
             )}
           </div>
 
-          {!showCustomerNav && <MobilePublicNav isHome={!navSolid && isHome} />}
+          {!showCustomerNav && <MobilePublicNav />}
         </div>
       </header>
 
@@ -132,11 +88,7 @@ export function AppLayout() {
         <Outlet />
       </main>
 
-      <SiteFooter
-        className={cn(
-          showCustomerNav && 'hidden md:block',
-        )}
-      />
+      <SiteFooter className={cn(showCustomerNav && 'hidden md:block')} />
       {showCustomerNav && <CustomerMobileNav />}
     </div>
   )

@@ -16,7 +16,7 @@ export function AuthLayout() {
       {/* Brand panel — desktop */}
       <div className="relative hidden flex-col justify-between bg-hero-gradient p-10 text-white lg:flex lg:w-[44%] xl:w-[42%]">
         <div>
-          <Logo to="/" highlighted showName={false} />
+          <Logo to="/" size="lg" className="brightness-0 invert" />
           <p className="mt-8 max-w-sm text-lg leading-relaxed text-brand-pale/90">{APP_TAGLINE}</p>
         </div>
         <ul className="space-y-4">
