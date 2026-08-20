@@ -620,9 +620,8 @@ export function RegisterPage() {
           <div className="rounded-lg border border-nexo-200 bg-nexo-50 px-3 py-3 text-sm text-nexo-900">
             <p className="font-medium">Platform fee</p>
             <p className="mt-1 text-nexo-800">
-              Nexo charges providers a {PROVIDER_PLATFORM_FEE_PERCENT}% platform fee on every
-              accepted job (based on the service amount), paid via PayNow when you accept a booking.
-              Customers are not charged this fee.
+              Customers pay Nexo for each job. Nexo deducts a {PROVIDER_PLATFORM_FEE_PERCENT}%
+              platform fee from the job amount before releasing the remaining payment to you.
             </p>
           </div>
         )}
@@ -646,7 +645,8 @@ export function RegisterPage() {
             </Link>
             {role === 'provider' && (
               <>
-                , and I understand the {PROVIDER_PLATFORM_FEE_PERCENT}% per-job platform fee
+                , and I understand Nexo deducts {PROVIDER_PLATFORM_FEE_PERCENT}% from each job
+                before payout
               </>
             )}
             .
