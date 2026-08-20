@@ -5,10 +5,16 @@ import { getDashboardPath } from '@/shared/lib/constants'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { Logo } from '@/shared/components/layout/Logo'
+import { InstallNexoMenuItem } from '@/shared/components/layout/InstallNexoMenuItem'
 import { Portal } from '@/shared/components/layout/Portal'
 import { cn } from '@/shared/lib/utils'
 
-export function MobilePublicNav() {
+type MobilePublicNavProps = {
+  /** When true (Capacitor), show hamburger even on wide screens */
+  alwaysVisible?: boolean
+}
+
+export function MobilePublicNav({ alwaysVisible = false }: MobilePublicNavProps) {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
   const { pathname } = useLocation()
@@ -35,7 +41,7 @@ export function MobilePublicNav() {
     <>
       <button
         type="button"
-        className="rounded-lg p-2 text-brand-primary md:hidden"
+        className={cn('rounded-lg p-2 text-brand-primary', !alwaysVisible && 'md:hidden')}
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >
@@ -44,7 +50,7 @@ export function MobilePublicNav() {
 
       {open && (
         <Portal>
-          <div className="fixed inset-0 z-[60] md:hidden">
+          <div className={cn('fixed inset-0 z-[60]', !alwaysVisible && 'md:hidden')}>
             <button
               type="button"
               className="absolute inset-0 bg-slate-900/50"
@@ -74,21 +80,27 @@ export function MobilePublicNav() {
                 <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
                   Cleaners
                 </Link>
+                <Link to="/how-it-works" className={linkClass} onClick={close}>
+                  How It Works
+                </Link>
                 <Link to="/support" className={linkClass} onClick={close}>
-                  Contact
+                  Help
                 </Link>
 
                 <p className="px-4 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Account
                 </p>
                 {user ? (
-                  <Link
-                    to={getDashboardPath(user.role)}
-                    className={cn(linkClass, 'bg-brand-light font-semibold text-brand-navy')}
-                    onClick={close}
-                  >
-                    Go to dashboard
-                  </Link>
+                  <>
+                    <Link
+                      to={getDashboardPath(user.role)}
+                      className={cn(linkClass, 'bg-brand-light font-semibold text-brand-navy')}
+                      onClick={close}
+                    >
+                      Go to dashboard
+                    </Link>
+                    <InstallNexoMenuItem className={linkClass} onAfterClick={close} />
+                  </>
                 ) : (
                   <>
                     <Link to="/login" className={linkClass} onClick={close}>

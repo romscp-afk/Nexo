@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Bell, Bookmark, Home, Star, User, X } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthProvider'
 import { LogoutButton } from '@/shared/components/layout/LogoutButton'
+import { InstallNexoMenuItem } from '@/shared/components/layout/InstallNexoMenuItem'
 import { Portal } from '@/shared/components/layout/Portal'
 import { cn } from '@/shared/lib/utils'
 
@@ -84,6 +85,7 @@ export function MobileMoreSheet({ open, onClose, unreadNotifications = 0 }: Mobi
           </p>
           <SheetLink to="/dashboard" icon={Home} label="Dashboard" onNavigate={onClose} />
           <SheetLink to="/dashboard/profile" icon={User} label="Profile" onNavigate={onClose} />
+          <InstallNexoMenuItem onAfterClick={onClose} />
           <SheetLink
             to="/dashboard/notifications"
             icon={Bell}

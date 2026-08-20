@@ -66,7 +66,8 @@
     "mobile:ios": "npx cap open ios",
     "mobile:android": "npx cap open android",
     "mobile:add": "npx cap add ios && npx cap add android",
-    "mobile:icons": "npx capacitor-assets generate --ios --android"
+    "mobile:icons": "npx capacitor-assets generate --ios --android",
+    "mobile:rebuild": "npm run mobile:build && echo 'Synced. Press Run in Xcode / Android Studio.'"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.1",

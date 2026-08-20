@@ -50,7 +50,7 @@ export type AdminPayment = Payment & {
 
 export const PAYMENT_KIND_LABELS: Record<PaymentKind, string> = {
   customer_advance: 'Customer PayNow',
-  provider_admin_fee: 'Provider platform fee (10%)',
+  provider_admin_fee: 'Provider service fee (10%)',
 }
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {

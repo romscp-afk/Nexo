@@ -162,7 +162,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
               <p className="rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950">
                 {role === 'customer'
                   ? 'CASH payment — pay the provider in cash when the job is done. No platform fee is charged to you.'
-                  : 'CASH job — customer pays you in cash on completion. Pay the 10% platform fee via PayNow to unlock customer contact.'}
+                  : 'CASH job — customer pays you in cash on completion. Pay the 10% service fee via PayNow to unlock customer contact.'}
               </p>
             )}
 
@@ -221,7 +221,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                   )}
                   {role === 'provider' && booking.adminFee != null && booking.adminFee > 0 && (
                     <div>
-                      <dt className="text-slate-500">Your platform fee (10%)</dt>
+                      <dt className="text-slate-500">Your service fee (10%)</dt>
                       <dd className="font-medium">{formatCurrency(booking.adminFee)}</dd>
                     </div>
                   )}
@@ -383,7 +383,7 @@ export function BookingDetailPage({ role, backPath }: BookingDetailPageProps) {
                     {!canStartJob() && (
                       <p className="w-full text-sm text-amber-800">
                         {isCash
-                          ? 'Waiting for your 10% platform fee PayNow confirmation.'
+                          ? 'Waiting for your 10% service fee PayNow confirmation.'
                           : 'Waiting for customer PayNow payment confirmation.'}
                       </p>
                     )}

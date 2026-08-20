@@ -41,7 +41,8 @@ import {
   type CleaningRequestDraft,
 } from '@/shared/lib/bookingDraft'
 import { trackEvent } from '@/shared/lib/analytics'
-import { recordPwaEngagement } from '@/shared/lib/pwaEngagement'
+import { recordPwaEngagement, recordBookingCompletedForPwa } from '@/shared/lib/pwaEngagement'
+import { PAGE_META, usePageMeta } from '@/shared/lib/pageMeta'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
 import { ProgressStepper } from '@/shared/components/ui/ProgressStepper'
 
@@ -56,6 +57,7 @@ const STEPS = [
 const TOTAL_STEPS = STEPS.length
 
 export function CleaningRequestPage() {
+  usePageMeta(PAGE_META.cleaningRequest)
   const { user } = useAuth()
   const navigate = useNavigate()
   const createBooking = useCreateBooking()
@@ -317,6 +319,7 @@ export function CleaningRequestPage() {
       confirmedRef.current = true
       clearCleaningDraft()
       recordPwaEngagement()
+      recordBookingCompletedForPwa()
       trackEvent('cleaning_request_confirmed')
       navigate(`/dashboard/bookings/${booking.id}?pay=1`)
     } catch (err) {

@@ -7,23 +7,23 @@ import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 const items = [
   {
     icon: ShieldCheck,
-    title: 'Verified cleaning professionals',
-    description: 'Background-checked providers on the Nexo platform.',
+    title: 'Provider profiles reviewed',
+    description: 'Provider information is reviewed before account activation.',
   },
   {
     icon: BadgeDollarSign,
-    title: 'Transparent hourly rates',
-    description: 'See your estimate before you submit a request.',
+    title: 'Clear pricing',
+    description: 'Review your estimated service cost before submitting.',
   },
   {
     icon: Lock,
-    title: 'Secure booking records',
-    description: 'Every booking tracked with clear status updates.',
+    title: 'Trackable bookings',
+    description: 'View booking details, status and communication in one place.',
   },
   {
     icon: HeadphonesIcon,
-    title: 'Responsive customer support',
-    description: 'Help when you need it across Singapore.',
+    title: 'Customer support',
+    description: 'Contact Nexo if you need assistance with a booking.',
   },
 ]
 

@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { BOOKING_CONFIRMATION } from '@/shared/lib/cleaningContent'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { PAGE_META, usePageMeta } from '@/shared/lib/pageMeta'
 
 const steps = [
   {
@@ -23,6 +24,7 @@ const steps = [
 ]
 
 export function HowNexoWorksPage() {
+  usePageMeta(PAGE_META.howItWorks)
   return (
     <div>
       <header className="mb-10">

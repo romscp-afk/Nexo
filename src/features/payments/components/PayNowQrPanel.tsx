@@ -100,7 +100,7 @@ export function PayNowQrPanel({ payment, booking, role }: PayNowQrPanelProps) {
           </h2>
           <p className="mt-1 text-sm text-slate-600">
             {isAdminFee
-              ? 'Pay the 10% platform fee via PayNow to unlock customer contact details.'
+              ? 'Pay the 10% service fee via PayNow to unlock customer contact details.'
               : booking.paymentMethod === 'cash'
                 ? 'No PayNow amount is due from you. Pay the provider in cash when the job is done.'
                 : 'Scan with any Singapore banking app to pay the service total.'}

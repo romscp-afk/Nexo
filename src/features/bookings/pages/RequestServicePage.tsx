@@ -13,6 +13,7 @@ import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
+import { recordBookingCompletedForPwa } from '@/shared/lib/pwaEngagement'
 
 export function RequestServicePage() {
   const { slug = '' } = useParams()
@@ -101,6 +102,7 @@ export function RequestServicePage() {
         platformFee: breakdown.platformFee,
         pricingSnapshot: breakdown,
       })
+      recordBookingCompletedForPwa()
       navigate(`/dashboard/bookings/${booking.id}`)
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Request failed')

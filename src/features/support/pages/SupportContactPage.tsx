@@ -1,51 +1,82 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { supportContactService } from '@/shared/services/supportContactService'
+import { PAGE_META, usePageMeta } from '@/shared/lib/pageMeta'
 import { cn } from '@/shared/lib/utils'
 
+const SUBJECT_CATEGORIES = [
+  'Booking request',
+  'Existing booking',
+  'Payment or refund',
+  'Service issue',
+  'Provider registration',
+  'Account access',
+  'Privacy request',
+  'Other',
+] as const
+
 export function SupportContactPage() {
+  usePageMeta(PAGE_META.support)
   const [searchParams] = useSearchParams()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [subject, setSubject] = useState('')
+  const [category, setCategory] = useState<(typeof SUBJECT_CATEGORIES)[number] | ''>('')
+  const [subjectDetail, setSubjectDetail] = useState('')
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [successId, setSuccessId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const presetSubject = searchParams.get('subject')
-    if (presetSubject) {
-      setSubject(presetSubject)
+    if (!presetSubject) return
+    const match = SUBJECT_CATEGORIES.find(
+      (c) => c.toLowerCase() === presetSubject.toLowerCase(),
+    )
+    if (match) setCategory(match)
+    else {
+      setCategory('Other')
+      setSubjectDetail(presetSubject)
     }
   }, [searchParams])
 
   const inputClass =
     'mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-nexo-500 focus:outline-none focus:ring-2 focus:ring-nexo-500/20'
 
+  const composedSubject =
+    category === 'Other' && subjectDetail.trim()
+      ? `Other: ${subjectDetail.trim()}`
+      : category || subjectDetail.trim()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return
     setError('')
+
+    if (!category) {
+      setError('Select a subject category.')
+      return
+    }
+    if (category === 'Other' && subjectDetail.trim().length < 3) {
+      setError('Enter a short subject for your request.')
+      return
+    }
+
     setLoading(true)
     try {
-      const { error: err } = await supportContactService.submit({
+      const { data, error: err } = await supportContactService.submit({
         fullName,
         email,
         phone: phone || undefined,
-        subject,
+        subject: composedSubject,
         message,
       })
       if (err) {
         setError(err)
         return
       }
-      setSuccess(true)
-      setFullName('')
-      setEmail('')
-      setPhone('')
-      setSubject('')
-      setMessage('')
+      setSuccessId(data?.id ?? 'submitted')
     } finally {
       setLoading(false)
     }
@@ -56,20 +87,26 @@ export function SupportContactPage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Contact Nexo</h1>
         <p className="mt-2 text-slate-600">
-          Questions about home cleaning bookings, your account, or becoming a cleaning professional?
-          Send us a message and our team will get back to you.
+          Questions about home cleaning bookings, your account, or joining as a cleaning service
+          provider? Send us a message and our team will get back to you.
         </p>
       </header>
 
-      {success ? (
+      {successId ? (
         <div
           className="rounded-xl border border-green-200 bg-green-50 px-5 py-6 text-center"
           role="status"
         >
           <p className="font-semibold text-green-900">Message sent</p>
           <p className="mt-2 text-sm text-green-800">
-            Thank you — we received your message and notified our team. We will reply to your email
-            as soon as we can.
+            Thank you — we received your message
+            {successId !== 'submitted' ? (
+              <>
+                {' '}
+                (reference <span className="font-mono text-xs">{successId}</span>)
+              </>
+            ) : null}
+            . We will reply to your email as soon as we can.
           </p>
           <Link
             to="/"
@@ -79,9 +116,18 @@ export function SupportContactPage() {
           </Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          data-install-block="true"
+          className="space-y-4 rounded-xl border border-slate-200 bg-white p-6"
+        >
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+            <p
+              className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+              role="alert"
+              data-form-error
+            >
               {error}
             </p>
           )}
@@ -128,16 +174,44 @@ export function SupportContactPage() {
 
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Subject</span>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+            <select
+              value={category}
+              onChange={(e) =>
+                setCategory(e.target.value as (typeof SUBJECT_CATEGORIES)[number] | '')
+              }
               className={inputClass}
               required
-              minLength={3}
               disabled={loading}
-            />
+            >
+              <option value="">Select a category</option>
+              {SUBJECT_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </label>
+
+          {category === 'Other' && (
+            <label className="block text-sm">
+              <span className="font-medium text-slate-700">Subject details</span>
+              <input
+                type="text"
+                value={subjectDetail}
+                onChange={(e) => setSubjectDetail(e.target.value)}
+                className={inputClass}
+                required
+                minLength={3}
+                disabled={loading}
+              />
+            </label>
+          )}
+
+          {category === 'Privacy request' && (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+              Do not include passwords, payment credentials or identity-document numbers in this form.
+            </p>
+          )}
 
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Message</span>

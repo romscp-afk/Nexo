@@ -28,6 +28,8 @@ const config: CapacitorConfig = {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
     scheme: 'Nexo',
+    // Keep the WebView in mobile layout (avoids desktop CSS on iPad).
+    limitsNavigationsToAppBoundDomains: true,
   },
   android: {
     allowMixedContent: false,

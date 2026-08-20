@@ -1,6 +1,8 @@
 # Nexo mobile apps (iOS & Android)
 
-Nexo ships as a **Capacitor** app: the same React web app is packaged into native iOS and Android shells for App Store and Google Play.
+Nexo ships as a **Capacitor** app: the same React web app (all website features) is packaged into native iOS and Android shells for App Store and Google Play.
+
+In the native shell the UI is forced into a **mobile app chrome** (hamburger / bottom tabs, no desktop website nav or marketing footer) so it does not feel like a desktop PWA — while booking, auth, PayNow, dashboards, and chat stay the same as the website.
 
 | Item | Value |
 |------|--------|

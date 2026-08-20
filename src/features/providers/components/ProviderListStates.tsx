@@ -21,7 +21,7 @@ function CleanerCardSkeleton() {
 
 export function ProviderListSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2" role="status" aria-label="Loading cleaners">
+    <div className="grid gap-4 lg:grid-cols-2" role="status" aria-label="Loading cleaning service providers">
       {Array.from({ length: count }).map((_, i) => (
         <CleanerCardSkeleton key={i} />
       ))}
@@ -45,7 +45,9 @@ export function ProviderListState({ variant, onClearFilters, onRetry }: Provider
         role="alert"
       >
         <AlertCircle className="mx-auto h-8 w-8 text-red-500" aria-hidden />
-        <h2 className="mt-4 text-lg font-semibold text-slate-900">We couldn&apos;t load cleaners.</h2>
+        <h2 className="mt-4 text-lg font-semibold text-slate-900">
+          We couldn&apos;t load cleaning service providers.
+        </h2>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {onRetry && (
             <button
@@ -61,7 +63,7 @@ export function ProviderListState({ variant, onClearFilters, onRetry }: Provider
             to={requestPath}
             className="rounded-lg border border-nexo-200 bg-white px-4 py-2.5 text-sm font-medium text-nexo-700 hover:bg-nexo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nexo-600"
           >
-            Request a cleaner
+            Request cleaning
           </Link>
         </div>
       </div>
@@ -72,24 +74,24 @@ export function ProviderListState({ variant, onClearFilters, onRetry }: Provider
     return (
       <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center">
         <h2 className="text-lg font-semibold text-slate-900">
-          We&apos;re onboarding cleaners in your area.
+          We&apos;re onboarding cleaning service providers in your area.
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
           Tell us your cleaning requirements and Nexo will help you find an available cleaning
-          professional.
+          service provider.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             to={requestPath}
             className="rounded-lg bg-nexo-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nexo-600"
           >
-            Request a cleaner
+            Request cleaning
           </Link>
           <Link
             to="/register?role=provider"
             className="rounded-lg px-4 py-2.5 text-sm font-medium text-nexo-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nexo-600"
           >
-            Join as a cleaning professional
+            Join as a Service Provider
           </Link>
         </div>
       </div>
@@ -98,7 +100,9 @@ export function ProviderListState({ variant, onClearFilters, onRetry }: Provider
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center">
-      <h2 className="text-lg font-semibold text-slate-900">No cleaners match your filters.</h2>
+      <h2 className="text-lg font-semibold text-slate-900">
+        No cleaning service providers match your filters.
+      </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
         Try changing the area, rating or price range.
       </p>
@@ -119,7 +123,7 @@ export function ProviderListState({ variant, onClearFilters, onRetry }: Provider
           to={requestPath}
           className="rounded-lg bg-nexo-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-nexo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nexo-600"
         >
-          Request a cleaner
+          Request cleaning
         </Link>
       </div>
     </div>

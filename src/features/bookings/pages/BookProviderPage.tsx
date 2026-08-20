@@ -17,6 +17,7 @@ import { StickyFormAction } from '@/shared/components/layout/StickyFormAction'
 import { isCategoryLaunched, PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
 import { getCleaningHourlyRateForDuration } from '@/shared/lib/cleaningContent'
 import type { BookingPaymentMethod } from '@/shared/types/booking'
+import { recordBookingCompletedForPwa } from '@/shared/lib/pwaEngagement'
 
 export function BookProviderPage() {
   const { id = '' } = useParams()
@@ -155,6 +156,7 @@ export function BookProviderPage() {
           // Photos optional — booking still created
         }
       }
+      recordBookingCompletedForPwa()
       navigate(`/dashboard/bookings/${booking.id}?pay=1`)
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Booking failed')

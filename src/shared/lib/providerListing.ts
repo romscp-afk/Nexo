@@ -3,8 +3,8 @@ import type { ProviderListing } from '@/shared/types/catalog'
 export type ProviderListingType = 'individual' | 'company'
 
 export const PROVIDER_LISTING_TYPE_LABELS: Record<ProviderListingType, string> = {
-  individual: 'Individual',
-  company: 'Company',
+  individual: 'Individual Service Provider',
+  company: 'Cleaning Company',
 }
 
 export function isPublicProviderListing(

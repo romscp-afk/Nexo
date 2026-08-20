@@ -13,6 +13,7 @@ import {
   PRIMARY_CATEGORY_SLUG,
 } from '@/shared/lib/catalogConfig'
 import { trackEvent } from '@/shared/lib/analytics'
+import { PAGE_META, usePageMeta } from '@/shared/lib/pageMeta'
 
 function ProviderFiltersBar({
   area,
@@ -110,6 +111,7 @@ function ProviderFiltersBar({
 }
 
 export function ProvidersPage() {
+  usePageMeta(PAGE_META.findCleaner)
   const { slug: routeCategorySlug } = useParams<{ slug?: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()

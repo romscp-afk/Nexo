@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'Nexo — Home Services',
         short_name: 'Nexo',
-        description: 'Book trusted home cleaning in Singapore. Verified cleaners, PayNow or cash.',
+        description: 'Book trusted home cleaning in Singapore. Clear pricing. PayNow or cash.',
         theme_color: '#2563eb',
         background_color: '#f8fafc',
         display: 'standalone',

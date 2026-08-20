@@ -23,7 +23,7 @@ const footerSections = [
     links: [
       { label: 'How It Works', to: '/how-it-works' },
       { label: 'Support', to: '/support' },
-      { label: 'Become a Provider', to: '/register?role=provider' },
+      { label: 'Join as a Service Provider', to: '/register?role=provider' },
     ],
   },
   {

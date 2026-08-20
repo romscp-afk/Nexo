@@ -5,8 +5,10 @@ import { HomeHowItWorks, HomeCta } from '@/features/home/components/HomeSections
 import { HomeFeaturedProviders } from '@/features/home/components/HomeFeaturedProviders'
 import { HomePricing } from '@/features/home/components/HomePricing'
 import { HomeReviews } from '@/features/home/components/HomeReviews'
+import { PAGE_META, usePageMeta } from '@/shared/lib/pageMeta'
 
 export function HomePage() {
+  usePageMeta(PAGE_META.home)
   return (
     <div className="overflow-x-hidden bg-brand-bg">
       <HomeHero />

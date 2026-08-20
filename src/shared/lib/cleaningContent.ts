@@ -119,9 +119,8 @@ export const CLEANING_SERVICE_CONTENT = {
   bookingProcess: BOOKING_CONFIRMATION,
   serviceAreas:
     'We are onboarding cleaners across Singapore. Availability varies by area — use Find a Cleaner to see who serves your location.',
-  // TODO(business): provide approved cancellation policy text
   cancellation:
-    'Cancellation terms depend on booking status and timing. Full policy requires business approval.',
+    'See the Cancellation and Rescheduling Policy for timing-based rules, refunds and rescheduling.',
   faqs: [
     {
       q: 'When is my booking confirmed?',

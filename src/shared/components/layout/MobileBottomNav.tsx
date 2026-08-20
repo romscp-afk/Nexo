@@ -43,18 +43,24 @@ type MobileBottomNavProps = {
   unreadMessages?: number
   moreBadge?: number
   onMoreClick?: () => void
+  /** When true (Capacitor), keep the tab bar on wide screens too */
+  forceVisible?: boolean
 }
 
 export function MobileBottomNav({
   unreadMessages = 0,
   moreBadge = 0,
   onMoreClick,
+  forceVisible = false,
 }: MobileBottomNavProps) {
   const { pathname } = useLocation()
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-brand-surface shadow-[0_-4px_24px_rgba(7,21,58,0.08)] md:hidden"
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-brand-surface shadow-[0_-4px_24px_rgba(7,21,58,0.08)]',
+        !forceVisible && 'md:hidden',
+      )}
       aria-label="Main navigation"
     >
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]">

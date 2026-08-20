@@ -10,8 +10,10 @@ import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
+import { InstallNexoMenuItem } from '@/shared/components/layout/InstallNexoMenuItem'
 import { Portal } from '@/shared/components/layout/Portal'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
+import { isNativeApp } from '@/shared/lib/nativeApp'
 
 type BadgeKind = 'notifications' | 'messages'
 
@@ -95,6 +97,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const { data: unreadChat = 0 } = useUnreadChatCount(
     role === 'customer' || role === 'provider' ? role : 'customer',
   )
+  const native = isNativeApp()
 
   useChatRealtimeSync(role === 'customer' || role === 'provider')
 
@@ -117,39 +120,44 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   })()
 
   return (
-    <div className="flex min-h-screen bg-brand-bg">
-      <aside className="hidden w-60 shrink-0 border-r border-brand-border bg-brand-surface md:block">
-        <div className="flex h-16 items-center border-b border-brand-border px-4">
-          <Logo to="/" size="sm" />
-        </div>
-        <nav className="space-y-1 p-3" aria-label="Dashboard">
-          {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              item={item}
-              isActive={isActive(item)}
-              badgeCount={badgeForItem(item)}
-            />
-          ))}
-          {role === 'customer' && (
-            <div className="mt-4 px-1">
-              <CleaningRequestLink className="flex min-h-10 w-full items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white transition hover:bg-brand-primary-hover">
-                Request Cleaning
-              </CleaningRequestLink>
-            </div>
-          )}
-          <Link to="/" className="mt-4 block px-3 text-xs text-brand-text-muted hover:text-brand-primary">
-            ← Back to site
-          </Link>
-          <div className="mt-2 border-t border-brand-border pt-2">
-            <LogoutButton variant="sidebar" />
+    <div className="flex min-h-dvh bg-brand-bg">
+      {!native && (
+        <aside className="hidden w-60 shrink-0 border-r border-brand-border bg-brand-surface md:block">
+          <div className="flex h-16 items-center border-b border-brand-border px-4">
+            <Logo to="/" size="sm" />
           </div>
-        </nav>
-      </aside>
+          <nav className="space-y-1 p-3" aria-label="Dashboard">
+            {nav.map((item) => (
+              <NavLink
+                key={item.to}
+                item={item}
+                isActive={isActive(item)}
+                badgeCount={badgeForItem(item)}
+              />
+            ))}
+            {role === 'customer' && (
+              <div className="mt-4 px-1">
+                <CleaningRequestLink className="flex min-h-10 w-full items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white transition hover:bg-brand-primary-hover">
+                  Request Cleaning
+                </CleaningRequestLink>
+              </div>
+            )}
+            <Link to="/" className="mt-4 block px-3 text-xs text-brand-text-muted hover:text-brand-primary">
+              ← Back to site
+            </Link>
+            <div className="mt-2 px-1">
+              <InstallNexoMenuItem className="rounded-lg px-3 py-2.5 text-sm" />
+            </div>
+            <div className="mt-2 border-t border-brand-border pt-2">
+              <LogoutButton variant="sidebar" />
+            </div>
+          </nav>
+        </aside>
+      )}
 
       {sidebarOpen && (
         <Portal>
-          <div className="fixed inset-0 z-40 md:hidden">
+          <div className={cn('fixed inset-0 z-40', !native && 'md:hidden')}>
             <div className="absolute inset-0 bg-brand-navy/40" onClick={() => setSidebarOpen(false)} />
             <aside className="absolute left-0 top-0 h-full w-64 bg-brand-surface shadow-card-hover">
               <div className="flex h-16 items-center justify-between border-b border-brand-border px-4 pt-[env(safe-area-inset-top)]">
@@ -169,6 +177,10 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
                   />
                 ))}
                 <div className="mt-4 border-t border-brand-border pt-2">
+                  <InstallNexoMenuItem
+                    className="rounded-lg px-3 py-2.5 text-sm"
+                    onAfterClick={() => setSidebarOpen(false)}
+                  />
                   <LogoutButton variant="sidebar" onLogout={() => setSidebarOpen(false)} />
                 </div>
               </nav>
@@ -178,30 +190,39 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center gap-3 border-b border-brand-border bg-brand-surface px-4 pt-[env(safe-area-inset-top)]">
-          {(role === 'provider' || role === 'admin') && (
-            <button className="min-h-11 min-w-11 md:hidden" onClick={toggleSidebar} aria-label="Open menu">
+        <header className="flex h-14 items-center gap-3 border-b border-brand-border bg-brand-surface px-4 pt-[env(safe-area-inset-top)] sm:h-16">
+          {(role === 'provider' || role === 'admin' || (native && role === 'customer')) && (
+            <button
+              className={cn('min-h-11 min-w-11', !native && 'md:hidden')}
+              onClick={toggleSidebar}
+              aria-label="Open menu"
+            >
               <Menu className="h-5 w-5 text-brand-text-secondary" />
             </button>
           )}
           <span className="text-sm font-semibold text-brand-text">{mobileTitle}</span>
-          <div className="ml-auto">
-            <LogoutButton className="hidden md:inline-flex" />
-          </div>
+          {!native && (
+            <div className="ml-auto">
+              <LogoutButton className="hidden md:inline-flex" />
+            </div>
+          )}
         </header>
         <main
           className={cn(
             'flex flex-1 flex-col p-4 sm:p-6',
-            role === 'customer' && 'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
+            role === 'customer' && 'pb-[calc(5rem+env(safe-area-inset-bottom))]',
+            !native && role === 'customer' && 'md:pb-6',
           )}
         >
           <div className="mx-auto w-full max-w-5xl flex-1">
             <Outlet />
           </div>
-          <SiteFooter compact className={cn('mt-8', role === 'customer' && 'hidden md:block')} />
+          {!native && (
+            <SiteFooter compact className={cn('mt-8', role === 'customer' && 'hidden md:block')} />
+          )}
         </main>
       </div>
-      {role === 'customer' && <CustomerMobileNav />}
+      {role === 'customer' && <CustomerMobileNav forceVisible={native} />}
     </div>
   )
 }

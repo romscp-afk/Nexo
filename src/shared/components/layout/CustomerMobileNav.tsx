@@ -4,8 +4,12 @@ import { MobileMoreSheet } from '@/shared/components/layout/MobileMoreSheet'
 import { useUnreadNotificationCount } from '@/features/customer/hooks/useNotifications'
 import { useUnreadChatCount } from '@/features/bookings/hooks/useBookingChat'
 
-/** Bottom tab bar + More sheet for logged-in customers on mobile/PWA. */
-export function CustomerMobileNav() {
+type CustomerMobileNavProps = {
+  forceVisible?: boolean
+}
+
+/** Bottom tab bar + More sheet for logged-in customers on mobile / native app. */
+export function CustomerMobileNav({ forceVisible = false }: CustomerMobileNavProps) {
   const [moreOpen, setMoreOpen] = useState(false)
   const unreadNotifications = useUnreadNotificationCount()
   const { data: unreadChat = 0 } = useUnreadChatCount('customer')
@@ -16,6 +20,7 @@ export function CustomerMobileNav() {
         unreadMessages={unreadChat}
         moreBadge={unreadNotifications}
         onMoreClick={() => setMoreOpen(true)}
+        forceVisible={forceVisible}
       />
       <MobileMoreSheet
         open={moreOpen}

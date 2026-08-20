@@ -3,12 +3,20 @@ import { App } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { SplashScreen } from '@capacitor/splash-screen'
 
+/** True when running inside the iOS/Android Capacitor shell. */
+export function isNativeApp() {
+  return Capacitor.isNativePlatform()
+}
+
 /** Native shell bootstrap — no-ops on web. */
 export async function initNativeApp() {
-  if (!Capacitor.isNativePlatform()) return
+  if (!isNativeApp()) return
 
-  document.documentElement.classList.add('native-app')
-  document.documentElement.dataset.platform = Capacitor.getPlatform()
+  const root = document.documentElement
+  root.classList.add('native-app')
+  root.dataset.platform = Capacitor.getPlatform()
+  // Keep mobile layout even on wide iPad / landscape simulators.
+  root.classList.add('native-mobile-shell')
 
   try {
     await StatusBar.setStyle({ style: Style.Light })
@@ -32,8 +40,4 @@ export async function initNativeApp() {
       void App.exitApp()
     }
   })
-}
-
-export function isNativeApp() {
-  return Capacitor.isNativePlatform()
 }

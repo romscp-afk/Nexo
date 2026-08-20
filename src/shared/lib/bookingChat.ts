@@ -68,7 +68,7 @@ export function getBookingChatAccess(input: {
       state: 'locked',
       reason:
         booking.paymentMethod === 'cash'
-          ? 'Chat opens after the provider pays the platform fee and contact details are shared.'
+          ? 'Chat opens after the provider pays the service fee and contact details are shared.'
           : 'Chat opens after your PayNow payment is confirmed.',
     }
   }
