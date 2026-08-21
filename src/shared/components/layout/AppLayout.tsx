@@ -16,7 +16,8 @@ import { isNativeApp } from '@/shared/lib/nativeApp'
 const NAV_LINKS = [
   { to: `/services/${PRIMARY_CATEGORY_SLUG}`, label: 'Services' },
   { to: '/how-it-works', label: 'How It Works' },
-  { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Cleaners' },
+  // Cleaners directory hidden until enough providers are live.
+  // { to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`, label: 'Cleaners' },
   { to: '/services/cleaning/request', label: 'Pricing' },
   { to: '/support', label: 'Help' },
 ] as const
