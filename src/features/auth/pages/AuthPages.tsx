@@ -8,6 +8,7 @@ import {
   DEMO_ADMIN_EMAIL,
   DEMO_ADMIN_PASSWORD,
   isAdminEmail,
+  SINGAPORE_AREAS,
 } from '@/shared/lib/constants'
 import { env } from '@/shared/lib/env'
 import { isDatabaseReady, getSqlEditorUrl } from '@/shared/lib/setupStatus'
@@ -363,7 +364,9 @@ export function RegisterPage() {
       if (yearsExperience === '' || Number.isNaN(Number(yearsExperience)) || Number(yearsExperience) < 0) {
         next.yearsExperience = 'Enter your years of experience.'
       }
-      if (serviceAreas.length === 0) next.serviceAreas = 'Select at least one service area.'
+      if (listingType === 'individual' && serviceAreas.length === 0) {
+        next.serviceAreas = 'Select at least one service area.'
+      }
       if (!workAuth) {
         next.workAuth =
           'Confirm that you are legally permitted to provide services in Singapore.'
@@ -424,7 +427,12 @@ export function RegisterPage() {
       bio: role === 'provider' ? bio : undefined,
       yearsExperience: role === 'provider' ? Number(yearsExperience) || 0 : undefined,
       hourlyRate: role === 'provider' ? STANDARD_PROVIDER_RATE : undefined,
-      serviceAreas: role === 'provider' ? serviceAreas : undefined,
+      serviceAreas:
+        role === 'provider'
+          ? listingType === 'company'
+            ? [...SINGAPORE_AREAS]
+            : serviceAreas
+          : undefined,
     })
     setLoading(false)
     if (err) {
@@ -661,7 +669,12 @@ export function RegisterPage() {
                       checked={listingType === type}
                       onChange={() => {
                         setListingType(type)
-                        setFieldErrors((p) => ({ ...p, listingType: undefined }))
+                        setFieldErrors((p) => ({
+                          ...p,
+                          listingType: undefined,
+                          serviceAreas: undefined,
+                          businessName: undefined,
+                        }))
                       }}
                       disabled={formLocked}
                       className="mt-1"
@@ -772,15 +785,25 @@ export function RegisterPage() {
               <h2 id="service-areas-heading" className="text-base font-semibold text-slate-900">
                 4. Service areas
               </h2>
-              <ServiceAreaPicker
-                selected={serviceAreas}
-                onChange={(areas) => {
-                  setServiceAreas(areas)
-                  setFieldErrors((p) => ({ ...p, serviceAreas: undefined }))
-                }}
-                disabled={formLocked}
-                error={fieldErrors.serviceAreas}
-              />
+              {listingType === 'individual' ? (
+                <ServiceAreaPicker
+                  selected={serviceAreas}
+                  onChange={(areas) => {
+                    setServiceAreas(areas)
+                    setFieldErrors((p) => ({ ...p, serviceAreas: undefined }))
+                  }}
+                  disabled={formLocked}
+                  error={fieldErrors.serviceAreas}
+                />
+              ) : (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
+                  <p className="font-medium text-slate-900">All regions</p>
+                  <p className="mt-1">
+                    Cleaning company accounts cover all Singapore service areas by default. You do
+                    not need to select individual areas during registration.
+                  </p>
+                </div>
+              )}
             </section>
 
             <section aria-labelledby="rate-heading" className="space-y-3">
