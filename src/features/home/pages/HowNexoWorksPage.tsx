@@ -40,7 +40,12 @@ export function HowNexoWorksPage() {
             key={step}
             className="rounded-2xl border border-nexo-200 bg-white p-8"
           >
-            <span className="text-4xl font-black text-nexo-200">{step}</span>
+            <span
+              aria-hidden
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-nexo-700 text-base font-bold tracking-wide text-white shadow-sm"
+            >
+              {step}
+            </span>
             <h2 className="mt-4 text-xl font-bold text-nexo-900">{title}</h2>
             <p className="mt-2 text-sm leading-relaxed text-nexo-800/70">{description}</p>
           </div>

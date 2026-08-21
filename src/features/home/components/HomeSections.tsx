@@ -86,14 +86,19 @@ export function HomeHowItWorks() {
         <div className="relative mt-14 grid gap-6 md:grid-cols-3">
           <div
             aria-hidden
-            className="absolute left-[16.67%] right-[16.67%] top-12 hidden h-px bg-brand-border md:block"
+            className="absolute left-[16.67%] right-[16.67%] top-14 hidden h-px bg-brand-border md:block"
           />
           {steps.map(({ step, title, description }) => (
             <div
               key={step}
               className="relative rounded-card-lg border border-brand-border bg-brand-bg p-8 transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
-              <span className="text-4xl font-black text-brand-pale">{step}</span>
+              <span
+                aria-hidden
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary text-base font-bold tracking-wide text-white shadow-sm"
+              >
+                {step}
+              </span>
               <h3 className="mt-4 text-xl font-bold text-brand-text">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-brand-text-secondary">{description}</p>
             </div>
