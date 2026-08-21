@@ -55,16 +55,16 @@ export function HomeHero() {
               Trusted home-cleaning services in Singapore. Book in minutes. Relax always.
             </p>
 
-            <ul className="mt-8 flex flex-wrap gap-5 sm:mt-10 sm:gap-8">
+            <ul className="mt-8 grid grid-cols-3 gap-3 sm:mt-10 sm:gap-6 lg:max-w-md lg:gap-8">
               {trustItems.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex flex-col items-center gap-2 text-center sm:items-start sm:text-left"
+                  className="flex flex-col items-center gap-2.5 text-center sm:gap-3"
                 >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-brand-primary/20 bg-brand-light text-brand-primary">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-primary/25 bg-brand-light text-brand-primary shadow-sm sm:h-16 sm:w-16 lg:h-[4.5rem] lg:w-[4.5rem]">
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8" strokeWidth={2} />
                   </span>
-                  <span className="max-w-[8rem] text-xs font-medium leading-snug text-brand-text-secondary">
+                  <span className="max-w-[6.5rem] text-[0.8125rem] font-semibold leading-snug text-brand-navy sm:max-w-[8rem] sm:text-sm lg:max-w-[9rem] lg:text-[0.9375rem]">
                     {label}
                   </span>
                 </li>

@@ -34,14 +34,16 @@ export function HomeTrustBar() {
         {items.map(({ icon: Icon, title, description }) => (
           <div
             key={title}
-            className="flex flex-col gap-3 bg-brand-surface px-5 py-8 sm:px-6"
+            className="flex flex-col items-center gap-4 bg-brand-surface px-5 py-10 text-center sm:px-6 sm:py-12"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-light">
-              <Icon className="h-5 w-5 text-brand-primary" strokeWidth={1.75} />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-light sm:h-[4.5rem] sm:w-[4.5rem]">
+              <Icon className="h-7 w-7 text-brand-primary sm:h-8 sm:w-8" strokeWidth={1.75} />
             </div>
-            <div>
-              <p className="font-semibold text-brand-text">{title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-brand-text-secondary">{description}</p>
+            <div className="max-w-[16rem]">
+              <p className="text-base font-semibold text-brand-text sm:text-lg">{title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-brand-text-secondary sm:text-[0.9375rem]">
+                {description}
+              </p>
             </div>
           </div>
         ))}
