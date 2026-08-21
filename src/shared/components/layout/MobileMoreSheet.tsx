@@ -101,7 +101,7 @@ export function MobileMoreSheet({ open, onClose, unreadNotifications = 0 }: Mobi
           <SheetLink
             to="/dashboard/saved-providers"
             icon={Bookmark}
-            label="Saved providers"
+            label="Saved service providers"
             onNavigate={onClose}
           />
 

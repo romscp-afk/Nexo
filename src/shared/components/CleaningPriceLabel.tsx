@@ -18,7 +18,7 @@ export function CleaningPriceLabel({
 
   return (
     <span className={className}>
-      {pricing.variesByCleaner ? 'Rates vary by cleaner' : pricing.headline}
+      {pricing.variesByCleaner ? 'Rates vary by service provider' : pricing.headline}
       {showDetail && (
         <span className="mt-0.5 block text-xs font-normal opacity-80">
           {pricing.detail}
@@ -35,7 +35,7 @@ export function CleaningPriceInline({ className }: { className?: string }) {
     <p className={className}>
       {pricing.variesByCleaner ? (
         <>
-          <span className="font-medium">Rates vary by cleaner</span>
+          <span className="font-medium">Rates vary by service provider</span>
           <span className="block text-xs opacity-80">
             Hourly · {pricing.minDurationHours} hr minimum
           </span>

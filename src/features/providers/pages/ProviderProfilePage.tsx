@@ -170,7 +170,7 @@ export function ProviderProfilePage() {
         businessName:
           listingType === 'company'
             ? businessName.trim()
-            : businessName.trim() || profile?.fullName || provider?.businessName || 'Individual cleaner',
+            : businessName.trim() || profile?.fullName || provider?.businessName || 'Individual service provider',
         listingType,
         bio,
         yearsExperience: Number(yearsExperience) || 0,
@@ -264,8 +264,8 @@ export function ProviderProfilePage() {
             <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
               <h2 className="font-semibold text-slate-900">Listing type</h2>
               <p className="text-sm text-slate-500">
-                Only <strong>company</strong> listings appear on the public Find a Cleaner page.
-                Individual cleaners can still receive bookings but their personal name stays hidden
+                Only <strong>company</strong> listings appear on the public Find a Service Provider page.
+                Individual service providers can still receive bookings but their personal name stays hidden
                 from the public site.
               </p>
 
@@ -316,7 +316,7 @@ export function ProviderProfilePage() {
                 </span>
                 {listingType === 'company' && (
                   <span className="mt-0.5 block text-xs text-slate-500">
-                    Shown to customers on Find a Cleaner
+                    Shown to customers on Find a Service Provider
                   </span>
                 )}
                 <input
@@ -387,7 +387,7 @@ export function ProviderProfilePage() {
               <div>
                 <h2 className="font-semibold text-slate-900">Services & pricing</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Cleaners use hourly rates. Aircon services use per-unit tier pricing (1 unit, 2 units, etc.).
+                  Service providers use hourly rates. Aircon services use per-unit tier pricing (1 unit, 2 units, etc.).
                 </p>
               </div>
 

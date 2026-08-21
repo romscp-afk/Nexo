@@ -8,14 +8,14 @@ export function SavedProvidersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Saved providers</h1>
-      <p className="mt-1 text-slate-600">Your favourite service professionals for quick rebooking.</p>
+      <h1 className="text-2xl font-bold text-slate-900">Saved service providers</h1>
+      <p className="mt-1 text-slate-600">Your favourite service providers for quick rebooking.</p>
 
       <QueryState
         loading={isLoading}
         error={error}
         empty={!providers?.length}
-        emptyMessage="No saved providers yet. Tap the heart on a provider profile to save them."
+        emptyMessage="No saved service providers yet. Tap the heart on a service provider profile to save them."
       >
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {providers?.map((provider) => (
@@ -29,7 +29,7 @@ export function SavedProvidersPage() {
           to="/providers/category/cleaning"
           className="mt-4 inline-block text-sm font-medium text-nexo-700 hover:underline"
         >
-          Browse providers →
+          Browse service providers →
         </Link>
       )}
     </div>

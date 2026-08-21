@@ -49,7 +49,7 @@ export function HomePricing() {
               <dd className="font-medium text-brand-text">{formatCurrency(CLEANING_EXTRA_HOUR_RATE_SGD)}/hour</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-brand-text-secondary">Cleaner-provided supplies</dt>
+              <dt className="text-brand-text-secondary">Service provider–provided supplies</dt>
               <dd className="font-medium text-brand-text">
                 <Link to="/support?subject=Other" className="text-brand-primary hover:underline">
                   Contact us

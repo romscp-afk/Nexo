@@ -22,7 +22,7 @@ export function HomeReviews() {
             to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
             className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-brand-primary transition hover:text-brand-primary-hover"
           >
-            Browse cleaners
+            Browse service providers
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

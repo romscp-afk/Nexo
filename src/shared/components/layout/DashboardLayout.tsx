@@ -24,7 +24,7 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { to: '/dashboard', label: 'Home', exact: true },
     { to: '/dashboard/bookings', label: 'Bookings' },
     { to: '/dashboard/messages', label: 'Messages', badge: 'messages' },
-    { to: '/dashboard/saved-providers', label: 'Saved cleaners' },
+    { to: '/dashboard/saved-providers', label: 'Saved service providers' },
     { to: '/dashboard/reviews', label: 'Reviews' },
     { to: '/dashboard/notifications', label: 'Notifications', badge: 'notifications' },
     { to: '/dashboard/profile', label: 'Profile' },

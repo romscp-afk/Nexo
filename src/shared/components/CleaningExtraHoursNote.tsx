@@ -9,7 +9,7 @@ export function CleaningExtraHoursNote({ className }: Props) {
   return (
     <p className={className ?? 'text-xs text-slate-500'}>
       Extra hours beyond your booked duration are charged at{' '}
-      {formatCurrency(CLEANING_EXTRA_HOUR_RATE_SGD)}/hr (if agreed with the cleaner on site).
+      {formatCurrency(CLEANING_EXTRA_HOUR_RATE_SGD)}/hr (if agreed with the service provider on site).
     </p>
   )
 }

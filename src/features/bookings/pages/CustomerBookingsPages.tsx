@@ -183,7 +183,7 @@ export function CustomerDashboardPage() {
             <p className="text-sm text-slate-600">
               {showingAllAreas
                 ? `No providers in ${user?.preferredArea} yet — showing all available providers.`
-                : 'Browse verified professionals and book a service.'}
+                : 'Browse verified service providers and book a service.'}
             </p>
           </div>
           <Link
@@ -204,7 +204,7 @@ export function CustomerDashboardPage() {
           emptyMessage={
             user?.preferredArea
               ? `No providers in ${user.preferredArea} yet. Try All areas on the providers page.`
-              : 'No cleaners listed yet. Check back soon or browse all providers.'
+              : 'No service providers listed yet. Check back soon or browse all providers.'
           }
         >
           <div className="grid gap-4 lg:grid-cols-2">

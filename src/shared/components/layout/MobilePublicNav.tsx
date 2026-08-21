@@ -77,9 +77,9 @@ export function MobilePublicNav({ alwaysVisible = false }: MobilePublicNavProps)
                 <Link to={`/services/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
                   Cleaning Services
                 </Link>
-                {/* Cleaners directory hidden until enough providers are live.
+                {/* Service Providers directory hidden until enough providers are live.
                 <Link to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`} className={linkClass} onClick={close}>
-                  Cleaners
+                  Service Providers
                 </Link>
                 */}
                 <Link to="/how-it-works" className={linkClass} onClick={close}>

@@ -17,9 +17,9 @@ export function HomeFeaturedProviders() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <SectionHeading
-            eyebrow="Featured cleaners"
-            title="Trusted professionals near you"
-            description="Browse verified home-cleaning providers available on Nexo."
+            eyebrow="Featured service providers"
+            title="Trusted service providers near you"
+            description="Browse verified home-cleaning service providers available on Nexo."
           />
           <Link
             to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
@@ -35,7 +35,7 @@ export function HomeFeaturedProviders() {
             loading={isLoading}
             error={error}
             empty={!isLoading && !providers?.length}
-            emptyMessage="No cleaners are listed yet. Check back soon or request a cleaning and we'll match you."
+            emptyMessage="No service providers are listed yet. Check back soon or request a cleaning and we'll match you."
           >
             {isLoading ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -52,8 +52,8 @@ export function HomeFeaturedProviders() {
             ) : (
               <EmptyState
                 icon={<Users className="h-5 w-5" />}
-                title="Cleaners coming soon"
-                description="Request a cleaning and we'll notify available professionals in your area."
+                title="Service providers coming soon"
+                description="Request a cleaning and we'll notify available service providers in your area."
                 action={
                   <Link
                     to="/services/cleaning/request"

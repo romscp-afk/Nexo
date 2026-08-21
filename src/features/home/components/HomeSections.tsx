@@ -66,7 +66,7 @@ const steps = [
   {
     step: '03',
     title: 'Get connected',
-    description: 'An available cleaning professional accepts your request and completes the service.',
+    description: 'An available service provider accepts your request and completes the service.',
   },
 ]
 
@@ -122,7 +122,7 @@ export function HomeCta() {
               to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Browse Cleaners
+              Browse Service Providers
             </Link>
           </div>
         </div>

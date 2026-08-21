@@ -117,7 +117,7 @@ export function CleaningRequestPage() {
     setPropertyType(draft.propertyType)
     setBedrooms(String(draft.bedrooms))
     setBathrooms(String(draft.bathrooms))
-    // Cleaner-provided supplies are offline/contact-only for now.
+    // Service provider–provided supplies are offline/contact-only for now.
     setSupplies('customer')
     const parsedSchedule = parseCleaningScheduledAt(draft.scheduledAt)
     const minDate = minCleaningScheduleDate()
@@ -754,7 +754,7 @@ export function CleaningRequestPage() {
               <aside className="h-fit rounded-xl border border-slate-200 bg-white p-6">
                 <h2 className="font-semibold text-slate-900">Price estimate</h2>
                 <p className="mt-2 text-sm text-slate-600">
-                  Based on catalog rate · final price may vary by cleaner
+                  Based on catalog rate · final price may vary by service provider
                 </p>
                 <div className="mt-3">
                   <CleaningPriceLabel showDetail className="text-sm font-medium text-nexo-800" />
@@ -766,14 +766,14 @@ export function CleaningRequestPage() {
                 <CleaningServicePlansSection compact className="mt-4" />
                 {paymentMethod === 'cash' && (
                   <p className="mt-2 text-xs text-amber-800">
-                    Cash bookings: pay the cleaner in cash when the job is done. No platform fee is charged to you.
+                    Cash bookings: pay the service provider in cash when the job is done. No platform fee is charged to you.
                   </p>
                 )}
                 <Link
                   to={`/providers/category/${PRIMARY_CATEGORY_SLUG}`}
                   className="mt-4 block text-center text-sm font-medium text-nexo-700 hover:underline"
                 >
-                  Or find a specific cleaner
+                  Or find a specific service provider
                 </Link>
               </aside>
             </div>

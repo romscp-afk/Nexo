@@ -245,10 +245,10 @@ export function ProvidersPage() {
         <PageHeader
           backTo={`/services/${PRIMARY_CATEGORY_SLUG}`}
           backLabel="Home cleaning"
-          title={activeCategory ? `${activeCategory.icon ?? ''} ${activeCategory.name}`.trim() : 'Cleaners'}
+          title={activeCategory ? `${activeCategory.icon ?? ''} ${activeCategory.name}`.trim() : 'Service Providers'}
           description={
             activeCategory?.description ??
-            'Browse home cleaning professionals available on Nexo.'
+            'Browse home cleaning service providers available on Nexo.'
           }
         />
 
@@ -306,8 +306,8 @@ export function ProvidersPage() {
   return (
     <div>
       <PageHeader
-        title="Find a cleaner"
-        description="Browse home cleaning professionals available on Nexo."
+        title="Find a service provider"
+        description="Browse home cleaning service providers available on Nexo."
       />
 
       <ProviderFiltersBar

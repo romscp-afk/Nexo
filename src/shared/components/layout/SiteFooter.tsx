@@ -15,7 +15,7 @@ const footerSections = [
     links: [
       { label: 'Home Cleaning', to: `/services/${PRIMARY_CATEGORY_SLUG}` },
       { label: 'Request Cleaning', to: '/services/cleaning/request' },
-      { label: 'Find a Cleaner', to: `/providers/category/${PRIMARY_CATEGORY_SLUG}` },
+      { label: 'Find a Service Provider', to: `/providers/category/${PRIMARY_CATEGORY_SLUG}` },
     ],
   },
   {

@@ -15,7 +15,7 @@ export function ServicesPage() {
     <div>
       <PageHeader
         title="Home cleaning"
-        description="Book trusted cleaners across Singapore."
+        description="Book trusted service providers across Singapore."
       />
 
       <QueryState

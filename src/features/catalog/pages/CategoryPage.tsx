@@ -44,7 +44,7 @@ function CategoryStaticContent({
           to={`/providers/category/${categorySlug}`}
           className="inline-flex min-h-11 items-center rounded-lg border border-nexo-200 px-5 py-2.5 text-sm font-medium text-nexo-700 hover:bg-nexo-50"
         >
-          Find a cleaner
+          Find a service provider
         </Link>
       </div>
 

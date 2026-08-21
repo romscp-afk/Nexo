@@ -21,7 +21,7 @@ import { ServiceAreaPicker } from '@/features/auth/components/ServiceAreaPicker'
 import { cn } from '@/shared/lib/utils'
 
 const ROLE_LABELS = {
-  customer: 'I need a cleaner',
+  customer: 'I need a service provider',
   provider: 'I want to join as a service provider',
 } as const
 

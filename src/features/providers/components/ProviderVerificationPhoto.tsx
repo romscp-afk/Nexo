@@ -54,7 +54,7 @@ export function ProviderVerificationPhoto({
           <h2 className="font-semibold text-slate-900">Profile photo for verification</h2>
           <p className="mt-1 text-sm text-slate-600">
             Upload a clear photo of your face. Nexo admins review this before marking your listing
-            as verified. Customers will see this photo on your cleaner profile.
+            as verified. Customers will see this photo on your service provider profile.
           </p>
 
           {!avatarUrl && (
