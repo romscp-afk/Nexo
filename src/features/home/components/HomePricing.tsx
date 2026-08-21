@@ -1,9 +1,9 @@
 import {
   CLEANING_DURATION_HOURLY_RATES,
   CLEANING_EXTRA_HOUR_RATE_SGD,
-  CLEANING_SUPPLIES_SURCHARGE_SGD,
   MIN_BOOKING_HOURS,
 } from '@/shared/lib/cleaningContent'
+import { Link } from 'react-router-dom'
 import { formatCurrency } from '@/shared/lib/utils'
 import { SectionHeading } from '@/shared/components/ui/SectionHeading'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
@@ -50,7 +50,11 @@ export function HomePricing() {
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-brand-text-secondary">Cleaner-provided supplies</dt>
-              <dd className="font-medium text-brand-text">+{formatCurrency(CLEANING_SUPPLIES_SURCHARGE_SGD)}</dd>
+              <dd className="font-medium text-brand-text">
+                <Link to="/support?subject=Other" className="text-brand-primary hover:underline">
+                  Contact us
+                </Link>
+              </dd>
             </div>
             <div className="flex justify-between gap-4 border-t border-brand-border pt-3">
               <dt className="text-brand-text-secondary">Minimum booking</dt>

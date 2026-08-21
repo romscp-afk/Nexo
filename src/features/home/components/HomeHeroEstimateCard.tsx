@@ -19,27 +19,10 @@ import {
   buildCleaningScheduledAt,
   formatCleaningTimeRange,
   getCleaningStartHours,
+  minCleaningScheduleDate,
 } from '@/shared/lib/cleaningSchedule'
 import { formatCurrency, cn } from '@/shared/lib/utils'
 import { trackEvent } from '@/shared/lib/analytics'
-
-/** Minimum selectable date = tomorrow in Asia/Singapore. */
-function singaporeTomorrowIso(): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Singapore',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(new Date())
-  const y = Number(parts.find((p) => p.type === 'year')?.value)
-  const m = Number(parts.find((p) => p.type === 'month')?.value)
-  const d = Number(parts.find((p) => p.type === 'day')?.value)
-  const tomorrow = new Date(Date.UTC(y, m - 1, d + 1))
-  const yy = tomorrow.getUTCFullYear()
-  const mm = String(tomorrow.getUTCMonth() + 1).padStart(2, '0')
-  const dd = String(tomorrow.getUTCDate()).padStart(2, '0')
-  return `${yy}-${mm}-${dd}`
-}
 
 function BookField({
   icon: Icon,
@@ -129,7 +112,7 @@ export function HomeHeroEstimateCard() {
   const timeRef = useRef<HTMLSelectElement>(null)
   const alertRef = useRef<HTMLDivElement>(null)
 
-  const minDate = singaporeTomorrowIso()
+  const minDate = minCleaningScheduleDate()
   const hourlyRate = getCleaningHourlyRateForDuration(duration)
 
   const breakdown = useMemo(
@@ -149,7 +132,7 @@ export function HomeHeroEstimateCard() {
     if (!date) {
       next.date = 'Select your preferred cleaning date.'
     } else if (date < minDate) {
-      next.date = 'Choose a future date.'
+      next.date = 'Choose a date at least 2 days from today.'
     }
     if (startHour == null) {
       next.startHour = 'Select your preferred start time.'
@@ -274,6 +257,11 @@ export function HomeHeroEstimateCard() {
           {errors.date && (
             <p id="hero-date-error" className="mt-1 px-1 text-xs text-red-600">
               {errors.date}
+            </p>
+          )}
+          {!errors.date && (
+            <p className="mt-1 px-1 text-xs text-brand-text-muted">
+              Earliest date is 2 days from today.
             </p>
           )}
         </div>

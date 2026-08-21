@@ -17,7 +17,7 @@ import { appendCleaningBookingNotes } from '@/shared/lib/bookingNotes'
 import { SINGAPORE_AREAS } from '@/shared/lib/constants'
 import {
   BOOKING_CONFIRMATION,
-  CLEANING_SUPPLIES_SURCHARGE_SGD,
+  CLEANER_SUPPLIES_CONTACT_NOTE,
   CLEANING_TYPES,
   MIN_BOOKING_HOURS,
   PROPERTY_TYPES,
@@ -99,15 +99,9 @@ export function CleaningRequestPage() {
     return buildCleaningScheduledAt(scheduleDate, scheduleStartHour)
   }, [scheduleDate, scheduleStartHour])
 
-  const suppliesSurcharge = supplies === 'cleaner' ? CLEANING_SUPPLIES_SURCHARGE_SGD : 0
-
   const breakdown = useMemo(() => {
     if (!selectedService) return null
     const hourlyRate = getCleaningHourlyRateForDuration(duration)
-    const extraLines =
-      suppliesSurcharge > 0
-        ? [{ label: 'Cleaning supplies (cleaner brings)', amount: suppliesSurcharge }]
-        : undefined
     return buildPriceBreakdown({
       pricingModel: selectedService.pricingModel,
       priceFrom: hourlyRate,
@@ -115,19 +109,21 @@ export function CleaningRequestPage() {
       durationHours: duration,
       quantity: 1,
       unitPrices: {},
-      extraLines,
     })
-  }, [selectedService, duration, suppliesSurcharge])
+  }, [selectedService, duration])
 
   const restoreDraft = useCallback((draft: CleaningRequestDraft) => {
     setCleaningTypeId(draft.cleaningTypeId)
     setPropertyType(draft.propertyType)
     setBedrooms(String(draft.bedrooms))
     setBathrooms(String(draft.bathrooms))
-    setSupplies(draft.supplies)
+    // Cleaner-provided supplies are offline/contact-only for now.
+    setSupplies('customer')
     const parsedSchedule = parseCleaningScheduledAt(draft.scheduledAt)
-    setScheduleDate(parsedSchedule.date)
-    setScheduleStartHour(parsedSchedule.startHour)
+    const minDate = minCleaningScheduleDate()
+    const dateOk = Boolean(parsedSchedule.date && parsedSchedule.date >= minDate)
+    setScheduleDate(dateOk ? parsedSchedule.date : '')
+    setScheduleStartHour(dateOk ? parsedSchedule.startHour : null)
     setDurationHours(
       isCleaningBookingDuration(draft.durationHours)
         ? String(draft.durationHours)
@@ -168,7 +164,7 @@ export function CleaningRequestPage() {
       propertyType,
       bedrooms: Number(bedrooms) || 0,
       bathrooms: Number(bathrooms) || 1,
-      supplies,
+      supplies: 'customer',
       scheduledAt,
       durationHours: duration,
       serviceArea,
@@ -231,6 +227,11 @@ export function CleaningRequestPage() {
     if (s === 3) {
       if (!scheduleDate) {
         setFieldError('Choose a preferred date.')
+        return false
+      }
+      const minDate = minCleaningScheduleDate()
+      if (scheduleDate < minDate) {
+        setFieldError('Choose a date at least 2 days from today. Sooner bookings may include additional charges — contact us.')
         return false
       }
       if (!isCleaningBookingDuration(duration)) {
@@ -306,7 +307,7 @@ export function CleaningRequestPage() {
           propertyType,
           bedrooms: Number(bedrooms) || 0,
           bathrooms: Number(bathrooms) || 1,
-          supplies: supplies === 'customer' ? 'Customer provides' : 'Cleaner brings',
+          supplies: 'Customer provides',
           serviceArea,
           notes: notes || undefined,
         }),
@@ -455,16 +456,16 @@ export function CleaningRequestPage() {
                             onChange={() => setSupplies(opt.value)}
                             className="mt-0.5"
                           />
-                          <span>
-                            {opt.label}
-                            {opt.surcharge > 0 && (
-                              <span className="mt-0.5 block text-xs font-medium text-nexo-700">
-                                +{formatCurrency(opt.surcharge)} added to your estimate
-                              </span>
-                            )}
-                          </span>
+                          <span>{opt.label}</span>
                         </label>
                       ))}
+                      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600">
+                        {CLEANER_SUPPLIES_CONTACT_NOTE}{' '}
+                        <Link to="/support?subject=Other" className="font-medium text-nexo-700 hover:underline">
+                          Contact us
+                        </Link>
+                        .
+                      </p>
                     </fieldset>
                   </div>
                 )}
@@ -518,6 +519,14 @@ export function CleaningRequestPage() {
                         className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5"
                         required
                       />
+                      <span className="mt-1.5 block text-xs text-slate-500">
+                        Bookings start from 2 days ahead. Sooner dates may include additional charges
+                        —{' '}
+                        <Link to="/support?subject=Booking%20request" className="font-medium text-nexo-700 hover:underline">
+                          contact us
+                        </Link>
+                        .
+                      </span>
                     </label>
 
                     {isCleaningBookingDuration(duration) && (
@@ -636,10 +645,7 @@ export function CleaningRequestPage() {
                       <div>
                         <dt className="text-slate-500">Property</dt>
                         <dd className="text-slate-900">
-                          {propertyType} · {bedrooms} bed · {bathrooms} bath ·{' '}
-                          {supplies === 'customer'
-                            ? 'You provide supplies'
-                            : `Cleaner brings supplies (+${formatCurrency(CLEANING_SUPPLIES_SURCHARGE_SGD)})`}
+                          {propertyType} · {bedrooms} bed · {bathrooms} bath · You provide supplies
                         </dd>
                       </div>
                       <div>

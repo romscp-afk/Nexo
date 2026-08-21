@@ -60,11 +60,6 @@ export function parseCleaningScheduledAt(
   }
 }
 
-export function minCleaningScheduleDate(): string {
-  const now = new Date()
-  return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`
-}
-
 export function formatCleaningScheduleSummary(
   scheduledAt: string,
   durationHours: number,
@@ -78,8 +73,30 @@ export function formatCleaningScheduleSummary(
     month: 'short',
     year: 'numeric',
   })
-
   return `${dateLabel} · ${formatCleaningTimeRange(startHour, durationHours)} (${durationHours} hr${
     durationHours === 1 ? '' : 's'
   })`
+}
+
+/** Minimum lead time before a booking date (calendar days after today, Asia/Singapore). */
+export const MIN_BOOKING_LEAD_DAYS = 2
+
+/** Singapore calendar date as YYYY-MM-DD, offset by `days` from today. */
+export function singaporeCalendarDatePlusDays(days: number): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Singapore',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date())
+  const y = Number(parts.find((p) => p.type === 'year')?.value)
+  const m = Number(parts.find((p) => p.type === 'month')?.value)
+  const d = Number(parts.find((p) => p.type === 'day')?.value)
+  const next = new Date(Date.UTC(y, m - 1, d + days))
+  return `${next.getUTCFullYear()}-${pad2(next.getUTCMonth() + 1)}-${pad2(next.getUTCDate())}`
+}
+
+/** Earliest selectable preferred date: today + 2 days in Singapore time. */
+export function minCleaningScheduleDate(): string {
+  return singaporeCalendarDatePlusDays(MIN_BOOKING_LEAD_DAYS)
 }

@@ -88,12 +88,11 @@ export const PROPERTY_TYPES = ['HDB', 'Condo', 'Landed home'] as const
 
 export const SUPPLY_OPTIONS = [
   { value: 'customer', label: 'I will provide cleaning supplies', surcharge: 0 },
-  {
-    value: 'cleaner',
-    label: 'Cleaner brings supplies',
-    surcharge: CLEANING_SUPPLIES_SURCHARGE_SGD,
-  },
 ] as const
+
+/** Cleaner-provided supplies are not bookable online for now — customers should contact support. */
+export const CLEANER_SUPPLIES_CONTACT_NOTE =
+  'Need the cleaner to bring supplies? Contact us — this option is arranged separately and may include additional charges.'
 
 export const CLEANING_SERVICE_CONTENT = {
   overview:
@@ -115,7 +114,7 @@ export const CLEANING_SERVICE_CONTENT = {
     'Hourly rate depends on booking length: $25/hr for 2 hours, $23/hr for 3 hours, $20/hr for 4 hours. Extra hours beyond your booking are $15/hr.',
   minDuration: `${MIN_BOOKING_HOURS} hours minimum per booking`,
   supplies:
-    'You can bring your own supplies at no extra charge, or add a supplies fee for the cleaner to bring them.',
+    'Please provide your own cleaning supplies for online bookings. If you need the cleaner to bring supplies, contact us — this may include additional charges.',
   bookingProcess: BOOKING_CONFIRMATION,
   serviceAreas:
     'We are onboarding cleaners across Singapore. Availability varies by area — use Find a Cleaner to see who serves your location.',
