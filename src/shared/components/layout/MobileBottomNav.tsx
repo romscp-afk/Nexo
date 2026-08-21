@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { CalendarDays, LayoutGrid, Menu, MessageCircle, Search } from 'lucide-react'
 import { PRIMARY_CATEGORY_SLUG } from '@/shared/lib/catalogConfig'
+import { isNativeApp } from '@/shared/lib/nativeApp'
 import { cn } from '@/shared/lib/utils'
 
 type Tab = {
@@ -11,33 +12,38 @@ type Tab = {
   action?: 'more'
 }
 
-const CUSTOMER_TABS: Tab[] = [
-  {
-    to: `/services/${PRIMARY_CATEGORY_SLUG}`,
-    label: 'Home',
-    icon: LayoutGrid,
-    match: (p) => p === '/' || p.startsWith('/services'),
-  },
-  {
-    to: `/providers/category/${PRIMARY_CATEGORY_SLUG}`,
-    label: 'Book',
-    icon: Search,
-    match: (p) => p.startsWith('/providers'),
-  },
-  {
-    to: '/dashboard/bookings',
-    label: 'Bookings',
-    icon: CalendarDays,
-    match: (p) => p.startsWith('/dashboard/bookings'),
-  },
-  {
-    to: '/dashboard/messages',
-    label: 'Messages',
-    icon: MessageCircle,
-    match: (p) => p.startsWith('/dashboard/messages'),
-  },
-  { label: 'More', icon: Menu, action: 'more' },
-]
+function customerTabs(native: boolean): Tab[] {
+  return [
+    {
+      to: native ? '/dashboard' : `/services/${PRIMARY_CATEGORY_SLUG}`,
+      label: 'Home',
+      icon: LayoutGrid,
+      match: (p) =>
+        native
+          ? p === '/dashboard' || p === '/'
+          : p === '/' || p.startsWith('/services'),
+    },
+    {
+      to: '/services/cleaning/request',
+      label: 'Book',
+      icon: Search,
+      match: (p) => p.startsWith('/services/cleaning/request') || p.startsWith('/providers'),
+    },
+    {
+      to: '/dashboard/bookings',
+      label: 'Bookings',
+      icon: CalendarDays,
+      match: (p) => p.startsWith('/dashboard/bookings'),
+    },
+    {
+      to: '/dashboard/messages',
+      label: 'Messages',
+      icon: MessageCircle,
+      match: (p) => p.startsWith('/dashboard/messages'),
+    },
+    { label: 'More', icon: Menu, action: 'more' },
+  ]
+}
 
 type MobileBottomNavProps = {
   unreadMessages?: number
@@ -54,6 +60,7 @@ export function MobileBottomNav({
   forceVisible = false,
 }: MobileBottomNavProps) {
   const { pathname } = useLocation()
+  const tabs = customerTabs(isNativeApp())
 
   return (
     <nav
@@ -64,7 +71,7 @@ export function MobileBottomNav({
       aria-label="Main navigation"
     >
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]">
-        {CUSTOMER_TABS.map(({ to, label, icon: Icon, match, action }) => {
+        {tabs.map(({ to, label, icon: Icon, match, action }) => {
           const active = action === 'more' ? false : match ? match(pathname) : pathname === to
           const messageBadge = label === 'Messages' && unreadMessages > 0
           const moreTabBadge = action === 'more' && moreBadge > 0
