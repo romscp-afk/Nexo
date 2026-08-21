@@ -223,13 +223,35 @@ html.native-app {
 html.native-app body {
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-  /* Phone-width feel even on iPad / landscape simulator */
   max-width: 100vw;
   overflow-x: hidden;
+  /* App background — not a wide marketing page */
+  background: #f8fafc;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html.native-app input,
+html.native-app textarea,
+html.native-app [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 html.native-app #root {
   min-height: 100dvh;
+  max-width: 100vw;
+}
+
+/* Phone app column — never expand like a desktop website */
+html.native-app .max-w-5xl,
+html.native-app .max-w-6xl {
+  max-width: 32rem !important;
+}
+
+html.native-app a,
+html.native-app button {
+  -webkit-touch-callout: none;
 }
 
 /* Stack marketing grids as a single column in the native app */

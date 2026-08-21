@@ -10,6 +10,7 @@ import { LogoutButton } from '@/shared/components/layout/LogoutButton'
 import { Logo } from '@/shared/components/layout/Logo'
 import { SiteFooter } from '@/shared/components/layout/SiteFooter'
 import { CustomerMobileNav } from '@/shared/components/layout/CustomerMobileNav'
+import { ProviderMobileNav } from '@/shared/components/layout/ProviderMobileNav'
 import { InstallNexoMenuItem } from '@/shared/components/layout/InstallNexoMenuItem'
 import { Portal } from '@/shared/components/layout/Portal'
 import { CleaningRequestLink } from '@/shared/components/CleaningPriceLabel'
@@ -190,8 +191,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-brand-border bg-brand-surface px-4 pt-[env(safe-area-inset-top)] sm:h-16">
-          {(role === 'provider' || role === 'admin' || (native && role === 'customer')) && (
+        <header className="flex h-12 items-center gap-3 border-b border-brand-border bg-brand-surface px-4 pt-[env(safe-area-inset-top)] sm:h-16">
+          {((!native && (role === 'provider' || role === 'admin')) || (native && role === 'admin')) && (
             <button
               className={cn('min-h-11 min-w-11', !native && 'md:hidden')}
               onClick={toggleSidebar}
@@ -210,7 +211,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         <main
           className={cn(
             'flex flex-1 flex-col p-4 sm:p-6',
-            role === 'customer' && 'pb-[calc(5rem+env(safe-area-inset-bottom))]',
+            (role === 'customer' || (native && role === 'provider')) &&
+              'pb-[calc(5rem+env(safe-area-inset-bottom))]',
             !native && role === 'customer' && 'md:pb-6',
           )}
         >
@@ -223,6 +225,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </main>
       </div>
       {role === 'customer' && <CustomerMobileNav forceVisible={native} />}
+      {native && role === 'provider' && <ProviderMobileNav />}
     </div>
   )
 }
